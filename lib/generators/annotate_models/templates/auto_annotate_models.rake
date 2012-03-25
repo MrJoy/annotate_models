@@ -17,4 +17,9 @@ if(Rails.env.development?)
     ENV['no_sort']              = "false"
     ENV['force']                = "false"
   end
+
+  Annotate.load_tasks
+  namespace :db do
+    task :migrate => :annotate_models
+  end
 end

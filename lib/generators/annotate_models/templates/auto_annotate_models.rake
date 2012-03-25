@@ -19,7 +19,4 @@ if(Rails.env.development?)
   end
 
   Annotate.load_tasks
-  namespace :db do
-    task :migrate => :annotate_models
-  end
 end

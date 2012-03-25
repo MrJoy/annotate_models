@@ -84,8 +84,13 @@ OptionParser.new do |opts|
 end.parse!
 
 ENV['is_cli'] = '1'
-if Annotate.load_tasks
-  Rake::Task[task].invoke
+
+if File.exists?('Rakefile')
+  require 'rake'
+  load 'Rakefile'
 else
   STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
 end
+
+Annotate.load_tasks
+Rake::Task[task].invoke

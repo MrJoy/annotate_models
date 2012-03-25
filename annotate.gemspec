@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cuong Tran", "Alex Chaffee", "Marcos Piccinini", "Turadg Aleahmad"]
-  s.date = "2012-03-01"
+  s.date = "2012-03-25"
   s.description = "When run, inserts table descriptions from db.schema into a comment block of relevant source code."
-  s.email = ["alex@stinky.com", "ctran@pragmaquest.com", "x@nofxx.com", "turadg@aleahmad.net"]
+  s.email = ["ctran@pragmaquest.com", "alex@stinky.com", "x@nofxx.com", "turadg@aleahmad.net"]
   s.executables = ["annotate_models"]
   s.extra_rdoc_files = [
     "README.rdoc"
@@ -36,15 +36,15 @@ Gem::Specification.new do |s|
     "lib/generators/annotate_models/templates/auto_annotate_models.rake",
     "lib/tasks/annotate_models.rake",
     "lib/tasks/annotate_routes.rake",
+    "lib/tasks/migrate.rake",
     "spec/annotate/annotate_models_spec.rb",
     "spec/annotate/annotate_routes_spec.rb",
     "spec/annotate_spec.rb",
     "spec/spec.opts",
     "spec/spec_helper.rb",
-    "tasks/migrate.rake",
     "todo.txt"
   ]
-  s.homepage = "http://github.com/ctran/annotate_models"
+  s.homepage = "http://github.com/MrJoy/annotate_models"
   s.require_paths = ["lib"]
   s.rubyforge_project = "annotate"
   s.rubygems_version = "1.8.13"

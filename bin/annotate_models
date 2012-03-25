@@ -5,6 +5,14 @@ require 'annotate'
 require 'rake/dsl_definition'
 require 'rake'
 
+Annotate.load_tasks
+if File.exists?('Rakefile')
+  load 'Rakefile'
+else
+  STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
+end
+Rake::Task[:set_annotation_options].invoke
+
 task = :annotate_models
 
 OptionParser.new do |opts|
@@ -17,7 +25,10 @@ OptionParser.new do |opts|
 
   opts.on('-p', '--position [before|after]', ['before', 'after'],
           "Place the annotations at the top (before) or the bottom (after) of the model file") do |p|
-    ENV['position'] = p
+    ENV['position']             = p
+    ENV['position_in_class']    = p
+    ENV['position_in_fixture']  = p
+    ENV['position_in_factory']  = p
   end
 
   opts.on('-r', '--routes',
@@ -83,14 +94,4 @@ OptionParser.new do |opts|
 
 end.parse!
 
-ENV['is_cli'] = '1'
-
-if File.exists?('Rakefile')
-  require 'rake'
-  load 'Rakefile'
-else
-  STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
-end
-
-Annotate.load_tasks
 Rake::Task[task].invoke

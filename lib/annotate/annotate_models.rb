@@ -299,6 +299,9 @@ module AnnotateModels
 
     # Retrieve loaded model class by path to the file where it's supposed to be defined.
     def get_loaded_model(model_path)
+      # TODO: The following is spitting out bunches of deprecation warnings for
+      # TODO: ActionController::DoubleRenderError and
+      # TODO: ActionController::UnknownAction...
       ObjectSpace.each_object.
         select { |c| c.is_a?(Class) && c.ancestors.include?(ActiveRecord::Base) }.
         detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }

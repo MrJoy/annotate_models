@@ -11,15 +11,14 @@ module AnnotateModels
   # I dont use windows, can`t test
   UNIT_TEST_DIR         = File.join("test", "unit"  )
   SPEC_MODEL_DIR        = File.join("spec", "models")
-  FIXTURE_TEST_DIR      = File.join("test", "fixtures")
-  FIXTURE_SPEC_DIR      = File.join("spec", "fixtures")
-  # Object Daddy http://github.com/flogic/object_daddy/tree/master
+  FIXTURE_DIRS          = [File.join("test", "fixtures"), File.join("spec", "fixtures")]
+  # Object Daddy http://github.com/flogic/object_daddy
   EXEMPLARS_TEST_DIR    = File.join("test", "exemplars")
   EXEMPLARS_SPEC_DIR    = File.join("spec", "exemplars")
   # Machinist http://github.com/notahat/machinist
   BLUEPRINTS_TEST_DIR   = File.join("test", "blueprints")
   BLUEPRINTS_SPEC_DIR   = File.join("spec", "blueprints")
-  # Factory Girl http://github.com/thoughtbot/factory_girl
+  # FactoryGirl http://github.com/thoughtbot/factory_girl
   FACTORY_GIRL_TEST_DIR = File.join("test", "factories")
   FACTORY_GIRL_SPEC_DIR = File.join("spec", "factories")
   # Fabrication https://github.com/paulelliott/fabrication.git
@@ -42,14 +41,14 @@ module AnnotateModels
     # Simple quoting for the default column value
     def quote(value)
       case value
-      when NilClass                 then "NULL"
-      when TrueClass                then "TRUE"
-      when FalseClass               then "FALSE"
-      when Float, Fixnum, Bignum    then value.to_s
+        when NilClass                 then "NULL"
+        when TrueClass                then "TRUE"
+        when FalseClass               then "FALSE"
+        when Float, Fixnum, Bignum    then value.to_s
         # BigDecimals need to be output in a non-normalized form and quoted.
-      when BigDecimal               then value.to_s('F')
-      else
-        value.inspect
+        when BigDecimal               then value.to_s('F')
+        else
+          value.inspect
       end
     end
 
@@ -229,19 +228,26 @@ module AnnotateModels
 
       unless options[:exclude_fixtures]
         [
-         File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-         File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-         File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-         File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-         File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-         File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-         File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-         File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-         File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-         File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+        File.join(EXEMPLARS_TEST_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
+        File.join(EXEMPLARS_SPEC_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
+        File.join(BLUEPRINTS_TEST_DIR, "#{model_name}_blueprint.rb"), # Machinist Blueprints
+        File.join(BLUEPRINTS_SPEC_DIR, "#{model_name}_blueprint.rb"), # Machinist Blueprints
+        File.join(FACTORY_GIRL_TEST_DIR, "#{model_name.pluralize}.rb"), # FactoryGirl Factories
+        File.join(FACTORY_GIRL_SPEC_DIR, "#{model_name.pluralize}.rb"), # FactoryGirl Factories
+        File.join(FABRICATORS_TEST_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+        File.join(FABRICATORS_SPEC_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         ].each do |file|
           if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
             annotated = true
+          end
+        end
+
+        FIXTURE_DIRS.each do |dir|
+          fixture_file_name = File.join(dir,klass.table_name + ".yml")
+          if File.exist?(fixture_file_name)
+            if annotate_one_file(fixture_file_name, info, options_with_position(options, :position_in_fixture))
+              annotated = true
+            end
           end
         end
       end
@@ -341,7 +347,10 @@ module AnnotateModels
             end
           end
         rescue Exception => e
-          puts "Unable to annotate #{file}: #{e.message} (#{e.backtrace.first})"
+          puts "Unable to annotate #{file}: #{e.inspect}"
+          puts ""
+# todo: check if all backtrace lines are in "gems" -- if so, it's an annotate bug, so print the whole stack trace.
+#          puts e.backtrace.join("\n\t")
         end
       end
       if annotated.empty?

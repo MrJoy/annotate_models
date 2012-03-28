@@ -11,10 +11,10 @@ Gem::Specification.new do |s|
 
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.extra_rdoc_files = ["README.rdoc"]
-  
+
   s.files             = %w( README.rdoc History.txt todo.txt )
   s.files            += Dir.glob("lib/**/*")
-  s.files            += Dir.glob("tasks/**/*")  
+  s.files            += Dir.glob("tasks/**/*")
   s.files            += ["bin/annotate"]  # todo: annotate_models
 
   s.homepage = %q{http://github.com/ctran/annotate_models}

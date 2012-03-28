@@ -177,7 +177,7 @@ module AnnotateModels
         if old_columns == new_columns && !options[:force]
           false
         else
-          
+
 # todo: figure out if we need to extract any logic from this merge chunk
 # <<<<<<< HEAD
 #           # Replace the old schema info with the new schema info
@@ -264,14 +264,14 @@ module AnnotateModels
 
       unless options[:exclude_factories]
         [
-         File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-         File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-         File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-         File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-         File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-         File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-         File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-         File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+          File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+          File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+          File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+          File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+          File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+          File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+          File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+          File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         ].each do |file|
           if annotate_one_file(file, info, options_with_position(options, :position_in_factory))
             annotated = true
@@ -402,18 +402,18 @@ module AnnotateModels
             remove_annotation_of_file(model_file_name)
 
             [
-             File.join(UNIT_TEST_DIR,          "#{model_name}_test.rb"),
-             File.join(SPEC_MODEL_DIR,         "#{model_name}_spec.rb"),
-             File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-             File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-             File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-             File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-             File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-             File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-             File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-             File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-             File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-             File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+              File.join(UNIT_TEST_DIR,          "#{model_name}_test.rb"),
+              File.join(SPEC_MODEL_DIR,         "#{model_name}_spec.rb"),
+              File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
+              File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+              File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+              File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+              File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+              File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+              File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+              File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+              File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+              File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
             ].each do |file|
               remove_annotation_of_file(file) if File.exist?(file)
             end

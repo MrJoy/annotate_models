@@ -5,6 +5,7 @@ module Annotate
   TRUE_RE = /(true|t|yes|y|1)$/i
   def self.setup_options(options = {})
     options[:position_in_class] = ENV['position_in_class'] || ENV['position'] || 'before'
+    options[:position_in_test] = ENV['position_in_test'] || ENV['position'] || 'before'
     options[:position_in_fixture] = ENV['position_in_fixture'] || ENV['position']  || 'before'
     options[:position_in_factory] = ENV['position_in_factory'] || ENV['position'] || 'before'
     options[:show_indexes] = ENV['show_indexes'] =~ TRUE_RE
@@ -14,6 +15,7 @@ module Annotate
     options[:require] = ENV['require'] ? ENV['require'].split(',') : []
     options[:exclude_tests] = ENV['exclude_tests'] =~ TRUE_RE
     options[:exclude_fixtures] = ENV['exclude_fixtures'] =~ TRUE_RE
+    options[:exclude_factories] = ENV['exclude_factories'] =~ TRUE_RE
     options[:ignore_model_sub_dir] = ENV['ignore_model_sub_dir'] =~ TRUE_RE
     options[:format_rdoc] = ENV['format_rdoc'] =~ TRUE_RE
     options[:format_markdown] = ENV['format_markdown'] =~ TRUE_RE

@@ -153,12 +153,9 @@ module AnnotateModels
     # Returns true or false depending on whether the file was modified.
     #
     # === Options (opts)
+    #  :force<Symbol>:: whether to update the file even if it doesn't seem to need it.
     #  :position<Symbol>:: where to place the annotated section in fixture or model file,
     #                      :before or :after. Default is :before.
-    #  :position_in_class<Symbol>:: where to place the annotated section in model file
-    #  :position_in_fixture<Symbol>:: where to place the annotated section in fixture file
-    #  :position_in_others<Symbol>:: where to place the annotated section in the rest of
-    #                      supported files
     #
     def annotate_one_file(file_name, info_block, options={})
       if File.exist?(file_name)
@@ -223,6 +220,16 @@ module AnnotateModels
     # of the model and fixture source files.
     # Returns true or false depending on whether the source
     # files were modified.
+    #
+    # === Options (opts)
+    #  :position_in_class<Symbol>:: where to place the annotated section in model file
+    #  :position_in_test<Symbol>:: where to place the annotated section in test/spec file(s)
+    #  :position_in_fixture<Symbol>:: where to place the annotated section in fixture file
+    #  :position_in_factory<Symbol>:: where to place the annotated section in factory file
+    #  :exclude_tests<Symbol>:: whether to skip modification of test/spec files
+    #  :exclude_fixtures<Symbol>:: whether to skip modification of fixture files
+    #  :exclude_factories<Symbol>:: whether to skip modification of factory files
+    #
     def annotate(klass, file, header, options={})
       info = get_schema_info(klass, header, options)
       annotated = false
@@ -238,8 +245,7 @@ module AnnotateModels
           find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
           find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
         ].each do |file|
-          # todo: add an option "position_in_test" -- or maybe just ask if anyone ever wants different positions for model vs. test vs. fixture
-          if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
+          if annotate_one_file(file, info, options_with_position(options, :position_in_test))
             annotated = true
           end
         end
@@ -247,8 +253,17 @@ module AnnotateModels
 
       unless options[:exclude_fixtures]
         [
-         File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-         File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+          File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
+          File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+        ].each do |file|
+          if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
+            annotated = true
+          end
+        end
+      end
+
+      unless options[:exclude_factories]
+        [
          File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
          File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
          File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
@@ -258,7 +273,7 @@ module AnnotateModels
          File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
          File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         ].each do |file|
-          if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
+          if annotate_one_file(file, info, options_with_position(options, :position_in_factory))
             annotated = true
           end
         end

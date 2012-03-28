@@ -228,6 +228,7 @@ module AnnotateModels
 
       unless options[:exclude_fixtures]
         [
+        FIXTURE_DIRS.map { |dir| File.join(dir,klass.table_name + ".yml") },
         File.join(EXEMPLARS_TEST_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
         File.join(EXEMPLARS_SPEC_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
         File.join(BLUEPRINTS_TEST_DIR, "#{model_name}_blueprint.rb"), # Machinist Blueprints
@@ -236,18 +237,9 @@ module AnnotateModels
         File.join(FACTORY_GIRL_SPEC_DIR, "#{model_name.pluralize}.rb"), # FactoryGirl Factories
         File.join(FABRICATORS_TEST_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         File.join(FABRICATORS_SPEC_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-        ].each do |file|
+        ].flatten.each do |file|
           if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
             annotated = true
-          end
-        end
-
-        FIXTURE_DIRS.each do |dir|
-          fixture_file_name = File.join(dir,klass.table_name + ".yml")
-          if File.exist?(fixture_file_name)
-            if annotate_one_file(fixture_file_name, info, options_with_position(options, :position_in_fixture))
-              annotated = true
-            end
           end
         end
       end

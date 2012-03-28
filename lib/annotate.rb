@@ -1,17 +1,7 @@
-
-require 'yaml'
+here = File.dirname __FILE__
+require "#{here}/annotate/version"
 
 module Annotate
-  def self.version
-    version_file = File.dirname(__FILE__) + "/../VERSION.yml"
-    if File.exist?(version_file)
-      config = YAML.load(File.read(version_file))
-      version = "#{config[:major]}.#{config[:minor]}.#{config[:patch]}"
-    else
-      version = "0.0.0"
-    end
-  end
-
   TRUE_RE = /(true|t|yes|y|1)$/i
   def self.setup_options(options = {})
     options[:position_in_class] = ENV['position_in_class'] || ENV['position'] || 'before'

@@ -84,6 +84,7 @@ EOS
       end
     end
 
+    # todo: use 'files' gem instead
     def create(file, body="hi")
       file_path = File.join(AnnotateModels.model_dir, file)
       FileUtils.mkdir_p(File.dirname(file_path))
@@ -138,6 +139,24 @@ EOS
         end
       EOS
       check_class_name 'foo_with_macro.rb', 'FooWithMacro'
+    end
+    
+    it "should not care about known macros" do
+      create('foo_with_known_macro.rb', <<-EOS)
+        class FooWithKnownMacro < ActiveRecord::Base
+          has_many :yah
+        end
+      EOS
+      check_class_name 'foo_with_known_macro.rb', 'FooWithKnownMacro'
+    end
+
+    it "should work with class names with ALL CAPS segments" do
+      create('foo_with_capitals.rb', <<-EOS)
+        class FooWithCAPITALS < ActiveRecord::Base
+          acts_as_awesome :yah
+          end
+        EOS
+      check_class_name 'foo_with_capitals.rb', 'FooWithCAPITALS'
     end
 
     it "should not complain of invalid multibyte char (USASCII)" do

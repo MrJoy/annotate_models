@@ -11,16 +11,21 @@ module AnnotateModels
   # I dont use windows, can`t test
   UNIT_TEST_DIR         = File.join("test", "unit"  )
   SPEC_MODEL_DIR        = File.join("spec", "models")
-  FIXTURE_DIRS          = [File.join("test", "fixtures"), File.join("spec", "fixtures")]
-  # Object Daddy http://github.com/flogic/object_daddy
+  FIXTURE_TEST_DIR      = File.join("test", "fixtures")
+  FIXTURE_SPEC_DIR      = File.join("spec", "fixtures")
+
+  # Object Daddy http://github.com/flogic/object_daddy/tree/master
   EXEMPLARS_TEST_DIR    = File.join("test", "exemplars")
   EXEMPLARS_SPEC_DIR    = File.join("spec", "exemplars")
+
   # Machinist http://github.com/notahat/machinist
   BLUEPRINTS_TEST_DIR   = File.join("test", "blueprints")
   BLUEPRINTS_SPEC_DIR   = File.join("spec", "blueprints")
-  # FactoryGirl http://github.com/thoughtbot/factory_girl
+
+  # Factory Girl http://github.com/thoughtbot/factory_girl
   FACTORY_GIRL_TEST_DIR = File.join("test", "factories")
   FACTORY_GIRL_SPEC_DIR = File.join("spec", "factories")
+
   # Fabrication https://github.com/paulelliott/fabrication.git
   FABRICATORS_TEST_DIR  = File.join("test", "fabricators")
   FABRICATORS_SPEC_DIR  = File.join("spec", "fabricators")
@@ -41,14 +46,14 @@ module AnnotateModels
     # Simple quoting for the default column value
     def quote(value)
       case value
-        when NilClass                 then "NULL"
-        when TrueClass                then "TRUE"
-        when FalseClass               then "FALSE"
-        when Float, Fixnum, Bignum    then value.to_s
-        # BigDecimals need to be output in a non-normalized form and quoted.
-        when BigDecimal               then value.to_s('F')
-        else
-          value.inspect
+      when NilClass                 then "NULL"
+      when TrueClass                then "TRUE"
+      when FalseClass               then "FALSE"
+      when Float, Fixnum, Bignum    then value.to_s
+      # BigDecimals need to be output in a non-normalized form and quoted.
+      when BigDecimal               then value.to_s('F')
+      else
+        value.inspect
       end
     end
 
@@ -175,6 +180,20 @@ module AnnotateModels
         if old_columns == new_columns && !options[:force]
           false
         else
+          
+# todo: figure out if we need to extract any logic from this merge chunk
+# <<<<<<< HEAD
+#           # Replace the old schema info with the new schema info
+#           new_content = old_content.sub(/^# #{COMPAT_PREFIX}.*?\n(#.*\n)*\n*/, info_block)
+#           # But, if there *was* no old schema info, we simply need to insert it
+#           if new_content == old_content
+#             old_content.sub!(encoding, '')
+#             new_content = options[:position] == 'after' ?
+#               (encoding_header + (old_content =~ /\n$/ ? old_content : old_content + "\n") + info_block) :
+#               (encoding_header + info_block + old_content)
+#           end
+# =======
+
           # Strip the old schema info, and insert new schema info.
           old_content.sub!(encoding, '')
           old_content.sub!(PATTERN, '')
@@ -228,16 +247,17 @@ module AnnotateModels
 
       unless options[:exclude_fixtures]
         [
-        FIXTURE_DIRS.map { |dir| File.join(dir,klass.table_name + ".yml") },
-        File.join(EXEMPLARS_TEST_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
-        File.join(EXEMPLARS_SPEC_DIR, "#{model_name}_exemplar.rb"),  # Object Daddy
-        File.join(BLUEPRINTS_TEST_DIR, "#{model_name}_blueprint.rb"), # Machinist Blueprints
-        File.join(BLUEPRINTS_SPEC_DIR, "#{model_name}_blueprint.rb"), # Machinist Blueprints
-        File.join(FACTORY_GIRL_TEST_DIR, "#{model_name.pluralize}.rb"), # FactoryGirl Factories
-        File.join(FACTORY_GIRL_SPEC_DIR, "#{model_name.pluralize}.rb"), # FactoryGirl Factories
-        File.join(FABRICATORS_TEST_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-        File.join(FABRICATORS_SPEC_DIR, "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-        ].flatten.each do |file|
+         File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
+         File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+         File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+         File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+         File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+         File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+         File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+         File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+         File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+         File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+        ].each do |file|
           if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
             annotated = true
           end
@@ -339,10 +359,8 @@ module AnnotateModels
             end
           end
         rescue Exception => e
-          puts "Unable to annotate #{file}: #{e.inspect}"
-          puts ""
-# todo: check if all backtrace lines are in "gems" -- if so, it's an annotate bug, so print the whole stack trace.
-#          puts e.backtrace.join("\n\t")
+          # todo: check if all backtrace lines are in "gems" -- if so, it's an annotate bug, so print the whole stack trace.
+          puts "Unable to annotate #{file}: #{e.message} (#{e.backtrace.first})"
         end
       end
       if annotated.empty?

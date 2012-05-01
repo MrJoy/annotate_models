@@ -133,7 +133,7 @@ module AnnotateModels
     end
 
     def get_index_info(klass)
-      index_info = "#\n# Indexes\n#\n"
+      index_info = []
 
       indexes = klass.connection.indexes(klass.table_name)
       return "" if indexes.empty?
@@ -143,7 +143,7 @@ module AnnotateModels
       indexes.each do |index|
         index_info << sprintf("#  %-#{max_size}.#{max_size}s %s %s", index.name, "(#{index.columns.join(",")})", index.unique ? "UNIQUE" : "").rstrip + "\n"
       end
-      return index_info.sort
+      return "#\n# Indexes\n#\n" + index_info.sort.join("")
     end
 
     # Add a schema block to a file. If the file already contains

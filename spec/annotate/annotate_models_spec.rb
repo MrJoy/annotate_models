@@ -140,7 +140,7 @@ EOS
       EOS
       check_class_name 'foo_with_macro.rb', 'FooWithMacro'
     end
-    
+
     it "should not care about known macros" do
       create('foo_with_known_macro.rb', <<-EOS)
         class FooWithKnownMacro < ActiveRecord::Base

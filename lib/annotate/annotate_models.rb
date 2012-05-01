@@ -143,7 +143,7 @@ module AnnotateModels
       indexes.each do |index|
         index_info << sprintf("#  %-#{max_size}.#{max_size}s %s %s", index.name, "(#{index.columns.join(",")})", index.unique ? "UNIQUE" : "").rstrip + "\n"
       end
-      return index_info
+      return index_info.sort
     end
 
     # Add a schema block to a file. If the file already contains

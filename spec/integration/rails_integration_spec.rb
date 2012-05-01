@@ -11,7 +11,7 @@ describe "annotate inside Rails" do
    base_dir = "rails-#{base_version}"
    gemfile = "#{here}/#{base_dir}.gems"
    annotate_bin = File.expand_path "#{here}/../../bin/annotate"
-  
+
    Bundler.with_clean_env do
     dir base_dir do
       temp_dir = Dir.pwd
@@ -22,12 +22,12 @@ describe "annotate inside Rails" do
       when /^2\./
         new_cmd = "#{rails_cmd}"
         generate_cmd = "script/generate"
-        
+
       when /^3\./
         new_cmd = "#{rails_cmd} new"
         generate_cmd = "#{rails_cmd} generate"
       end
-      
+
       # todo: optionally use rvm
       `bundle install  --binstubs=#{temp_dir} --gemfile #{gemfile}`.should =~ /Your bundle is complete/
       rails_version = `#{rails_cmd} -v`.chomp

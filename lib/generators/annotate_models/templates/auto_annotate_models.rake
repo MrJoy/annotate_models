@@ -14,7 +14,7 @@ if(Rails.env.development?)
     ENV['skip_on_db_migrate']   = "false"
     ENV['format_rdoc']          = "false"
     ENV['format_markdown']      = "false"
-    ENV['no_sort']              = "false"
+    ENV['sort']                 = "false"
     ENV['force']                = "false"
   end
 end

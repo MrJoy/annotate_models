@@ -20,7 +20,6 @@ end
 Rake::Task[:set_annotation_options].invoke
 
 task = :do_annotations
-
 OptionParser.new do |opts|
   opts.banner = "Usage: annotate_models [options]"
 

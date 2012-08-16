@@ -21,13 +21,13 @@ task :default => [:spec]
 #
 # rake gem
 #   Build gem into dist/
-# 
+#
 # rake gem:publish
 #   Push the gem to RubyGems.org
-# 
+#
 # rake gem:install
 #   Build and install as local gem
-# 
+#
 # rake package
 #   Build gem and tarball into dist/
 begin

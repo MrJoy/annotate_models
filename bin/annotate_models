@@ -30,11 +30,27 @@ OptionParser.new do |opts|
 
   opts.on('-p', '--position [before|after]', ['before', 'after'],
           "Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)") do |p|
-    ENV['position']             = p
-    ENV['position_in_class']    = p
-    ENV['position_in_fixture']  = p
-    ENV['position_in_factory']  = p
-    ENV['position_in_test']     = p
+    ENV['position'] = p
+  end
+
+  opts.on('--pc', '--position-in-class [before|after]', ['before', 'after'],
+          "Place the annotations at the top (before) or the bottom (after) of the model file") do |p|
+    ENV['position_in_class'] = p
+  end
+
+  opts.on('--pf', '--position-in-factory [before|after]', ['before', 'after'],
+          "Place the annotations at the top (before) or the bottom (after) of the factory file") do |p|
+    ENV['position_in_factory'] = p
+  end
+
+  opts.on('--px', '--position-in-fixture [before|after]', ['before', 'after'],
+          "Place the annotations at the top (before) or the bottom (after) of the fixture file") do |p|
+    ENV['position_in_fixture'] = p
+  end
+
+  opts.on('--pt', '--position-in-test [before|after]', ['before', 'after'],
+          "Place the annotations at the top (before) or the bottom (after) of the test file") do |p|
+    ENV['position_in_test'] = p
   end
 
   opts.on('-v', '--version',

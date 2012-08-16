@@ -106,6 +106,14 @@ anywhere in the file:
     Usage: annotate_models [options]
         -d, --delete                     Remove annotations from all model files
         -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)
+            --pc, --position-in-class [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of the model file
+            --pf, --position-in-factory [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of the factory file
+            --px, --position-in-fixture [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of the fixture file
+            --pt, --position-in-test [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of the test file
         -v, --version                    Show the current version of this gem
         -m, --show-migration             Include the migration version number in the annotation
         -i, --show-indexes               List the table's database indexes in the annotation

@@ -372,7 +372,8 @@ module AnnotateModels
           end
         rescue Exception => e
           # todo: check if all backtrace lines are in "gems" -- if so, it's an annotate bug, so print the whole stack trace.
-          puts "Unable to annotate #{file}: #{e.message} (#{e.backtrace.first})"
+          puts "Unable to annotate #{file}: #{e.message}"
+          puts "\t#{e.backtrace.join("\n\t")}"
         end
       end
       if annotated.empty?
@@ -384,7 +385,6 @@ module AnnotateModels
 
     def remove_annotations(options={})
       if options[:model_dir]
-        puts "removing"
         self.model_dir = options[:model_dir]
       end
       deannotated = []
@@ -417,10 +417,10 @@ module AnnotateModels
 
           end
         rescue Exception => e
-          puts "Unable to annotate #{file}: #{e.message}"
+          puts "Unable to remove annotations from #{file}: #{e.message}"
         end
       end
-      puts "Removed annotation from: #{deannotated.join(', ')}"
+      puts "Removed annotations from: #{deannotated.join(', ')}"
     end
 
     def find_test_file(dir, file_name)

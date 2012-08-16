@@ -15,11 +15,11 @@ describe AnnotateRoutes do
       AnnotateRoutes.do_annotate
     end
 
-    describe "When Annotating" do
+    describe "When Annotating, with older Rake Versions" do
 
       before(:each) do
         File.should_receive(:exists?).with("config/routes.rb").and_return(true)
-        AnnotateRoutes.should_receive(:`).with("rake routes").and_return("bad line\ngood line")
+        AnnotateRoutes.should_receive(:`).with("rake routes").and_return("(in /bad/line)\ngood line")
         File.should_receive(:open).with("config/routes.rb", "wb").and_yield(mock_file)
         AnnotateRoutes.should_receive(:puts).with("Route file annotated.")
       end
@@ -60,6 +60,57 @@ describe AnnotateRoutes do
         it "should not add a newline if there are empty lines already." do
           File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo\n\n\n")
           @mock_file.should_receive(:puts).with(/^ActionController::Routing...\nfoo\n\n\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# good line\n/)
+          AnnotateRoutes.do_annotate({ :position_in_routes => 'after' })
+        end
+      end
+
+    end
+
+    describe "When Annotating, with newer Rake Versions" do
+
+      before(:each) do
+        File.should_receive(:exists?).with("config/routes.rb").and_return(true)
+        AnnotateRoutes.should_receive(:`).with("rake routes").and_return("another good line\ngood line")
+        File.should_receive(:open).with("config/routes.rb", "wb").and_yield(mock_file)
+        AnnotateRoutes.should_receive(:puts).with("Route file annotated.")
+      end
+
+      describe "With Annotations at the Top of the File" do
+        it "should annotate and add a newline as a spacer from the content" do
+          File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo\n")
+          @mock_file.should_receive(:puts).with(/^# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n\nActionController::Routing...\nfoo\n/)
+          AnnotateRoutes.do_annotate
+        end
+
+        it "should always ensure a trailing newline on the file." do
+          File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo")
+          @mock_file.should_receive(:puts).with(/^# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n\nActionController::Routing...\nfoo\n/)
+          AnnotateRoutes.do_annotate
+        end
+
+        it "should not add a newline if there are empty lines already." do
+          File.should_receive(:read).with("config/routes.rb").and_return("\n\n\nActionController::Routing...\nfoo\n")
+          @mock_file.should_receive(:puts).with(/^# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n\n\n\nActionController::Routing...\nfoo\n/)
+          AnnotateRoutes.do_annotate
+        end
+      end
+
+      describe "With Annotations at the Bottom of the File" do
+        it "should annotate and add a newline as a spacer from the content" do
+          File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo\n")
+          @mock_file.should_receive(:puts).with(/^ActionController::Routing...\nfoo\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/)
+          AnnotateRoutes.do_annotate({ :position_in_routes => 'after' })
+        end
+
+        it "should always ensure a trailing newline on the file." do
+          File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo")
+          @mock_file.should_receive(:puts).with(/^ActionController::Routing...\nfoo\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/)
+          AnnotateRoutes.do_annotate({ :position_in_routes => 'after' })
+        end
+
+        it "should not add a newline if there are empty lines already." do
+          File.should_receive(:read).with("config/routes.rb").and_return("ActionController::Routing...\nfoo\n\n\n")
+          @mock_file.should_receive(:puts).with(/^ActionController::Routing...\nfoo\n\n\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/)
           AnnotateRoutes.do_annotate({ :position_in_routes => 'after' })
         end
       end

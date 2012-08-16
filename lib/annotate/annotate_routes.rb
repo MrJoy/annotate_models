@@ -26,8 +26,11 @@ module AnnotateRoutes
     position_after = options[:position_in_routes] == 'after'
 
     routes_map = `rake routes`.split(/\n/, -1)
-    routes_map.shift # remove the first line of rake routes which is just a
-                     # file path.
+
+    # In old versions of Rake, the first line of output was the cwd.  Not so
+    # much in newer ones.  We ditch that line if it exists, and if not, we
+    # keep the line around.
+    routes_map.shift if(routes_map.first =~ /^\(in \//)
 
     header = [
       "#{PREFIX} (Updated #{Time.now.strftime("%Y-%m-%d %H:%M")})",

@@ -18,6 +18,7 @@ RUBY
       ROUTE_ANNOTATION=<<-RUBY
 # == Route Map (Updated YYYY-MM-DD HH:MM)
 #
+#     tasks GET    /tasks(.:format)          tasks#index
 #           POST   /tasks(.:format)          tasks#create
 #  new_task GET    /tasks/new(.:format)      tasks#new
 # edit_task GET    /tasks/:id/edit(.:format) tasks#edit

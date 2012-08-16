@@ -1,6 +1,9 @@
 # Smoke test to assure basic functionality works on a variety of Rails versions.
+$:.unshift(File.dirname(__FILE__))
+require 'spec_helper'
 require 'files'
 require 'wrong'
+require 'rake'
 include Files
 include Wrong::D
 

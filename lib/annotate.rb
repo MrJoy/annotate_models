@@ -1,5 +1,5 @@
-here = File.dirname __FILE__
-require "#{here}/annotate/version"
+$:.unshift(File.dirname(__FILE__))
+require "annotate/version"
 
 module Annotate
   TRUE_RE = /(true|t|yes|y|1)$/i

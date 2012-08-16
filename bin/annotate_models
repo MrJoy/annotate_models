@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler'
+Bundler.setup
+
+here = File.expand_path(File.dirname __FILE__)
+$:<< "#{here}/../lib"
+
 require 'optparse'
 require 'rake/dsl_definition'
 require 'rake'
-begin
-  require "annotate"
-rescue LoadError
-  here = File.expand_path(File.dirname __FILE__)
-  $:<< "#{here}/../lib"
-  require "annotate"
-end
+require 'annotate'
 
 Annotate.load_tasks
 if File.exists?('Rakefile')
@@ -18,14 +19,14 @@ else
 end
 Rake::Task[:set_annotation_options].invoke
 
-task = :annotate_models
+task = :do_annotations
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: annotate_models [options] [model_file]*"
+  opts.banner = "Usage: annotate_models [options]"
 
   opts.on('-d', '--delete',
           "Remove annotations from all model files") do
-    task = :remove_annotation
+    task = :remove_annotations
   end
 
   opts.on('-p', '--position [before|after]', ['before', 'after'],
@@ -34,11 +35,6 @@ OptionParser.new do |opts|
     ENV['position_in_class']    = p
     ENV['position_in_fixture']  = p
     ENV['position_in_factory']  = p
-  end
-
-  opts.on('-r', '--routes',
-          "Annotate routes.rb with the output of 'rake routes'") do
-    task = :annotate_routes
   end
 
   opts.on('-v', '--version',
@@ -85,7 +81,7 @@ OptionParser.new do |opts|
     end
   end
 
-  opts.on('-e', '--exclude [tests,fixtures,factories]', Array, "Do not annotate fixtures, test files, or both") do |exclusions|
+  opts.on('-e', '--exclude [tests,fixtures,factories]', Array, "Do not annotate fixtures, test files, and/or factories") do |exclusions|
     exclusions.each { |exclusion| ENV["exclude_#{exclusion}"] = "yes" }
   end
 
@@ -99,4 +95,11 @@ OptionParser.new do |opts|
 
 end.parse!
 
-Rake::Task[task].invoke
+Rake::Task[:environment].invoke
+
+Annotate.eager_load
+
+require "annotate/annotate_models"
+require "annotate/active_record_patch"
+options=Annotate.setup_options({ :is_rake => true })
+AnnotateModels.send(task, options)

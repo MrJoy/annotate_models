@@ -10,5 +10,6 @@ require "wrong/adapters/rspec"
 
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'active_support'
+require "active_support/core_ext/class/subclasses"
 require 'active_support/core_ext/string/inflections'
 require 'annotate'

@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'bundler'
+Bundler.setup
+
+here = File.expand_path(File.dirname __FILE__)
+$:<< "#{here}/../lib"
+
+require 'optparse'
+require 'rake/dsl_definition'
+require 'rake'
+require 'annotate'
+
+Annotate.load_tasks
+if File.exists?('Rakefile')
+  load 'Rakefile'
+else
+  STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
+end
+Rake::Task[:set_annotation_options].invoke
+
+task = :do_annotate
+OptionParser.new do |opts|
+  opts.banner = "Usage: annotate_routes [options]"
+
+  # TODO: Implement these options...
+  opts.on('-d', '--delete',
+          "Remove annotations from routes file") do
+    task = :remove_annotations
+  end
+
+  opts.on('-p', '--position [before|after]', ['before', 'after'],
+          "Place the annotations at the top (before) or the bottom (after) of the routes file") do |p|
+    ENV['position_in_routes'] = p
+  end
+
+  opts.on('-v', '--version',
+          "Show the current version of this gem") do
+    puts "annotate v#{Annotate.version}"; exit
+  end
+
+  opts.on('-R', '--require path',
+          "Additional files to require before loading models") do |path|
+    if ENV['require']
+      ENV['require'] = ENV['require'] + ",#{path}"
+    else
+      ENV['require'] = path
+    end
+  end
+
+  # TODO: Implement this option...
+  # opts.on('-f', '--format [bare|rdoc|markdown]', ['bare', 'rdoc', 'markdown'], 'Render Schema Infomation as plain/RDoc/Markdown') do |fmt|
+  #   ENV["format_#{fmt}"] = 'yes'
+  # end
+
+end.parse!
+
+require "annotate/annotate_routes"
+options=Annotate.setup_options({ :is_rake => true })
+AnnotateRoutes.send(task, options)

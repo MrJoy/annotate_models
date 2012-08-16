@@ -327,17 +327,14 @@ module AnnotateModels
       require File.expand_path("#{model_dir}/#{file}")
 
       model_path = file.gsub(/\.rb$/, '')
+
       get_loaded_model(model_path) || get_loaded_model(model_path.split('/').last)
     end
 
     # Retrieve loaded model class by path to the file where it's supposed to be defined.
     def get_loaded_model(model_path)
-      # TODO: The following is spitting out bunches of deprecation warnings for
-      # TODO: ActionController::DoubleRenderError and
-      # TODO: ActionController::UnknownAction...
-      ObjectSpace.each_object.
-        select { |c| c.is_a?(Class) && c.ancestors.include?(ActiveRecord::Base) }.
-        detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }
+      model_classes = ::ActiveRecord::Base.send(:subclasses)
+      model_classes.detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }
     end
 
     # We're passed a name of things that might be

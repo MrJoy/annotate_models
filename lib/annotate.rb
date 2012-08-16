@@ -33,4 +33,18 @@ module Annotate
     # TODO: selectively do this require on Rails 2.x?
     Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
   end
+
+  def self.eager_load
+    if(Rails.version.split('.').first.to_i < 3)
+      Rails.configuration.eager_load_paths.each do |load_path|
+        matcher = /\A#{Regexp.escape(load_path)}(.*)\.rb\Z/
+        Dir.glob("#{load_path}/**/*.rb").sort.each do |file|
+          require_dependency file.sub(matcher, '\1')
+        end
+      end
+    else
+      klass = Rails::Application.send(:subclasses).first
+      klass.eager_load!
+    end
+  end
 end

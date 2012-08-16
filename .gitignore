@@ -1,6 +1,6 @@
 .DS_Store
+/.yardoc/*
 /doc/*
-/rdoc/*
 /coverage/*
 /spec/debug.log
 /pkg/*

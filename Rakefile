@@ -84,9 +84,6 @@ namespace :jeweler do
 end
 task :clobber => :'jeweler:clobber'
 
-# want other tests/tasks run by default? Add them to the list
-task :default => [:spec]
-
 require "rspec/core/rake_task" # RSpec 2.0
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = ['spec/*_spec.rb', 'spec/**/*_spec.rb']
@@ -151,3 +148,6 @@ namespace :rubinius do
   end
 end
 task :clobber => :'rubinius:clobber'
+
+# want other tests/tasks run by default? Add them to the list
+task :default => [:spec]

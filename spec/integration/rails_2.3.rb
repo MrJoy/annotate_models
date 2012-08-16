@@ -18,15 +18,13 @@ RUBY
       ROUTE_ANNOTATION=<<-RUBY
 # == Route Map (Updated YYYY-MM-DD HH:MM)
 #
-#     tasks GET    /tasks(.:format)                   {:controller=>"tasks", :action=>"index"}
-#           POST   /tasks(.:format)                   {:controller=>"tasks", :action=>"create"}
-#  new_task GET    /tasks/new(.:format)               {:controller=>"tasks", :action=>"new"}
-# edit_task GET    /tasks/:id/edit(.:format)          {:controller=>"tasks", :action=>"edit"}
-#      task GET    /tasks/:id(.:format)               {:controller=>"tasks", :action=>"show"}
-#           PUT    /tasks/:id(.:format)               {:controller=>"tasks", :action=>"update"}
-#           DELETE /tasks/:id(.:format)               {:controller=>"tasks", :action=>"destroy"}
-#                  /:controller/:action/:id
-#                  /:controller/:action/:id(.:format)
+#     tasks GET    /tasks(.:format)          {:controller=>"tasks", :action=>"index"}
+#           POST   /tasks(.:format)          {:controller=>"tasks", :action=>"create"}
+#  new_task GET    /tasks/new(.:format)      {:controller=>"tasks", :action=>"new"}
+# edit_task GET    /tasks/:id/edit(.:format) {:controller=>"tasks", :action=>"edit"}
+#      task GET    /tasks/:id(.:format)      {:controller=>"tasks", :action=>"show"}
+#           PUT    /tasks/:id(.:format)      {:controller=>"tasks", :action=>"update"}
+#           DELETE /tasks/:id(.:format)      {:controller=>"tasks", :action=>"destroy"}
 #
 RUBY
 

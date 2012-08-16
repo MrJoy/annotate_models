@@ -270,6 +270,8 @@ module AnnotateModels
           File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
           File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
           File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+          File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
+          File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
           File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
           File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         ].each do |file|

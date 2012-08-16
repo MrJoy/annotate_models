@@ -17,6 +17,7 @@ module Annotate
         check_task_model(test_rig, schema_annotation, place_before) if(which_files[:model])
         check_task_unittest(test_rig, schema_annotation, place_before) if(which_files[:test])
         check_task_fixture(test_rig, schema_annotation, place_before) if(which_files[:fixture])
+        check_task_factory(test_rig, schema_annotation, place_before) if(which_files[:factory])
         check_routes(test_rig, routes_annotation, place_before) if(which_files[:routes])
       end
 
@@ -35,6 +36,11 @@ module Annotate
       def self.check_task_unittest(test_rig, annotation, place_before=true)
         unittest = apply_annotation(test_rig, "test/unit/task_test.rb", annotation, place_before)
         File.read("test/unit/task_test.rb").should == unittest
+      end
+
+      def self.check_task_factory(test_rig, annotation, place_before=true)
+        fixture = apply_annotation(test_rig, "test/factories/tasks.rb", annotation, place_before)
+        File.read("test/factories/tasks.rb").should == fixture
       end
 
       def self.check_task_fixture(test_rig, annotation, place_before=true)

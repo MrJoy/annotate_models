@@ -1,5 +1,6 @@
 == 2.5.0
 
+* Added support for new FactoryGirl naming convention.
 * Fix behavior of route annotations in newer versions of Rake that don't spit
   out the CWD as their first line of output.
 * Overhauled integration testing system to be much easier to work with, better

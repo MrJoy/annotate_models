@@ -95,6 +95,7 @@ If you want to skip the annotation pass when running `rake db:migrate`, set the
 
   skip_on_db_migrate=1 rake db:migrate
 
+
 If you want to always skip annotations on a particular model, add this string
 anywhere in the file:
 
@@ -104,7 +105,7 @@ anywhere in the file:
 
     Usage: annotate_models [options]
         -d, --delete                     Remove annotations from all model files
-        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model file
+        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)
         -v, --version                    Show the current version of this gem
         -m, --show-migration             Include the migration version number in the annotation
         -i, --show-indexes               List the table's database indexes in the annotation
@@ -112,7 +113,7 @@ anywhere in the file:
             --model-dir dir              Annotate model files stored in dir rather than app/models
             --ignore-model-subdirects    Ignore subdirectories of the models directory
         -n, --no-sort                    Sort columns in creation order rather than alphabetically
-        -R, --require path               Additional files to require before loading models
+        -R, --require path               Additional file to require before loading models, may be used multiple times
         -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
             --exclude
         -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
@@ -120,8 +121,10 @@ anywhere in the file:
             --force                      Force new annotations even if there are no changes.
 
     Usage: annotate_routes [options]
+        -d, --delete                     Remove annotations from routes file
+        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the routes file
         -v, --version                    Show the current version of this gem
-        -R, --require path               Additional files to require before loading models
+        -R, --require path               Additional file to require before loading models, may be used multiple times
 
 == SORTING
 

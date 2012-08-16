@@ -29,7 +29,7 @@ OptionParser.new do |opts|
   end
 
   opts.on('-p', '--position [before|after]', ['before', 'after'],
-          "Place the annotations at the top (before) or the bottom (after) of the model file") do |p|
+          "Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)") do |p|
     ENV['position']             = p
     ENV['position_in_class']    = p
     ENV['position_in_fixture']  = p
@@ -73,7 +73,7 @@ OptionParser.new do |opts|
   end
 
   opts.on('-R', '--require path',
-          "Additional files to require before loading models") do |path|
+          "Additional file to require before loading models, may be used multiple times") do |path|
     if ENV['require']
       ENV['require'] = ENV['require'] + ",#{path}"
     else

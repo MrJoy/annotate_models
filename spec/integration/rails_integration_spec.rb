@@ -7,61 +7,57 @@ require 'rake'
 include Files
 include Wrong::D
 
-describe "annotate inside Rails" do
- here = File.expand_path(File.dirname __FILE__)
- ['3.2', '2.3'].each do |base_version|
-  it "works under Rails #{base_version}" do
-   base_dir = "rails-#{base_version}"
-   gemfile = "#{here}/#{base_dir}.gems"
-   annotate_bin = File.expand_path "#{here}/../../bin/annotate"
+RVM_BIN = `which rvm`.chomp
+USING_RVM = (RVM_BIN != '')
 
-   Bundler.with_clean_env do
-    dir base_dir do
-      temp_dir = Dir.pwd
-      File.basename(Dir.pwd).should == base_dir
-      rails_cmd = "#{temp_dir}/rails"
+CURRENT_RUBY = `rvm-prompt i v p 2>/dev/null`.chomp
+ENV['rvm_pretty_print_flag'] = '0'
+ENV['BUNDLE_GEMFILE'] = './Gemfile'
 
-      case base_version
-      when /^2\./
-        new_cmd = "#{rails_cmd}"
-        generate_cmd = "script/generate"
-
-      when /^3\./
-        new_cmd = "#{rails_cmd} new"
-        generate_cmd = "#{rails_cmd} generate"
+describe "annotate inside Rails, using #{CURRENT_RUBY}" do
+  here = File.expand_path('..', __FILE__)
+  Annotate::Integration::SCENARIOS.each do |test_rig, base_dir, test_name|
+    it "works under #{test_name}" do
+      if(!USING_RVM)
+        pending "Must have RVM installed."
+        next
       end
 
-      # todo: optionally use rvm
-      `bundle install  --binstubs=#{temp_dir} --gemfile #{gemfile}`.should =~ /Your bundle is complete/
-      rails_version = `#{rails_cmd} -v`.chomp
-      rails_version.should =~ /^Rails/
-      rails_version = rails_version.split(" ").last
-      rails_version.should =~ /(\d+)(\.\d+)*/
-      rails_version.should =~ /^#{base_version}/
+      # Don't proceed if the working copy is dirty!
+      Annotate::Integration.is_clean?(test_rig).should == true
 
-      `#{new_cmd} todo`
-      Dir.chdir("#{temp_dir}/todo") do
-        `#{generate_cmd} scaffold Task content:string`.should =~ %r{db/migrate/.*_create_tasks.rb}
-        `../rake db:migrate`.should =~ /CreateTasks: migrated/
-        File.read("app/models/task.rb").should == "class Task < ActiveRecord::Base\nend\n"
-        `#{annotate_bin}`.chomp.should == "Annotated (1): Task"
-        File.read("app/models/task.rb").should == <<-RUBY
-# == Schema Information
-#
-# Table name: tasks
-#
-#  content    :string(255)
-#  created_at :datetime         not null
-#  id         :integer          not null, primary key
-#  updated_at :datetime         not null
-#
+      Bundler.with_clean_env do
+        dir base_dir do
+          temp_dir = Dir.pwd
+          File.basename(temp_dir).should == base_dir
 
-class Task < ActiveRecord::Base
-end
-        RUBY
+          # Delete cruft from hands-on debugging...
+          Annotate::Integration.nuke_cruft(test_rig)
+
+          # Copy everything to our test directory...
+          exclusions = ["#{test_rig}/.", "#{test_rig}/.."]
+          FileUtils.cp_r(FileList["#{test_rig}/*", "#{test_rig}/.*"] - exclusions, temp_dir)
+
+          Annotate::Integration.compile_templates(base_dir, temp_dir, false)
+
+          # By default, rvm_ruby_string isn't inherited over properly, so let's
+          # make sure it's there so our .rvmrc will work.
+          ENV['rvm_ruby_string']=CURRENT_RUBY
+
+          require "#{base_dir}" # Will get "#{base_dir}.rb"...
+          klass = "Annotate::Validations::#{base_dir.gsub('.', '_').classify}".constantize
+
+          Dir.chdir(temp_dir) do
+            output = `
+              (
+                source .rvmrc &&
+                #{klass.test_commands}
+              ) 2>&1`.chomp
+            klass.verify_output(output)
+            klass.verify_files(test_rig)
+          end
+        end
       end
     end
-   end
   end
- end
 end

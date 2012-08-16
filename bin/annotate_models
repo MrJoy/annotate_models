@@ -35,6 +35,7 @@ OptionParser.new do |opts|
     ENV['position_in_class']    = p
     ENV['position_in_fixture']  = p
     ENV['position_in_factory']  = p
+    ENV['position_in_test']     = p
   end
 
   opts.on('-v', '--version',

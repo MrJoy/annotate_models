@@ -2,25 +2,44 @@ $:.unshift(File.dirname(__FILE__))
 require "annotate/version"
 
 module Annotate
-  TRUE_RE = /(true|t|yes|y|1)$/i
+  ##
+  # The set of available options to customize the behavior of Annotate.
+  #
+  OPTIONS = %w(position_in_routes position_in_class position_in_test position_in_fixture
+    position_in_factory show_indexes simple_indexes simple_indexes model_dir
+    include_version require exclude_tests exclude_fixtures exclude_factories
+    ignore_model_sub_dir skip_on_db_migrate format_bare format_rdoc
+    format_markdown no_sort force)
+
+  ##
+  # Set default values that can be overridden via environment variables.
+  #
+  def self.set_defaults(options = {})
+    OPTIONS.each do |key|
+      default_value = options[key] if(options.has_key?(key))
+      default_value = ENV[key] if(ENV[key] && ENV[key] != '')
+      ENV[key] = default_value
+    end
+  end
+
+  TRUE_RE = /^(true|t|yes|y|1)$/i
   def self.setup_options(options = {})
-    options[:position_in_class] = ENV['position_in_class'] || ENV['position'] || 'before'
-    options[:position_in_test] = ENV['position_in_test'] || ENV['position'] || 'before'
-    options[:position_in_fixture] = ENV['position_in_fixture'] || ENV['position']  || 'before'
-    options[:position_in_factory] = ENV['position_in_factory'] || ENV['position'] || 'before'
-    options[:show_indexes] = ENV['show_indexes'] =~ TRUE_RE
-    options[:simple_indexes] = ENV['simple_indexes'] =~ TRUE_RE
+    [
+      :position_in_routes, :position_in_class, :position_in_test,
+      :position_in_fixture, :position_in_factory,
+    ].each do |key|
+      options[key] = fallback(ENV[key.to_s], ENV['position'], 'before')
+    end
+    [
+      :show_indexes, :simple_indexes, :include_version, :exclude_tests,
+      :exclude_fixtures, :exclude_factories, :ignore_model_sub_dir,
+      :format_rdoc, :format_markdown, :no_sort, :force,
+    ].each do |key|
+      options[key] = true?(ENV[key.to_s])
+    end
+
     options[:model_dir] = ENV['model_dir']
-    options[:include_version] = ENV['include_version'] =~ TRUE_RE
-    options[:require] = ENV['require'] ? ENV['require'].split(',') : []
-    options[:exclude_tests] = ENV['exclude_tests'] =~ TRUE_RE
-    options[:exclude_fixtures] = ENV['exclude_fixtures'] =~ TRUE_RE
-    options[:exclude_factories] = ENV['exclude_factories'] =~ TRUE_RE
-    options[:ignore_model_sub_dir] = ENV['ignore_model_sub_dir'] =~ TRUE_RE
-    options[:format_rdoc] = ENV['format_rdoc'] =~ TRUE_RE
-    options[:format_markdown] = ENV['format_markdown'] =~ TRUE_RE
-    options[:no_sort] = ENV['no_sort'] =~ TRUE_RE
-    options[:force] = ENV['force'] =~ TRUE_RE
+    options[:require]   = ENV['require'] ? ENV['require'].split(',') : []
 
     return options
   end
@@ -46,5 +65,15 @@ module Annotate
       klass = Rails::Application.send(:subclasses).first
       klass.eager_load!
     end
+  end
+
+  def self.fallback(*args)
+    return args.detect { |arg| !arg.nil? && arg != '' }
+  end
+
+  def self.true?(val)
+    return false if(val.nil? || val == '')
+    return false unless(val =~ TRUE_RE)
+    return true
   end
 end

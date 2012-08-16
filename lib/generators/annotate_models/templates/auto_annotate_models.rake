@@ -3,21 +3,28 @@
 # NOTE: to have a dev-mode tool do its thing in production.
 if(Rails.env.development?)
   task :set_annotation_options do
-    ENV['position_in_class']    = "before"
-    ENV['position_in_test']     = "before"
-    ENV['position_in_fixture']  = "before"
-    ENV['position_in_factory']  = "before"
-    ENV['show_indexes']         = "true"
-    ENV['include_version']      = "false"
-    ENV['exclude_tests']        = "false"
-    ENV['exclude_fixtures']     = "false"
-    ENV['exclude_factories']    = "false"
-    ENV['ignore_model_sub_dir'] = "false"
-    ENV['skip_on_db_migrate']   = "false"
-    ENV['format_rdoc']          = "false"
-    ENV['format_markdown']      = "false"
-    ENV['no_sort']              = "false"
-    ENV['force']                = "false"
+    Annotate.set_defaults({
+      'position_in_routes'   => "before"
+      'position_in_class'    => "before",
+      'position_in_test'     => "before",
+      'position_in_fixture'  => "before",
+      'position_in_factory'  => "before",
+      'show_indexes'         => "true",
+      'simple_indexes'       => "false",
+      'model_dir'            => "app/models",
+      'include_version'      => "false",
+      'require'              => "",
+      'exclude_tests'        => "false",
+      'exclude_fixtures'     => "false",
+      'exclude_factories'    => "false",
+      'ignore_model_sub_dir' => "false",
+      'skip_on_db_migrate'   => "false",
+      'format_bare'          => "false",
+      'format_rdoc'          => "false",
+      'format_markdown'      => "true",
+      'no_sort'              => "false",
+      'force'                => "false",
+    })
   end
 
   Annotate.load_tasks

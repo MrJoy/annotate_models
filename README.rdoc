@@ -48,7 +48,7 @@ Into Gemfile from Github:
 
     gem 'annotate', :git => 'git://github.com/MrJoy/annotate_models.git'
 
-Into environment gems From rubygems.org:
+Into environment gems from rubygems.org:
 
     gem install annotate
 
@@ -130,6 +130,7 @@ anywhere in the file:
         -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
             --format
             --force                      Force new annotations even if there are no changes.
+            --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
 
     Usage: annotate_routes [options]
         -d, --delete                     Remove annotations from routes file
@@ -189,5 +190,12 @@ With help from:
 - Nathan Brazil - http://github.com/bitaxis
 - Ian Duggan http://github.com/ijcd
 - Jon Frisby http://github.com/mrjoy
+- Tsutomu Kuroda
+- Kevin Moore
+- Philip Hallstrom
+- Brent Greeff
+- Paul Alexander
+- Dmitry Lihachev
+- qichunren
 
 and many others that I may have missed to add.

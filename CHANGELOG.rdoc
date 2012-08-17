@@ -25,6 +25,10 @@
   combination of the new schema are different than that of the old (i.e., don't
   regenerate if columns happen to be in a different order. That's just how life
   is sometimes)
+* Works better with Rails 3
+* Bugfix: schema kept prepending additional newlines
+* Updates to make annotate smarter about when to touch a model
+* Recognize column+type, and don't change a file unless the column+type combination of the new schema are different than that of the old (i.e., don't regenerate if columns happen to be in a different order. That's just how life is sometimes.)
 * Grab old specification even if it has \r\n as line endings rather than pure \ns
 * Various warning and specification fixes
 * Fix "no such file to load -- annotate/annotate_models (MissingSourceFile)"
@@ -84,6 +88,13 @@
   no replacement. It will be removed on or after 2011-10-01.`
 * Fix handling of files with no trailing newline when putting annotations at
   the end of the file.
+* Now works on tables with no primary key.
+* --format=markdown option
+* --trace option to help debug "Unable to annotate" errors
+* "Table name" annotation (if table name is different from model name)
+* "Human name" annotation (enabling translation to non-English locales)
+* Fix JRuby ObjectSpace compatibility bug (https://github.com/ctran/annotate_models/pull/85)
+* Fix FactoryGirl compatibility bug (https://github.com/ctran/annotate_models/pull/82)
 
 == 2.4.2 2009-11-21
 

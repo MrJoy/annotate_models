@@ -50,7 +50,7 @@ module AnnotateModels
       when TrueClass                then "TRUE"
       when FalseClass               then "FALSE"
       when Float, Fixnum, Bignum    then value.to_s
-      # BigDecimals need to be output in a non-normalized form and quoted.
+        # BigDecimals need to be output in a non-normalized form and quoted.
       when BigDecimal               then value.to_s('F')
       else
         value.inspect
@@ -133,17 +133,16 @@ module AnnotateModels
     end
 
     def get_index_info(klass)
-      index_info = []
+      index_info = "#\n# Indexes\n#\n"
 
       indexes = klass.connection.indexes(klass.table_name)
       return "" if indexes.empty?
 
-      max_size = indexes.collect{|index| index.name.size}.max || 0
-      max_size += 1
-      indexes.each do |index|
+      max_size = indexes.collect{|index| index.name.size}.max + 1
+      indexes.sort_by{|index| index.name}.each do |index|
         index_info << sprintf("#  %-#{max_size}.#{max_size}s %s %s", index.name, "(#{index.columns.join(",")})", index.unique ? "UNIQUE" : "").rstrip + "\n"
       end
-      return "#\n# Indexes\n#\n" + index_info.sort.join("")
+      return index_info
     end
 
     # Add a schema block to a file. If the file already contains
@@ -194,6 +193,7 @@ module AnnotateModels
           # Strip the old schema info, and insert new schema info.
           old_content.sub!(encoding, '')
           old_content.sub!(PATTERN, '')
+
           new_content = (options[:position] || 'before').to_s == 'after' ?
             (encoding_header + (old_content.rstrip + "\n\n" + info_block)) :
             (encoding_header + info_block + old_content)
@@ -359,24 +359,11 @@ module AnnotateModels
         end
       end
 
-      if options[:model_dir]
-        self.model_dir = options[:model_dir]
-      end
+      self.model_dir = options[:model_dir] if options[:model_dir]
 
       annotated = []
       get_model_files(options).each do |file|
-        begin
-          klass = get_model_class(file)
-          if klass && klass < ActiveRecord::Base && !klass.abstract_class?
-            if annotate(klass, file, header, options)
-              annotated << klass
-            end
-          end
-        rescue Exception => e
-          # todo: check if all backtrace lines are in "gems" -- if so, it's an annotate bug, so print the whole stack trace.
-          puts "Unable to annotate #{file}: #{e.message}"
-          puts "\t#{e.backtrace.join("\n\t")}"
-        end
+        annotate_model_file(annotated, file, header, options)
       end
       if annotated.empty?
         puts "Nothing annotated."
@@ -385,10 +372,22 @@ module AnnotateModels
       end
     end
 
-    def remove_annotations(options={})
-      if options[:model_dir]
-        self.model_dir = options[:model_dir]
+    def annotate_model_file(annotated, file, header, options)
+      begin
+        klass = get_model_class(file)
+        if klass && klass < ActiveRecord::Base && !klass.abstract_class?
+          if annotate(klass, file, header, options)
+            annotated << klass
+          end
+        end
+      rescue Exception => e
+        puts "Unable to annotate #{file}: #{e.message}"
+        puts "\t" + e.backtrace.join("\n\t") if options[:trace]
       end
+    end
+
+    def remove_annotations(options={})
+      self.model_dir = options[:model_dir] if options[:model_dir]
       deannotated = []
       get_model_files(options).each do |file|
         begin
@@ -419,7 +418,8 @@ module AnnotateModels
 
           end
         rescue Exception => e
-          puts "Unable to remove annotations from #{file}: #{e.message}"
+          puts "Unable to deannotate #{file}: #{e.message}"
+          puts "\t" + e.backtrace.join("\n\t") if options[:trace]
         end
       end
       puts "Removed annotations from: #{deannotated.join(', ')}"

@@ -7,7 +7,11 @@ here = File.expand_path(File.dirname __FILE__)
 $:<< "#{here}/../lib"
 
 require 'optparse'
-require 'rake/dsl_definition'
+begin
+  require 'rake/dsl_definition'
+rescue Exception => e
+  # We might just be on an old version of Rake...
+end
 require 'rake'
 require 'annotate'
 

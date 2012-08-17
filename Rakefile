@@ -8,9 +8,17 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 
-require 'rake/dsl_definition'
+using_dsl = false
+begin
+  require 'rake/dsl_definition'
+  using_dsl = true
+rescue Exception => e
+  # We might just be on an old version of Rake...
+end
 require 'rake'
-include Rake::DSL
+if(using_dsl)
+  include Rake::DSL
+end
 
 require "./lib/annotate"
 

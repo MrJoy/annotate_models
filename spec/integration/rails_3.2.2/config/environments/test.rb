@@ -1,4 +1,4 @@
-Rails32::Application.configure do
+Rails322::Application.configure do
   config.action_controller.allow_forgery_protection = false
   config.action_controller.perform_caching = false
   config.action_dispatch.show_exceptions = false

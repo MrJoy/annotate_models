@@ -2,7 +2,7 @@ require 'common_validation'
 
 module Annotate
   module Validations
-    module Rails32
+    module Rails322
       SCHEMA_ANNOTATION=<<-RUBY
 # == Schema Information
 #

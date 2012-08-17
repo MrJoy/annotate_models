@@ -7,7 +7,7 @@ if defined?(Bundler)
   Bundler.require(*Rails.groups(:assets => %w(development test)))
 end
 
-module Rails32
+module Rails322
   class Application < Rails::Application
     config.assets.enabled = true
     config.assets.version = '1.0'

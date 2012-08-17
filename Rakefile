@@ -154,6 +154,7 @@ task :clobber => :'yard:clobber'
 namespace :rubinius do
   task :clobber do
     FileList["**/*.rbc"].each { |fname| FileUtils.rm_f(fname) }
+    FileList[".rbx/**/*"].each { |fname| FileUtils.rm_f(fname) }
   end
 end
 task :clobber => :'rubinius:clobber'

@@ -10,6 +10,7 @@
 /.idea/
 /.rvmrc
 .bundle
+/.rbx
 /spec/integration/*/bin/
 /spec/integration/*/log/*
 !/spec/integration/*/log/.gitkeep

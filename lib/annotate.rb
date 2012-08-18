@@ -44,6 +44,10 @@ module Annotate
     return options
   end
 
+  def self.skip_on_migration?
+    ENV['skip_on_db_migrate'] =~ TRUE_RE
+  end
+
   def self.loaded_tasks=(val); @loaded_tasks = val; end
   def self.loaded_tasks; return @loaded_tasks; end
 

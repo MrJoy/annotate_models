@@ -234,10 +234,16 @@ module AnnotateModels
       info = get_schema_info(klass, header, options)
       annotated = false
       model_name = klass.name.underscore
-      model_file_name = File.join(model_dir, file)
+      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
+      # A model could be defined in multiple files...
+      files = self.model_dir.
+        map { |dir| File.join(dir, file) }.
+        select { |fname| File.exist?(fname) }
 
-      if annotate_one_file(model_file_name, info, options_with_position(options, :position_in_class))
-        annotated = true
+      files.each do |model_file_name|
+        if annotate_one_file(model_file_name, info, options[:position_in_class])
+          annotated = true
+        end
       end
 
       unless options[:exclude_tests]

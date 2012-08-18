@@ -7,9 +7,9 @@ module Annotate
   #
   OPTIONS = %w(position_in_routes position_in_class position_in_test
     position_in_fixture position_in_factory show_indexes simple_indexes
-    simple_indexes model_dir include_version require exclude_tests
-    exclude_fixtures exclude_factories ignore_model_sub_dir skip_on_db_migrate
-    format_bare format_rdoc format_markdown no_sort force)
+    model_dir include_version require exclude_tests exclude_fixtures
+    exclude_factories ignore_model_sub_dir skip_on_db_migrate
+    format_bare format_rdoc format_markdown no_sort force trace)
 
   ##
   # Set default values that can be overridden via environment variables.

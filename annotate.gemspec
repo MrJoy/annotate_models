@@ -35,8 +35,6 @@ Gem::Specification.new do |s|
     "lib/generators/annotate_models/USAGE",
     "lib/generators/annotate_models/install_generator.rb",
     "lib/generators/annotate_models/templates/auto_annotate_models.rake",
-    "lib/tasks/annotate_models.rake",
-    "lib/tasks/annotate_routes.rake",
     "lib/tasks/migrate.rake"
   ]
   s.homepage = "http://github.com/ctran/annotate_models"

@@ -342,10 +342,6 @@ module AnnotateModels
     # if its a subclass of ActiveRecord::Base,
     # then pass it to the associated block
     def do_annotations(options={})
-      if options[:require]
-        options[:require].each { |path| require path }
-      end
-
       header = options[:format_markdown] ? PREFIX_MD.dup : PREFIX.dup
 
       if options[:include_version]

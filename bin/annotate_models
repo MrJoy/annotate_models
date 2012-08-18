@@ -122,8 +122,8 @@ end.parse!
 
 
 Annotate.eager_load
-
 require "annotate/annotate_models"
 require "annotate/active_record_patch"
 options=Annotate.setup_options({ :is_rake => true })
+options[:require].each { |path| require path } if options[:require]
 AnnotateModels.send(task, options)

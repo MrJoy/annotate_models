@@ -61,4 +61,5 @@ end.parse!
 
 require "annotate/annotate_routes"
 options=Annotate.setup_options({ :is_rake => true })
+options[:require].each { |path| require path } if options[:require]
 AnnotateRoutes.send(task, options)

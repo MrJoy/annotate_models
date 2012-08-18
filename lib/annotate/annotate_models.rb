@@ -345,9 +345,7 @@ module AnnotateModels
     # then pass it to the associated block
     def do_annotations(options={})
       if options[:require]
-        options[:require].each do |path|
-          require path
-        end
+        options[:require].each { |path| require path }
       end
 
       header = options[:format_markdown] ? PREFIX_MD.dup : PREFIX.dup

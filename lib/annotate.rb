@@ -75,6 +75,8 @@ module Annotate
     end
   end
 
+private
+
   def self.fallback(*args)
     return args.detect { |arg| !arg.nil? && arg != '' }
   end

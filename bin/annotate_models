@@ -94,7 +94,7 @@ OptionParser.new do |opts|
 
   opts.on('-R', '--require path',
           "Additional file to require before loading models, may be used multiple times") do |path|
-    if ENV['require']
+    if !ENV['require'].blank?
       ENV['require'] = ENV['require'] + ",#{path}"
     else
       ENV['require'] = path

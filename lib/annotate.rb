@@ -65,10 +65,7 @@ module Annotate
     return if(self.loaded_tasks)
     self.loaded_tasks = true
 
-    # Rails 3 wants to load our .rake files for us.
-    if(Rails.version.split('.').first.to_i < 3)
-      Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
-    end
+    Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
   end
 
   def self.eager_load

@@ -288,7 +288,7 @@ module AnnotateModels
     end
 
     def get_subclasses_recursively(klass)
-      subs = klass.subclasses
+      subs = klass.send(:subclasses)
       subs += subs.map { |c| get_subclasses_recursively(c) }.flatten
       return subs
     end

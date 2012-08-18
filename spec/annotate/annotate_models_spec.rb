@@ -197,7 +197,7 @@ end
       File.read(@model_file_name).should == "#{@schema_info}#{@file_content}"
     end
 
-    it "should annotate before if given :position => :after" do
+    it "should annotate after if given :position => :after" do
       annotate_one_file :position => :after
       File.read(@model_file_name).should == "#{@file_content}\n#{@schema_info}"
     end

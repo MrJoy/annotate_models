@@ -242,7 +242,7 @@ module AnnotateModels
           select { |fname| fname && File.exist?(fname) }
 
         files.each do |file|
-          did_annotate ||= annotate_one_file(file, info, :position_in_class, options)
+          did_annotate = annotate_one_file(file, info, :position_in_class, options) || did_annotate
         end
 
         unless options[:exclude_tests]
@@ -250,7 +250,7 @@ module AnnotateModels
             find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
             find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
           ].each do |file|
-            did_annotate ||= annotate_one_file(file, info, :position_in_test, options)
+            did_annotate = annotate_one_file(file, info, :position_in_test, options) || did_annotate
           end
         end
 
@@ -259,7 +259,7 @@ module AnnotateModels
             File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
             File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
           ].each do |file|
-            did_annotate ||= annotate_one_file(file, info, :position_in_fixture, options)
+            did_annotate = annotate_one_file(file, info, :position_in_fixture, options) || did_annotate
           end
         end
 
@@ -276,7 +276,7 @@ module AnnotateModels
             File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
             File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
           ].each do |file|
-            did_annotate ||= annotate_one_file(file, info, :position_in_factory, options)
+            did_annotate = annotate_one_file(file, info, :position_in_factory, options) || did_annotate
           end
         end
 

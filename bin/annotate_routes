@@ -27,7 +27,6 @@ task = :do_annotate
 OptionParser.new do |opts|
   opts.banner = "Usage: annotate_routes [options]"
 
-  # TODO: Implement these options...
   opts.on('-d', '--delete',
           "Remove annotations from routes file") do
     task = :remove_annotations

@@ -11,13 +11,19 @@ task :set_annotation_options
 
 namespace :db do
   task :migrate => :set_annotation_options do
-    sh 'annotate_models' unless(Annotate.skip_on_migration?)
+    unless(Annotate.skip_on_migration?)
+      ENV['is_rake']='1'
+      sh 'annotate_models'
+    end
   end
 
   namespace :migrate do
     [:change, :up, :down, :reset, :redo].each do |t|
       task t => :set_annotation_options do
-        sh 'annotate_models' unless(Annotate.skip_on_migration?)
+        unless(Annotate.skip_on_migration?)
+          ENV['is_rake']='1'
+          sh 'annotate_models'
+        end
       end
     end
   end

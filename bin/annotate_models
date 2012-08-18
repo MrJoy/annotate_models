@@ -26,7 +26,7 @@ Rake::Task[:set_annotation_options].invoke
 
 task = :do_annotations
 OptionParser.new do |opts|
-  opts.banner = "Usage: annotate_models [options]"
+  opts.banner = "Usage: annotate_models [options] [ModelNames]"
 
   opts.on('-d', '--delete',
           "Remove annotations from all model files") do
@@ -121,13 +121,12 @@ OptionParser.new do |opts|
   opts.on('--trace', 'If unable to annotate a file, print the full stack trace, not just the exception message.') do |value|
     ENV['trace'] = 'yes'
   end
-
 end.parse!
 
 
 Annotate.eager_load
 require "annotate/annotate_models"
 require "annotate/active_record_patch"
-options=Annotate.setup_options({ :is_rake => true })
+options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
 options[:require].each { |path| require path } if options[:require]
 AnnotateModels.send(task, options)

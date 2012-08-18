@@ -106,7 +106,7 @@ anywhere in the file:
 
 == OPTIONS
 
-    Usage: annotate_models [options]
+    Usage: annotate_models [options] [ModelNames]
         -d, --delete                     Remove annotations from all model files
         -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)
             --pc, --position-in-class [before|after]

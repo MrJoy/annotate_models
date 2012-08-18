@@ -289,48 +289,6 @@ module AnnotateModels
       options.merge(:position=>(options[position_in] || options[:position]))
     end
 
-    # Return a list of the model files to annotate. If we have
-    # command line arguments, they're assumed to be either
-    # the underscore or CamelCase versions of model names.
-    # Otherwise we take all the model files in the
-    # model_dir directory.
-    def get_model_files(options)
-      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
-      if(!options[:is_rake])
-        models = ARGV.dup
-        models.shift
-      else
-        models = []
-      end
-      models.reject!{|m| m.match(/^(.*)=/)}
-      if models.empty?
-        errors = 0
-        self.model_dir.each do |dir|
-          begin
-            Dir.chdir(dir) do
-              models += if options[:ignore_model_sub_dir]
-                Dir["*.rb"]
-              else
-                Dir["**/*.rb"]
-              end
-            end
-          rescue SystemCallError
-            puts "No such directory '#{dir}'."
-            errors += 1
-          end
-        end
-        if(errors > 0)
-          puts "Use the --model-dir option to specify a list of directories holding your models."
-          puts "Call 'annotate_models --help' for more info."
-          if(errors == self.model_dir.length)
-            puts "No valid model dirs found!"
-            exit 1
-          end
-        end
-      end
-      models.flatten
-    end
-
     # Retrieve the classes belonging to the model names we're asked to process
     # Check for namespaced models in subdirectories as well as models
     # in subdirectories without namespacing.
@@ -369,7 +327,16 @@ module AnnotateModels
       self.model_dir = options[:model_dir] if options[:model_dir].length > 0
 
       annotated = []
-      get_subclasses_recursively(ActiveRecord::Base).each do |model_class|
+
+      models = []
+      if(!options[:is_rake])
+        models = ARGV.map { |arg| ActiveSupport::Inflector.safe_constantize(arg) }.reject { |klass| klass.nil? }
+      end
+      if(models.length == 0)
+        models = get_subclasses_recursively(ActiveRecord::Base)
+      end
+
+      models.each do |model_class|
         file = "#{ActiveSupport::Inflector.underscore(model_class)}.rb"
         found_file = false
         self.model_dir.each do |dir|
@@ -409,7 +376,16 @@ module AnnotateModels
       self.model_dir = options[:model_dir] if options[:model_dir].length > 0
 
       deannotated = []
-      get_subclasses_recursively(ActiveRecord::Base).each do |klass|
+
+      models = []
+      if(!options[:is_rake])
+        models = ARGV.map { |arg| ActiveSupport::Inflector.safe_constantize(arg) }.reject { |klass| klass.nil? }
+      end
+      if(models.length == 0)
+        models = get_subclasses_recursively(ActiveRecord::Base)
+      end
+
+      models.each do |klass|
         begin
           file = "#{ActiveSupport::Inflector.underscore(klass)}.rb"
           deannotated_klass = false

@@ -161,11 +161,6 @@ end
 
   describe "annotating a file" do
     before do
-      Annotate.instance_variable_set('@has_set_defaults', false)
-      Annotate::POSITION_OPTIONS.each { |key| ENV[key.to_s] = '' }
-      Annotate::FLAG_OPTIONS.each { |key| ENV[key.to_s] = '' }
-      Annotate::PATH_OPTIONS.each { |key| ENV[key.to_s] = '' }
-
       @model_dir = Dir.mktmpdir('annotate_models')
       (@model_file_name, @file_content) = write_model "user.rb", <<-EOS
 class User < ActiveRecord::Base
@@ -191,6 +186,12 @@ end
       Annotate.set_defaults(options)
       options = Annotate.setup_options(options)
       AnnotateModels.annotate_one_file(@model_file_name, @schema_info, :position_in_class, options)
+
+      # Wipe settings so the next call will pick up new values...
+      Annotate.instance_variable_set('@has_set_defaults', false)
+      Annotate::POSITION_OPTIONS.each { |key| ENV[key.to_s] = '' }
+      Annotate::FLAG_OPTIONS.each { |key| ENV[key.to_s] = '' }
+      Annotate::PATH_OPTIONS.each { |key| ENV[key.to_s] = '' }
     end
 
     it "should annotate the file before the model if position == 'before'" do

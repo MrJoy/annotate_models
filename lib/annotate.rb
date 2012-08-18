@@ -1,5 +1,5 @@
 $:.unshift(File.dirname(__FILE__))
-require "annotate/version"
+require 'annotate/version'
 
 module Annotate
   ##

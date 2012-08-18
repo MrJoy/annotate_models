@@ -14,7 +14,7 @@ module Annotate
     :exclude_fixtures, :exclude_factories, :ignore_model_sub_dir,
     :format_bare, :format_rdoc, :format_markdown, :no_sort, :force, :trace,
   ]
-  OTHER_OPTIONS=[
+  PATH_OPTIONS=[
     :model_dir, :require,
   ]
 
@@ -26,7 +26,7 @@ module Annotate
     return if(@has_set_defaults)
     @has_set_defaults = true
     options = HashWithIndifferentAccess.new(options)
-    [POSITION_OPTIONS, FLAG_OPTIONS, OTHER_OPTIONS].flatten.each do |key|
+    [POSITION_OPTIONS, FLAG_OPTIONS, PATH_OPTIONS].flatten.each do |key|
       if(options.has_key?(key))
         default_value = if(options[key].is_a?(Array))
           options[key].join(",")
@@ -47,9 +47,9 @@ module Annotate
     FLAG_OPTIONS.each do |key|
       options[key] = true?(ENV[key.to_s])
     end
-
-    options[:model_dir] = ENV['model_dir']
-    options[:require]   = (!ENV['require'].blank?) ? ENV['require'].split(',') : []
+    PATH_OPTIONS.each do |key|
+      options[key] = (!ENV[key.to_s].blank?) ? ENV[key.to_s].split(',') : []
+    end
 
     return options
   end

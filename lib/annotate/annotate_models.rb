@@ -36,7 +36,7 @@ module AnnotateModels
 
   class << self
     def model_dir
-      @model_dir || "app/models"
+      @model_dir || ["app/models"]
     end
 
     def model_dir=(dir)
@@ -295,6 +295,7 @@ module AnnotateModels
     # Otherwise we take all the model files in the
     # model_dir directory.
     def get_model_files(options)
+      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
       if(!options[:is_rake])
         models = ARGV.dup
         models.shift
@@ -303,22 +304,31 @@ module AnnotateModels
       end
       models.reject!{|m| m.match(/^(.*)=/)}
       if models.empty?
-        begin
-          Dir.chdir(model_dir) do
-            models = if options[:ignore_model_sub_dir]
-              Dir["*.rb"]
-            else
-              Dir["**/*.rb"]
+        errors = 0
+        self.model_dir.each do |dir|
+          begin
+            Dir.chdir(dir) do
+              models += if options[:ignore_model_sub_dir]
+                Dir["*.rb"]
+              else
+                Dir["**/*.rb"]
+              end
             end
+          rescue SystemCallError
+            puts "No such directory '#{dir}'."
+            errors += 1
           end
-        rescue SystemCallError
-          puts "No models found in directory '#{model_dir}'."
-          puts "Either specify models on the command line, or use the --model-dir option."
-          puts "Call 'annotate --help' for more info."
-          exit 1;
+        end
+        if(errors > 0)
+          puts "Use the --model-dir option to specify a list of directories holding your models."
+          puts "Call 'annotate_models --help' for more info."
+          if(errors == self.model_dir.length)
+            puts "No valid model dirs found!"
+            exit 1
+          end
         end
       end
-      models
+      models.flatten
     end
 
     # Retrieve the classes belonging to the model names we're asked to process
@@ -356,15 +366,17 @@ module AnnotateModels
         end
       end
 
-      self.model_dir = options[:model_dir] if options[:model_dir]
+      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
 
       annotated = []
       get_subclasses_recursively(ActiveRecord::Base).each do |model_class|
         file = "#{ActiveSupport::Inflector.underscore(model_class)}.rb"
         found_file = false
-        if(File.exist?(File.join(self.model_dir, file)))
-          annotate_model_file(annotated, file, header, options)
-          found_file = true
+        self.model_dir.each do |dir|
+          if(File.exist?(File.join(dir, file)))
+            annotate_model_file(annotated, file, header, options)
+            found_file = true
+          end
         end
 
         if(!found_file && options[:trace])
@@ -394,17 +406,20 @@ module AnnotateModels
     end
 
     def remove_annotations(options={})
-      self.model_dir = options[:model_dir] if options[:model_dir]
+      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
+
       deannotated = []
       get_subclasses_recursively(ActiveRecord::Base).each do |klass|
         begin
           file = "#{ActiveSupport::Inflector.underscore(klass)}.rb"
           deannotated_klass = false
           model_name = klass.name.underscore
-          model_file_name = File.join(self.model_dir, file)
-          if(File.exist?(model_file_name))
-            remove_annotation_of_file(model_file_name)
-            deannotated_klass = true
+          self.model_dir.each do |dir|
+            model_file_name = File.join(dir, file)
+            if(File.exist?(model_file_name))
+              remove_annotation_of_file(model_file_name)
+              deannotated_klass = true
+            end
           end
 
           [

@@ -79,8 +79,12 @@ OptionParser.new do |opts|
   end
 
   opts.on('--model-dir dir',
-          "Annotate model files stored in dir rather than app/models") do |dir|
-    ENV['model_dir'] = dir
+          "Annotate model files stored in dir rather than app/models, may be used multiple times") do |dir|
+    if !ENV['model_dir'].blank?
+      ENV['model_dir'] = ENV['model_dir'] + ",#{dir}"
+    else
+      ENV['model_dir'] = dir
+    end
   end
 
   opts.on('--ignore-model-subdirects',

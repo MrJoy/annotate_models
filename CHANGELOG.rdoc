@@ -1,5 +1,7 @@
 == 2.5.0
 
+* Bugfix: Load the Rakefile from the current directory, not the first Rakefile
+  in our load path.
 * Added support for new FactoryGirl naming convention.
 * Fix behavior of route annotations in newer versions of Rake that don't spit
   out the CWD as their first line of output.

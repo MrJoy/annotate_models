@@ -17,7 +17,7 @@ require 'annotate'
 
 Annotate.load_tasks
 if File.exists?('Rakefile')
-  load 'Rakefile'
+  load './Rakefile'
 else
   STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
 end

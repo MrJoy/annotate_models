@@ -36,7 +36,7 @@ module Annotate
         end
       end
       default_value = ENV[key.to_s] if(!ENV[key.to_s].blank?)
-      ENV[key.to_s] = default_value
+      ENV[key.to_s] = default_value.to_s
     end
   end
 

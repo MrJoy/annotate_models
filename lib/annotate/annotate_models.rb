@@ -389,7 +389,7 @@ module AnnotateModels
       get_model_files(options).each do |file|
         begin
           klass = get_model_class(file)
-          if klass < ActiveRecord::Base && !klass.abstract_class?
+          if klass && !klass.abstract_class?
             deannotated << klass
 
             model_name = klass.name.underscore

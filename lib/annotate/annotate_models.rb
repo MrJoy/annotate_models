@@ -325,8 +325,7 @@ module AnnotateModels
     # Check for namespaced models in subdirectories as well as models
     # in subdirectories without namespacing.
     def get_model_class(file)
-
-      model_path = file.gsub(/\.rb$/, '')
+      model_path = file.sub(/\.rb$/, '')
 
       get_loaded_model(model_path) || get_loaded_model(model_path.split('/').last)
     end

@@ -245,7 +245,7 @@ module AnnotateModels
           find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
           find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
         ].each do |file|
-          if annotate_one_file(file, info, options_with_position(options, :position_in_test))
+          if annotate_one_file(file, info, options[:position_in_test])
             annotated = true
           end
         end
@@ -256,7 +256,7 @@ module AnnotateModels
           File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
           File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
         ].each do |file|
-          if annotate_one_file(file, info, options_with_position(options, :position_in_fixture))
+          if annotate_one_file(file, info, options[:position_in_fixture])
             annotated = true
           end
         end
@@ -275,18 +275,13 @@ module AnnotateModels
           File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
           File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
         ].each do |file|
-          if annotate_one_file(file, info, options_with_position(options, :position_in_factory))
+          if annotate_one_file(file, info, options[:position_in_factory])
             annotated = true
           end
         end
       end
 
       annotated
-    end
-
-    # position = :position_in_fixture or :position_in_class
-    def options_with_position(options, position_in)
-      options.merge(:position=>(options[position_in] || options[:position]))
     end
 
     # Retrieve the classes belonging to the model names we're asked to process

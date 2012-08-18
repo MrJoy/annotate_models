@@ -21,9 +21,9 @@ if(Rails.env.development?)
       'exclude_factories'    => "false",
       'ignore_model_sub_dir' => "false",
       'skip_on_db_migrate'   => "false",
-      'format_bare'          => "false",
+      'format_bare'          => "true",
       'format_rdoc'          => "false",
-      'format_markdown'      => "true",
+      'format_markdown'      => "false",
       'no_sort'              => "false",
       'force'                => "false",
     })

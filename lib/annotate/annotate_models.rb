@@ -153,10 +153,10 @@ module AnnotateModels
     #
     # === Options (opts)
     #  :force<Symbol>:: whether to update the file even if it doesn't seem to need it.
-    #  :position<Symbol>:: where to place the annotated section in fixture or model file,
-    #                      :before or :after. Default is :before.
+    #  :position_in_*<Symbol>:: where to place the annotated section in fixture or model file,
+    #                           :before or :after. Default is :before.
     #
-    def annotate_one_file(file_name, info_block, options={})
+    def annotate_one_file(file_name, info_block, position, options={})
       if File.exist?(file_name)
         old_content = File.read(file_name)
         return false if(old_content =~ /# -\*- SkipSchemaAnnotations.*\n/)
@@ -194,7 +194,7 @@ module AnnotateModels
           old_content.sub!(encoding, '')
           old_content.sub!(PATTERN, '')
 
-          new_content = (options[:position] || 'before').to_s == 'after' ?
+          new_content = options[position].to_s == 'after' ?
             (encoding_header + (old_content.rstrip + "\n\n" + info_block)) :
             (encoding_header + info_block + old_content)
 
@@ -230,85 +230,67 @@ module AnnotateModels
     #  :exclude_fixtures<Symbol>:: whether to skip modification of fixture files
     #  :exclude_factories<Symbol>:: whether to skip modification of factory files
     #
-    def annotate(klass, file, header, options={})
-      info = get_schema_info(klass, header, options)
-      annotated = false
-      model_name = klass.name.underscore
-      self.model_dir = options[:model_dir] if options[:model_dir].length > 0
-      # A model could be defined in multiple files...
-      files = self.model_dir.
-        map { |dir| File.join(dir, file) }.
-        select { |fname| File.exist?(fname) }
+    def annotate(klass, file, header, annotated, options={})
+      begin
+        info = get_schema_info(klass, header, options)
+        did_annotate = false
+        model_name = klass.name.underscore
+        self.model_dir = options[:model_dir] if options[:model_dir].length > 0
+        # A model could be defined in multiple files...
+        files = self.model_dir.
+          map { |dir| File.join(dir, file) }.
+          select { |fname| fname && File.exist?(fname) }
 
-      files.each do |model_file_name|
-        if annotate_one_file(model_file_name, info, options[:position_in_class])
-          annotated = true
+        files.each do |file|
+          did_annotate ||= annotate_one_file(file, info, :position_in_class, options)
         end
-      end
 
-      unless options[:exclude_tests]
-        [
-          find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
-          find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
-        ].each do |file|
-          if annotate_one_file(file, info, options[:position_in_test])
-            annotated = true
+        unless options[:exclude_tests]
+          [
+            find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
+            find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
+          ].each do |file|
+            did_annotate ||= annotate_one_file(file, info, :position_in_test, options)
           end
         end
-      end
 
-      unless options[:exclude_fixtures]
-        [
-          File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-          File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-        ].each do |file|
-          if annotate_one_file(file, info, options[:position_in_fixture])
-            annotated = true
+        unless options[:exclude_fixtures]
+          [
+            File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
+            File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+          ].each do |file|
+            did_annotate ||= annotate_one_file(file, info, :position_in_fixture, options)
           end
         end
-      end
 
-      unless options[:exclude_factories]
-        [
-          File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-          File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-          File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-          File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-          File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-          File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-          File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
-          File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
-          File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-          File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-        ].each do |file|
-          if annotate_one_file(file, info, options[:position_in_factory])
-            annotated = true
+        unless options[:exclude_factories]
+          [
+            File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+            File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+            File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+            File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+            File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+            File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+            File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
+            File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name.pluralize}.rb"),  # Factory Girl Factories, new naming convention.
+            File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+            File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+          ].each do |file|
+            did_annotate ||= annotate_one_file(file, info, :position_in_factory, options)
           end
         end
+
+        annotated << klass if(did_annotate)
+      rescue Exception => e
+        puts "Unable to annotate #{file}: #{e.message}"
+        puts "\t" + e.backtrace.join("\n\t") if options[:trace]
       end
-
-      annotated
-    end
-
-    # Retrieve the classes belonging to the model names we're asked to process
-    # Check for namespaced models in subdirectories as well as models
-    # in subdirectories without namespacing.
-    def get_model_class(file)
-      model_path = file.sub(/\.rb$/, '')
-
-      get_loaded_model(model_path) || get_loaded_model(model_path.split('/').last)
     end
 
     def get_subclasses_recursively(klass)
       subs = klass.subclasses
       subs += subs.map { |c| get_subclasses_recursively(c) }.flatten
       return subs
-    end
-
-    # Retrieve loaded model class by path to the file where it's supposed to be defined.
-    def get_loaded_model(model_path)
-      model_classes = get_subclasses_recursively(ActiveRecord::Base)
-      return model_classes.detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }
     end
 
     # We're passed a name of things that might be
@@ -342,7 +324,7 @@ module AnnotateModels
         found_file = false
         self.model_dir.each do |dir|
           if(File.exist?(File.join(dir, file)))
-            annotate_model_file(annotated, file, header, options)
+            annotate(klass, file, header, annotated, options)
             found_file = true
           end
         end
@@ -356,20 +338,6 @@ module AnnotateModels
         puts "Nothing annotated."
       else
         puts "Annotated (#{annotated.length}): #{annotated.join(', ')}"
-      end
-    end
-
-    def annotate_model_file(annotated, file, header, options)
-      begin
-        klass = get_model_class(file)
-        if klass && klass < ActiveRecord::Base && !klass.abstract_class?
-          if annotate(klass, file, header, options)
-            annotated << klass
-          end
-        end
-      rescue Exception => e
-        puts "Unable to annotate #{file}: #{e.message}"
-        puts "\t" + e.backtrace.join("\n\t") if options[:trace]
       end
     end
 

@@ -5,36 +5,46 @@ module Annotate
   ##
   # The set of available options to customize the behavior of Annotate.
   #
-  OPTIONS = %w(position_in_routes position_in_class position_in_test
-    position_in_fixture position_in_factory show_indexes simple_indexes
-    model_dir include_version require exclude_tests exclude_fixtures
-    exclude_factories ignore_model_sub_dir skip_on_db_migrate
-    format_bare format_rdoc format_markdown no_sort force trace)
+  POSITION_OPTIONS=[
+    :position_in_routes, :position_in_class, :position_in_test,
+    :position_in_fixture, :position_in_factory, :position,
+  ]
+  FLAG_OPTIONS=[
+    :show_indexes, :simple_indexes, :include_version, :exclude_tests,
+    :exclude_fixtures, :exclude_factories, :ignore_model_sub_dir,
+    :format_bare, :format_rdoc, :format_markdown, :no_sort, :force, :trace,
+  ]
+  OTHER_OPTIONS=[
+    :model_dir, :require,
+  ]
+
 
   ##
   # Set default values that can be overridden via environment variables.
   #
   def self.set_defaults(options = {})
-    OPTIONS.each do |key|
-      default_value = options[key] if(options.has_key?(key))
-      default_value = ENV[key] if(ENV[key] && ENV[key] != '')
-      ENV[key] = default_value
+    return if(@has_set_defaults)
+    @has_set_defaults = true
+    options = HashWithIndifferentAccess.new(options)
+    [POSITION_OPTIONS, FLAG_OPTIONS, OTHER_OPTIONS].flatten.each do |key|
+      if(options.has_key?(key))
+        default_value = if(options[key].is_a?(Array))
+          options[key].join(",")
+        else
+          options[key]
+        end
+      end
+      default_value = ENV[key.to_s] if(!ENV[key.to_s].blank?)
+      ENV[key.to_s] = default_value
     end
   end
 
   TRUE_RE = /^(true|t|yes|y|1)$/i
   def self.setup_options(options = {})
-    [
-      :position_in_routes, :position_in_class, :position_in_test,
-      :position_in_fixture, :position_in_factory,
-    ].each do |key|
+    POSITION_OPTIONS.each do |key|
       options[key] = fallback(ENV[key.to_s], ENV['position'], 'before')
     end
-    [
-      :show_indexes, :simple_indexes, :include_version, :exclude_tests,
-      :exclude_fixtures, :exclude_factories, :ignore_model_sub_dir,
-      :format_rdoc, :format_markdown, :no_sort, :force,
-    ].each do |key|
+    FLAG_OPTIONS.each do |key|
       options[key] = true?(ENV[key.to_s])
     end
 

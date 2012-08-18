@@ -359,9 +359,19 @@ module AnnotateModels
       self.model_dir = options[:model_dir] if options[:model_dir]
 
       annotated = []
-      get_model_files(options).each do |file|
-        annotate_model_file(annotated, file, header, options)
+      get_subclasses_recursively(ActiveRecord::Base).each do |model_class|
+        file = "#{ActiveSupport::Inflector.underscore(model_class)}.rb"
+        found_file = false
+        if(File.exist?(File.join(self.model_dir, file)))
+          annotate_model_file(annotated, file, header, options)
+          found_file = true
+        end
+
+        if(!found_file && options[:trace])
+          puts "Skipping #{model_class}, as it seems to be provided by a gem/engine, or otherwise isn't in a path where we expect to find it."
+        end
       end
+
       if annotated.empty?
         puts "Nothing annotated."
       else
@@ -386,34 +396,38 @@ module AnnotateModels
     def remove_annotations(options={})
       self.model_dir = options[:model_dir] if options[:model_dir]
       deannotated = []
-      get_model_files(options).each do |file|
+      get_subclasses_recursively(ActiveRecord::Base).each do |klass|
         begin
-          klass = get_model_class(file)
-          if klass && !klass.abstract_class?
-            deannotated << klass
-
-            model_name = klass.name.underscore
-            model_file_name = File.join(model_dir, file)
+          file = "#{ActiveSupport::Inflector.underscore(klass)}.rb"
+          deannotated_klass = false
+          model_name = klass.name.underscore
+          model_file_name = File.join(self.model_dir, file)
+          if(File.exist?(model_file_name))
             remove_annotation_of_file(model_file_name)
-
-            [
-              File.join(UNIT_TEST_DIR,          "#{model_name}_test.rb"),
-              File.join(SPEC_MODEL_DIR,         "#{model_name}_spec.rb"),
-              File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-              File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-              File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-              File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-              File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-              File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-              File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-              File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-              File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-              File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-            ].each do |file|
-              remove_annotation_of_file(file) if File.exist?(file)
-            end
-
+            deannotated_klass = true
           end
+
+          [
+            File.join(UNIT_TEST_DIR,          "#{model_name}_test.rb"),
+            File.join(SPEC_MODEL_DIR,         "#{model_name}_spec.rb"),
+            File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
+            File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
+            File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+            File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
+            File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+            File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
+            File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+            File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
+            File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+            File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
+          ].each do |file|
+            if File.exist?(file)
+              remove_annotation_of_file(file)
+              deannotated_klass = true
+            end
+          end
+
+          deannotated << klass if(deannotated_klass)
         rescue Exception => e
           puts "Unable to deannotate #{file}: #{e.message}"
           puts "\t" + e.backtrace.join("\n\t") if options[:trace]

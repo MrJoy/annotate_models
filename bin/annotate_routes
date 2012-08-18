@@ -15,12 +15,13 @@ end
 require 'rake'
 require 'annotate'
 
-Annotate.load_tasks
 if File.exists?('Rakefile')
   load './Rakefile'
 else
   STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
 end
+Rake::Task[:environment].invoke
+Annotate.load_tasks
 Rake::Task[:set_annotation_options].invoke
 
 task = :do_annotate

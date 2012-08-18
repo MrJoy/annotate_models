@@ -1,3 +1,5 @@
+Annotate.loaded_tasks = true
+
 task :set_annotation_options
 
 desc "Add schema information (as comments) to model and fixture files"

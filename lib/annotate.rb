@@ -44,13 +44,17 @@ module Annotate
     return options
   end
 
+  def self.loaded_tasks=(val); @loaded_tasks = val; end
+  def self.loaded_tasks; return @loaded_tasks; end
+
   def self.load_tasks
-    return if(@loaded_tasks)
-    @loaded_tasks = true
+    return if(self.loaded_tasks)
+    self.loaded_tasks = true
 
     # Rails 3 wants to load our .rake files for us.
-    # TODO: selectively do this require on Rails 2.x?
-    Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
+    if(Rails.version.split('.').first.to_i < 3)
+      Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
+    end
   end
 
   def self.eager_load

@@ -5,6 +5,8 @@
 # run after doing db:migrate.
 # Unfortunately it relies on ENV for options; it'd be nice to be able to set options
 # in a per-project config file so this task can read them.
+Annotate.loaded_tasks = true
+
 task :set_annotation_options
 
 namespace :db do

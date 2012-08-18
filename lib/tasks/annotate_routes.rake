@@ -1,3 +1,5 @@
+Annotate.loaded_tasks = true
+
 task :set_annotation_options
 
 desc "Prepends the route map to the top of routes.rb"

@@ -1,6 +1,12 @@
 $:.unshift(File.dirname(__FILE__))
 require 'annotate/version'
-require 'active_support/hash_with_indifferent_access'
+begin
+  # ActiveSupport 3.x...
+  require 'active_support/hash_with_indifferent_access'
+rescue Exception => e
+  # ActiveSupport 2.x...
+  require 'active_support/core_ext/hash/indifferent_access'
+end
 
 module Annotate
   ##

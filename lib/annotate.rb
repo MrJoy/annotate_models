@@ -39,7 +39,7 @@ module Annotate
     end
 
     options[:model_dir] = ENV['model_dir']
-    options[:require]   = ENV['require'] ? ENV['require'].split(',') : []
+    options[:require]   = (!ENV['require'].blank?) ? ENV['require'].split(',') : []
 
     return options
   end
@@ -78,11 +78,11 @@ module Annotate
 private
 
   def self.fallback(*args)
-    return args.detect { |arg| !arg.nil? && arg != '' }
+    return args.detect { |arg| !arg.blank? }
   end
 
   def self.true?(val)
-    return false if(val.nil? || val == '')
+    return false if(val.blank?)
     return false unless(val =~ TRUE_RE)
     return true
   end

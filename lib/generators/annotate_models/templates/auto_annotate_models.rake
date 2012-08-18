@@ -26,6 +26,7 @@ if(Rails.env.development?)
       'format_markdown'      => "false",
       'no_sort'              => "false",
       'force'                => "false",
+      'trace'                => "false",
     })
   end
 

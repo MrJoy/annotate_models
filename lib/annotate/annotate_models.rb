@@ -330,10 +330,16 @@ module AnnotateModels
       get_loaded_model(model_path) || get_loaded_model(model_path.split('/').last)
     end
 
+    def get_subclasses_recursively(klass)
+      subs = klass.subclasses
+      subs += subs.map { |c| get_subclasses_recursively(c) }.flatten
+      return subs
+    end
+
     # Retrieve loaded model class by path to the file where it's supposed to be defined.
     def get_loaded_model(model_path)
-      model_classes = ::ActiveRecord::Base.send(:subclasses)
-      model_classes.detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }
+      model_classes = get_subclasses_recursively(ActiveRecord::Base)
+      return model_classes.detect { |c| ActiveSupport::Inflector.underscore(c) == model_path }
     end
 
     # We're passed a name of things that might be

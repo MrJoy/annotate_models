@@ -337,8 +337,8 @@ module AnnotateModels
         models = get_subclasses_recursively(ActiveRecord::Base)
       end
 
-      models.each do |model_class|
-        file = "#{ActiveSupport::Inflector.underscore(model_class)}.rb"
+      models.each do |klass|
+        file = "#{ActiveSupport::Inflector.underscore(klass)}.rb"
         found_file = false
         self.model_dir.each do |dir|
           if(File.exist?(File.join(dir, file)))
@@ -348,7 +348,7 @@ module AnnotateModels
         end
 
         if(!found_file && options[:trace])
-          puts "Skipping #{model_class}, as it seems to be provided by a gem/engine, or otherwise isn't in a path where we expect to find it."
+          puts "Skipping #{klass}, as it seems to be provided by a gem/engine, or otherwise isn't in a path where we expect to find it."
         end
       end
 

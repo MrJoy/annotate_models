@@ -11,7 +11,7 @@
 # and remove cruft that may interfere with the build.
 source 'https://rubygems.org'
 
-gem 'bundler', '~>1.1.4'
+gem 'bundler'
 gem 'rake', '~>0.8.7', :require => false
 gem 'rails', '~>2.3.14'
 gem 'sqlite3'

@@ -36,8 +36,8 @@ if [ "$SKIP_BUNDLER" != "1" ]; then
   # where the gemset will in fact already be set up, but the binstubs get nuked.
   mkdir -p bin
   if [ $(($(ls bin | wc -l) + 0)) -eq 0 ]; then
-    bundle --gemfile ./Gemfile install --binstubs=bin
+    bundle install --binstubs=bin --gemfile ./Gemfile
   else
-    bundle check || bundle --gemfile ./Gemfile install --binstubs=bin
+    bundle check || bundle install --binstubs=bin --gemfile ./Gemfile
   fi
 fi

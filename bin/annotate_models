@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'bundler'
-Bundler.setup
+begin
+  require 'bundler'
+  Bundler.setup
+rescue Exception => e
+end
 
 here = File.expand_path(File.dirname __FILE__)
 $:<< "#{here}/../lib"
@@ -51,19 +54,19 @@ OptionParser.new do |opts|
   end
 
   opts.on('--pf', '--position-in-factory [before|after]', ['before', 'after'],
-          "Place the annotations at the top (before) or the bottom (after) of the factory file") do |p|
+          "Place the annotations at the top (before) or the bottom (after) of any factory files") do |p|
     ENV['position_in_factory'] = p
     has_set_position['position_in_factory'] = true
   end
 
   opts.on('--px', '--position-in-fixture [before|after]', ['before', 'after'],
-          "Place the annotations at the top (before) or the bottom (after) of the fixture file") do |p|
+          "Place the annotations at the top (before) or the bottom (after) of any fixture files") do |p|
     ENV['position_in_fixture'] = p
     has_set_position['position_in_fixture'] = true
   end
 
   opts.on('--pt', '--position-in-test [before|after]', ['before', 'after'],
-          "Place the annotations at the top (before) or the bottom (after) of the test file") do |p|
+          "Place the annotations at the top (before) or the bottom (after) of any test files") do |p|
     ENV['position_in_test'] = p
     has_set_position['position_in_test'] = true
   end

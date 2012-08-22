@@ -80,8 +80,6 @@
   already reflected to reduce confusion about what is and is not implemented
   here.
 * Accept String or Symbol for :position (et al) options.
-* Rename "annotate" bin to "annotate_models" to avoid conflicting with
-  ImageMagick.
 * Add RDoc output formatting as an option.
 * Add Markdown output formatting as an option.
 * Add option to force annotation regeneration.

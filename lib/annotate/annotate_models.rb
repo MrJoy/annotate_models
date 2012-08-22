@@ -197,7 +197,7 @@ module AnnotateModels
         encoding_header = old_content.match(encoding).to_s
 
         if old_columns == new_columns && !options[:force]
-          false
+          return false
         else
 
 # todo: figure out if we need to extract any logic from this merge chunk
@@ -222,8 +222,10 @@ module AnnotateModels
             (encoding_header + info_block + old_content)
 
           File.open(file_name, "wb") { |f| f.puts new_content }
-          true
+          return true
         end
+      else
+        return false
       end
     end
 
@@ -234,6 +236,10 @@ module AnnotateModels
         content.sub!(PATTERN, '')
 
         File.open(file_name, "wb") { |f| f.puts content }
+
+        return true
+      else
+        return false
       end
     end
 

@@ -34,6 +34,7 @@ PLATFORMS
 
 DEPENDENCIES
   annotate!
+  bundler
   rails (~> 2.3.14)
   rake (~> 0.8.7)
   sqlite3

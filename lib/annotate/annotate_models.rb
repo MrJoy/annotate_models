@@ -9,7 +9,7 @@ module AnnotateModels
 
   # File.join for windows reverse bar compat?
   # I dont use windows, can`t test
-  UNIT_TEST_DIR         = File.join("test", "unit"  )
+  UNIT_TEST_DIR         = File.join("test", "unit")
   SPEC_MODEL_DIR        = File.join("spec", "models")
   FIXTURE_TEST_DIR      = File.join("test", "fixtures")
   FIXTURE_SPEC_DIR      = File.join("spec", "fixtures")

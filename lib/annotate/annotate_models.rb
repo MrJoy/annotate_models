@@ -30,6 +30,29 @@ module AnnotateModels
   FABRICATORS_TEST_DIR  = File.join("test", "fabricators")
   FABRICATORS_SPEC_DIR  = File.join("spec", "fabricators")
 
+  TEST_PATTERNS = [
+    [UNIT_TEST_DIR,  "%MODEL_NAME%_test.rb"],
+    [SPEC_MODEL_DIR, "%MODEL_NAME%_spec.rb"],
+  ]
+
+  FIXTURE_PATTERNS = [
+    File.join(FIXTURE_TEST_DIR, "%TABLE_NAME%.yml"),
+    File.join(FIXTURE_SPEC_DIR, "%TABLE_NAME%.yml"),
+  ]
+
+  FACTORY_PATTERNS = [
+    File.join(EXEMPLARS_TEST_DIR,     "%MODEL_NAME%_exemplar.rb"),
+    File.join(EXEMPLARS_SPEC_DIR,     "%MODEL_NAME%_exemplar.rb"),
+    File.join(BLUEPRINTS_TEST_DIR,    "%MODEL_NAME%_blueprint.rb"),
+    File.join(BLUEPRINTS_SPEC_DIR,    "%MODEL_NAME%_blueprint.rb"),
+    File.join(FACTORY_GIRL_TEST_DIR,  "%MODEL_NAME%_factory.rb"),    # (old style)
+    File.join(FACTORY_GIRL_SPEC_DIR,  "%MODEL_NAME%_factory.rb"),    # (old style)
+    File.join(FACTORY_GIRL_TEST_DIR,  "%TABLE_NAME%.rb"),            # (new style)
+    File.join(FACTORY_GIRL_SPEC_DIR,  "%TABLE_NAME%.rb"),            # (new style)
+    File.join(FABRICATORS_TEST_DIR,   "%MODEL_NAME%_fabricator.rb"),
+    File.join(FABRICATORS_SPEC_DIR,   "%MODEL_NAME%_fabricator.rb"),
+  ]
+
   # Don't show limit (#) on these column types
   # Example: show "integer" instead of "integer(4)"
   NO_LIMIT_COL_TYPES = ["integer", "boolean"]
@@ -235,49 +258,36 @@ module AnnotateModels
         info = get_schema_info(klass, header, options)
         did_annotate = false
         model_name = klass.name.underscore
+        table_name = klass.table_name
         self.model_dir = options[:model_dir] if options[:model_dir].length > 0
-        # A model could be defined in multiple files...
-        files = self.model_dir.
-          map { |dir| File.join(dir, file) }.
-          select { |fname| fname && File.exist?(fname) }
 
-        files.each do |file|
-          did_annotate = annotate_one_file(file, info, :position_in_class, options) || did_annotate
-        end
+        # A model could be defined in multiple files...
+        did_annotate = self.model_dir.
+          map { |dir| File.join(dir, file) }.
+          select { |fname| fname && File.exist?(fname) }.
+          map { |file| annotate_one_file(file, info, :position_in_class, options) }.
+          detect { |result| result } || did_annotate
 
         unless options[:exclude_tests]
-          [
-            find_test_file(UNIT_TEST_DIR,      "#{model_name}_test.rb"), # test
-            find_test_file(SPEC_MODEL_DIR,     "#{model_name}_spec.rb"), # spec
-          ].each do |file|
-            did_annotate = annotate_one_file(file, info, :position_in_test, options) || did_annotate
-          end
+          did_annotate = TEST_PATTERNS.
+            map { |pat| [pat[0], resolve_filename(pat[1], model_name, table_name)] }.
+            map { |pat| find_test_file(*pat) }.
+            map { |file| annotate_one_file(file, info, :position_in_test, options) }.
+            detect { |result| result } || did_annotate
         end
 
         unless options[:exclude_fixtures]
-          [
-            File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-            File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-          ].each do |file|
-            did_annotate = annotate_one_file(file, info, :position_in_fixture, options) || did_annotate
-          end
+          did_annotate = FIXTURE_PATTERNS.
+            map { |file| resolve_filename(file, model_name, table_name) }.
+            map { |file| annotate_one_file(file, info, :position_in_fixture, options) }.
+            detect { |result| result } || did_annotate
         end
 
         unless options[:exclude_factories]
-          [
-            File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-            File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-            File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-            File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-            File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-            File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-            File.join(FACTORY_GIRL_TEST_DIR,  "#{klass.table_name}.rb"),      # Factory Girl Factories, new naming convention.
-            File.join(FACTORY_GIRL_SPEC_DIR,  "#{klass.table_name}.rb"),      # Factory Girl Factories, new naming convention.
-            File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-            File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-          ].each do |file|
-            did_annotate = annotate_one_file(file, info, :position_in_factory, options) || did_annotate
-          end
+          did_annotate = FACTORY_PATTERNS.
+            map { |file| resolve_filename(file, model_name, table_name) }.
+            map { |file| annotate_one_file(file, info, :position_in_factory, options) }.
+            detect { |result| result } || did_annotate
         end
 
         annotated << klass if(did_annotate)
@@ -359,6 +369,7 @@ module AnnotateModels
           file = "#{ActiveSupport::Inflector.underscore(klass)}.rb"
           deannotated_klass = false
           model_name = klass.name.underscore
+          table_name = klass.table_name
           self.model_dir.each do |dir|
             model_file_name = File.join(dir, file)
             if(File.exist?(model_file_name))
@@ -367,27 +378,23 @@ module AnnotateModels
             end
           end
 
-          [
-            File.join(UNIT_TEST_DIR,          "#{model_name}_test.rb"),
-            File.join(SPEC_MODEL_DIR,         "#{model_name}_spec.rb"),
-            File.join(FIXTURE_TEST_DIR,       "#{klass.table_name}.yml"),     # fixture
-            File.join(FIXTURE_SPEC_DIR,       "#{klass.table_name}.yml"),     # fixture
-            File.join(EXEMPLARS_TEST_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-            File.join(EXEMPLARS_SPEC_DIR,     "#{model_name}_exemplar.rb"),   # Object Daddy
-            File.join(BLUEPRINTS_TEST_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-            File.join(BLUEPRINTS_SPEC_DIR,    "#{model_name}_blueprint.rb"),  # Machinist Blueprints
-            File.join(FACTORY_GIRL_TEST_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-            File.join(FACTORY_GIRL_SPEC_DIR,  "#{model_name}_factory.rb"),    # Factory Girl Factories
-            File.join(FACTORY_GIRL_TEST_DIR,  "#{klass.table_name}.rb"),      # Factory Girl Factories, new naming convention.
-            File.join(FACTORY_GIRL_SPEC_DIR,  "#{klass.table_name}.rb"),      # Factory Girl Factories, new naming convention.
-            File.join(FABRICATORS_TEST_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-            File.join(FABRICATORS_SPEC_DIR,   "#{model_name}_fabricator.rb"), # Fabrication Fabricators
-          ].each do |file|
-            if File.exist?(file)
-              remove_annotation_of_file(file)
-              deannotated_klass = true
+          TEST_PATTERNS.
+            map { |pat| [pat[0], resolve_filename(pat[1], model_name, table_name)]}.
+            map { |pat| find_test_file(*pat) }.each do |file|
+              if(File.exist?(file))
+                remove_annotation_of_file(file)
+                deannotated_klass = true
+              end
             end
-          end
+
+          (FIXTURE_PATTERNS + FACTORY_PATTERNS).
+            map { |file| resolve_filename(file, model_name, table_name) }.
+            each do |file|
+              if File.exist?(file)
+                remove_annotation_of_file(file)
+                deannotated_klass = true
+              end
+            end
 
           deannotated << klass if(deannotated_klass)
         rescue Exception => e
@@ -400,6 +407,12 @@ module AnnotateModels
 
     def find_test_file(dir, file_name)
       Dir.glob(File.join(dir, "**", file_name)).first || File.join(dir, file_name)
+    end
+
+    def resolve_filename(filename_template, model_name, table_name)
+      return filename_template.
+        gsub('%MODEL_NAME%', model_name).
+        gsub('%TABLE_NAME%', table_name)
     end
   end
 end

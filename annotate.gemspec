@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "annotate"
-  s.version = "2.5.0.beta2"
+  s.version = "2.5.0.beta3"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cuong Tran", "Alex Chaffee", "Marcos Piccinini", "Turadg Aleahmad", "Jon Frisby"]
-  s.date = "2012-08-18"
+  s.date = "2012-08-22"
   s.description = "Annotates Rails/ActiveRecord Models, routes, fixtures, and others based on the database schema."
   s.email = ["alex@stinky.com", "ctran@pragmaquest.com", "x@nofxx.com", "turadg@aleahmad.net", "jon@cloudability.com"]
   s.executables = ["annotate_models", "annotate_routes"]

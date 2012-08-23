@@ -30,7 +30,7 @@ Rake::Task[:set_annotation_options].invoke
 task = :do_annotations
 has_set_position = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: annotate_models [options] [ModelNames]"
+  opts.banner = "Usage: annotate_models [options] [ModelName]*"
 
   opts.on('-d', '--delete',
           "Remove annotations from all model files") do
@@ -105,9 +105,9 @@ OptionParser.new do |opts|
     ENV['ignore_model_sub_dir'] = "yes"
   end
 
-  opts.on('-n', '--no-sort',
+  opts.on('--sort',
           "Sort columns in creation order rather than alphabetically") do |dir|
-    ENV['no_sort'] = "yes"
+    ENV['sort'] = "yes"
   end
 
   opts.on('-R', '--require path',

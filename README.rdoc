@@ -110,24 +110,24 @@ anywhere in the file:
 
 == OPTIONS
 
-    Usage: annotate_models [options] [ModelNames]
+    Usage: annotate_models [options] [ModelName]*
         -d, --delete                     Remove annotations from all model files
         -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)
             --pc, --position-in-class [before|after]
                                          Place the annotations at the top (before) or the bottom (after) of the model file
             --pf, --position-in-factory [before|after]
-                                         Place the annotations at the top (before) or the bottom (after) of the factory file
+                                         Place the annotations at the top (before) or the bottom (after) of any factory files
             --px, --position-in-fixture [before|after]
-                                         Place the annotations at the top (before) or the bottom (after) of the fixture file
+                                         Place the annotations at the top (before) or the bottom (after) of any fixture files
             --pt, --position-in-test [before|after]
-                                         Place the annotations at the top (before) or the bottom (after) of the test file
+                                         Place the annotations at the top (before) or the bottom (after) of any test files
         -v, --version                    Show the current version of this gem
         -m, --show-migration             Include the migration version number in the annotation
         -i, --show-indexes               List the table's database indexes in the annotation
         -s, --simple-indexes             Concat the column's related indexes in the annotation
-            --model-dir dir              Annotate model files stored in dir rather than app/models
+            --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
             --ignore-model-subdirects    Ignore subdirectories of the models directory
-            --sort                       Sort columns alphabetically, rather than in creation order
+            --sort                       Sort columns in creation order rather than alphabetically
         -R, --require path               Additional file to require before loading models, may be used multiple times
         -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
             --exclude
@@ -144,10 +144,12 @@ anywhere in the file:
 
 == SORTING
 
-By default, columns will be sorted in database order (i.e. the order in which migrations were run).
+By default, columns will be sorted in database order (i.e. the order in which
+migrations were run).
 
 If you prefer to sort alphabetically so that the results of
-annotation are consistent regardless of what order migrations are executed in, use  --sort.
+annotation are consistent regardless of what order migrations are executed in,
+use  --sort.
 
 == WARNING
 

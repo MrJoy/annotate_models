@@ -98,6 +98,9 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ['--backtrace', '--format d']
 end
 
+# Placeholder for running bin/* in development...
+task :environment
+
 task :integration_environment do
   require './spec/spec_helper'
 end

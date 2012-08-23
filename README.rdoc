@@ -127,7 +127,7 @@ anywhere in the file:
         -s, --simple-indexes             Concat the column's related indexes in the annotation
             --model-dir dir              Annotate model files stored in dir rather than app/models
             --ignore-model-subdirects    Ignore subdirectories of the models directory
-        -n, --no-sort                    Sort columns in creation order rather than alphabetically
+            --sort                       Sort columns alphabetically, rather than in creation order
         -R, --require path               Additional file to require before loading models, may be used multiple times
         -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
             --exclude
@@ -144,10 +144,10 @@ anywhere in the file:
 
 == SORTING
 
-By default, columns will be sorted alphabetically so that the results of
-annotation are consistent regardless of what order migrations are executed in.
+By default, columns will be sorted in database order (i.e. the order in which migrations were run).
 
-If you prefer the old behavior, use --no-sort.
+If you prefer to sort alphabetically so that the results of
+annotation are consistent regardless of what order migrations are executed in, use  --sort.
 
 == WARNING
 

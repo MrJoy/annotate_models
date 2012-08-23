@@ -99,12 +99,12 @@ module AnnotateModels
       end
 
       cols = klass.columns
-      cols = cols.sort_by(&:name) unless(options[:no_sort])
+      cols = cols.sort_by(&:name) if(options[:sort])
       cols.each do |col|
         attrs = []
         attrs << "default(#{quote(col.default)})" unless col.default.nil?
         attrs << "not null" unless col.null
-        attrs << "primary key" if !klass.primary_key.nil? && col.name.to_sym == klass.primary_key.to_sym
+        attrs << "primary key" if klass.primary_key && col.name.to_sym == klass.primary_key.to_sym
 
         col_type = (col.type || col.sql_type).to_s
         if col_type == "decimal"

@@ -23,5 +23,5 @@ OptionParser.new do |opts|
 end.parse!
 
 options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
-options[:require].each { |path| require path } if options[:require]
+Annotate.load_requires(options)
 target[:klass].send(target[:task], options)

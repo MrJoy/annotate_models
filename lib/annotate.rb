@@ -156,17 +156,32 @@ module Annotate
     Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each { |rake| load rake }
   end
 
-  def self.eager_load
-    if(Rails.version.split('.').first.to_i < 3)
-      Rails.configuration.eager_load_paths.each do |load_path|
-        matcher = /\A#{Regexp.escape(load_path)}(.*)\.rb\Z/
-        Dir.glob("#{load_path}/**/*.rb").sort.each do |file|
-          require_dependency file.sub(matcher, '\1')
+  def self.load_requires(options)
+    options[:require].each { |path| require path } if options[:require].count > 0
+  end
+
+  def self.eager_load(options)
+    self.load_requires(options)
+    require "annotate/active_record_patch"
+
+    if(defined?(Rails))
+      if(Rails.version.split('.').first.to_i < 3)
+        Rails.configuration.eager_load_paths.each do |load_path|
+          matcher = /\A#{Regexp.escape(load_path)}(.*)\.rb\Z/
+          Dir.glob("#{load_path}/**/*.rb").sort.each do |file|
+            require_dependency file.sub(matcher, '\1')
+          end
         end
+      else
+        klass = Rails::Application.send(:subclasses).first
+        klass.eager_load!
       end
     else
-      klass = Rails::Application.send(:subclasses).first
-      klass.eager_load!
+      options[:model_dir].each do |dir|
+        FileList["#{dir}/**/*.rb"].each do |fname|
+          require File.expand_path(fname)
+        end
+      end
     end
   end
 

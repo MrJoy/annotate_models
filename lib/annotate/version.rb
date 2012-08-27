@@ -1,5 +1,5 @@
 module Annotate
   def self.version
-    @version ||= File.read(File.expand_path("../../../VERSION", __FILE__)).chomp
+    '2.5.0.beta4'
   end
 end

@@ -4,7 +4,7 @@ gem 'rake', '>= 0.8.7', :require => false
 gem 'activesupport', '>= 2.3.0', :require => false
 
 group :development do
-  gem 'jeweler', '~> 1.8.4', :require => false
+  gem 'mg', :require => false
   platforms :ruby do
     gem 'yard', :require => false
   end

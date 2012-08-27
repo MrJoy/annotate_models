@@ -177,7 +177,6 @@ namespace :integration do
       end
     end
   end
-#FileUtils.copy_entry(src, dest, preserve = false, dereference_root = false, remove_destination = false)
 end
 task :clobber => :'integration:clobber'
 

@@ -80,7 +80,9 @@ additional functionality of annotating `routes.rb` so two binaries are
 provided, one for each task.
 
 
-== Usage (Rails)
+== Usage
+
+=== Usage in Rails
 
 To annotate all your models, tests, fixtures, and factories:
 
@@ -121,7 +123,7 @@ Or:
     annotate_routes --delete
 
 
-== Usage (Outside of Rails)
+=== Usage Outside of Rails
 
 Everything above applies, except that --routes is not meaningful, and you will
 probably need to explicitly set one or more `--require` option(s), and/or one
@@ -129,7 +131,13 @@ or more `--model-dir` options to inform annotate about the structure of your
 project and help it bootstrap and load the relevant code.
 
 
-== Configuration (Rails)
+
+== Configuration
+
+If you want to always skip annotations on a particular model, add this string
+anywhere in the file:
+
+    # -*- SkipSchemaAnnotations
 
 To generate a configuration file (in the form of a `.rake` file), to set
 default options:
@@ -140,14 +148,15 @@ Edit this file to control things like output format, where annotations are
 added (top or bottom of file), and in which artifacts.
 
 
-== Configuration (General)
+=== Configuration in Rails
 
-If you want to always skip annotations on a particular model, add this string
-anywhere in the file:
+To generate a configuration file (in the form of a `.rake` file), to set
+default options:
 
-    # -*- SkipSchemaAnnotations
+    rails g annotate:install
 
-
+Edit this file to control things like output format, where annotations are
+added (top or bottom of file), and in which artifacts.
 == Rails Integration
 
 By default, once you've generated a configuration file, annotate will be

@@ -2,8 +2,9 @@ require 'common_validation'
 
 module Annotate
   module Validations
-    module Rails32CustomInflection
-      SCHEMA_ANNOTATION=<<-RUBY
+    class Rails32CustomInflection < Base
+      def self.schema_annotation
+        return <<-RUBY
 # == Schema Information
 #
 # Table name: tasks
@@ -14,8 +15,10 @@ module Annotate
 #  updated_at :datetime         not null
 #
 RUBY
+      end
 
-      ROUTE_ANNOTATION=<<-RUBY
+      def self.route_annotation
+        return <<-RUBY
 # == Route Map (Updated YYYY-MM-DD HH:MM)
 #
 #     tasks GET    /tasks(.:format)          tasks#index
@@ -27,24 +30,11 @@ RUBY
 #           DELETE /tasks/:id(.:format)      tasks#destroy
 #
 RUBY
-
-      def self.test_commands
-        return Annotate::Validations::Common.test_commands
       end
 
       def self.verify_output(output)
         output.should =~ /Annotated \(1\): TASk/
         output.should =~ /Route file annotated./
-      end
-
-      def self.verify_files(test_rig)
-        return Annotate::Validations::Common.verify_files({
-          :model => true,
-          :test => true,
-          :fixture => true,
-          :factory => false,
-          :routes => true
-        }, test_rig, SCHEMA_ANNOTATION, ROUTE_ANNOTATION, true)
       end
     end
   end

@@ -28,7 +28,7 @@ module AnnotateRoutes
   end
   PREFIX = "# == Route Map"
 
-  def self.do_annotate(options={})
+  def self.do_annotations(options={})
     return unless(routes_exists?)
 
     position_after = options[:position_in_routes] != 'before'

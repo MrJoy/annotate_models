@@ -1,4 +1,4 @@
-== 2.5.0
+== 2.6.0.beta1
 
 * It's now possible to use Annotate in standalone ActiveRecord (non-Rails)
   projects again.
@@ -39,6 +39,10 @@
   combination of the new schema are different than that of the old (i.e., don't
   regenerate if columns happen to be in a different order. That's just how life
   is sometimes)
+* Change annotate to use options hash instead of ENV.
+
+== 2.5.0
+
 * Works better with Rails 3
 * Bugfix: schema kept prepending additional newlines
 * Updates to make annotate smarter about when to touch a model
@@ -56,8 +60,7 @@
 * Allow task loading from Rakefile for gems (plugin installation already
   auto-detects).
 * Add skip_on_db_migrate option as well for people that don't want it
-* Fix options parsing to convert strings to proper booleans. Change annotate to
-  use options hash instead of ENV.
+* Fix options parsing to convert strings to proper booleans
 * Add support for Fabrication fabricators
 * Leave magic encoding comment intact
 * Fix issue #14 - RuntimeError: Already memoized

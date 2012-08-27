@@ -1,9 +1,10 @@
 == Annotate (aka AnnotateModels)
 
-IMPORTANT:  If you're upgrading from a previous version, including 2.5.0.beta2,
+IMPORTANT:  If you're upgrading from a previous version, including 2.5.0.beta3,
 re-run the generator task!
 
-Add a comment summarizing the current schema to the top or bottom of each of your...
+Add a comment summarizing the current schema to the top or bottom of each of
+your...
 
 - ActiveRecord models
 - Fixture files
@@ -31,7 +32,8 @@ The schema comment looks like this:
       belongs_to :product
      . . .
 
-It also annotates geometrical columns, geom type and srid, when using SpatialAdapter or PostgisAdapter:
+It also annotates geometrical columns, geom type and srid, when using
+`SpatialAdapter` or `PostgisAdapter`:
 
    # == Schema Info
    #
@@ -40,7 +42,9 @@ It also annotates geometrical columns, geom type and srid, when using SpatialAda
    #  local           :geometry        point, 4326
    #  path            :geometry        line_string, 4326
 
-Also, if you pass the -r option, it'll annotate routes.rb with the output of "rake routes".
+Also, if you pass the -r option, it'll annotate routes.rb with the output of
+`rake routes`.
+
 
 == INSTALL
 
@@ -59,70 +63,144 @@ Into environment gems from Github checkout:
     rake build
     gem install pkg/annotate-*.gem
 
-== USAGE
+
+== COMMANDS
 
 (If you used the Gemfile install, prefix the below commands with `bundle exec`.)
+
+It's important to note that there are three binaries provided by this gem:
+
+- `annotate`: Can annotate models (and related artifacts), or `routes.rb`.
+- `annotate_models`: Can annotate models (and related artifacts).
+- `annotate_routes`: Can annotate `routes.rb`.
+
+The reason for this is that `annotate` is also used by ImageMagick, and so can
+be a source of conflicts.  The name `annotate_models` is misleading given the
+additional functionality of annotating `routes.rb` so two binaries are
+provided, one for each task.
+
+
+== USAGE
 
 To annotate all your models, tests, fixtures, and factories:
 
     cd /path/to/app
+    annotate
+
+Or:
+
+    cd /path/to/app
     annotate_models
 
-To annotate your models, tests, and factories:
+To annotate just your models, tests, and factories:
 
-    annotate_models --exclude fixtures
+    annotate --exclude fixtures
 
 To annotate just your models:
 
-    annotate_models --exclude tests,fixtures,factories
+    annotate --exclude tests,fixtures,factories
 
 To annotate routes.rb:
 
-    annotate_models -r
+    annotate --routes
+
+Or:
+
+    annotate_routes
 
 To remove model/test/fixture/factory annotations:
 
-    annotate_models -d
+    annotate --delete
 
 To remove routes.rb annotations:
 
-    annotate_routes -d
+    annotate --routes --delete
 
-To automatically annotate after running 'rake db:migrate', ensure you've added
-annotate_models to your Rails project's Gemfile, and run this:
+Or:
 
-    rails g annotate_models:install
+    annotate_routes --delete
 
-This will produce a .rake file that will ensure annotation happens after
-migration (but only in development mode), and provide configuration options
-you can use to tailor the output.
 
-If you want to skip the annotation pass when running `rake db:migrate`, set the
-`skip_on_db_migrate` variable:
+== Configuration
 
-    skip_on_db_migrate=1 rake db:migrate
+To generate a configuration file (in the form of a `.rake` file), to set
+default options:
 
+    rails g annotate:install
+
+Edit this file to control things like output format, where annotations are
+added (top or bottom of file), and in which artifacts.
 
 If you want to always skip annotations on a particular model, add this string
 anywhere in the file:
 
     # -*- SkipSchemaAnnotations
 
+
+== Integration
+
+By default, once you've generated a configuration file, annotate will be
+executed whenever you run `rake db:migrate` (but only in development mode).
+If you want to disable this behavior permanently, edit the `.rake` file and
+change:
+
+    'skip_on_db_migrate'   => "false",
+
+To:
+
+    'skip_on_db_migrate'   => "try",
+
+If you want to run `rake db:migrate` as a one-off without running annotate,
+you can do so with a simple environment variable, instead of editing the
+`.rake` file:
+
+    skip_on_db_migrate=1 rake db:migrate
+
+
 == OPTIONS
+
+    Usage: annotate [options] [ModelName]*
+        -m, --show-migration             Include the migration version number in the annotation
+        -i, --show-indexes               List the table's database indexes in the annotation
+        -s, --simple-indexes             Concat the column's related indexes in the annotation
+        -D, --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
+        -I, --ignore-model-subdirs       Ignore subdirectories of the models directory
+        -S, --sort                       Sort columns in creation order rather than alphabetically
+        -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
+            --exclude
+        -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
+            --format
+        -F, --force                      Force new annotations even if there are no changes.
+        -t, --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
+        -r, --routes                     Annotate the Routes.rb file instead of annotating other items like the model/test/fixture/factory.
+        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)
+            --pc, --position-in-class [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of the model file
+            --pf, --position-in-factory [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of any factory files
+            --px, --position-in-fixture [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of any fixture files
+            --pt, --position-in-test [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of any test files
+            --pr, --position-in-routes [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of any test files
+        -R, --require path               Additional file to require before loading models, may be used multiple times
+        -d, --delete                     Remove annotations from all relevant files
+        -v, --version                    Show the current version of this gem
 
     Usage: annotate_models [options] [ModelName]*
         -m, --show-migration             Include the migration version number in the annotation
         -i, --show-indexes               List the table's database indexes in the annotation
         -s, --simple-indexes             Concat the column's related indexes in the annotation
-            --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
-            --ignore-model-subdirs       Ignore subdirectories of the models directory
-            --sort                       Sort columns in creation order rather than alphabetically
+        -D, --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
+        -I, --ignore-model-subdirs       Ignore subdirectories of the models directory
+        -S, --sort                       Sort columns in creation order rather than alphabetically
         -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
             --exclude
         -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
             --format
-            --force                      Force new annotations even if there are no changes.
-            --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
+        -F, --force                      Force new annotations even if there are no changes.
+        -t, --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
         -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)
             --pc, --position-in-class [before|after]
                                          Place the annotations at the top (before) or the bottom (after) of the model file
@@ -144,6 +222,7 @@ anywhere in the file:
         -d, --delete                     Remove annotations from all relevant files
         -v, --version                    Show the current version of this gem
 
+
 == SORTING
 
 By default, columns will be sorted in database order (i.e. the order in which
@@ -152,6 +231,7 @@ migrations were run).
 If you prefer to sort alphabetically so that the results of
 annotation are consistent regardless of what order migrations are executed in,
 use  --sort.
+
 
 == MARKDOWN
 
@@ -168,6 +248,7 @@ Be sure to add this to your `Gemfile` as well:
 
     gem 'kramdown', :groups => [:development], :require => false
 
+
 == WARNING
 
 Note that this code will blow away the initial/final comment block in your
@@ -175,6 +256,7 @@ models if it looks like it was previously added by this gem, so you don't want
 to add additional text to an automatically created comment block.
 
 BACK UP YOUR MODELS BEFORE USING THIS TOOL!
+
 
 == LINKS
 
@@ -185,9 +267,11 @@ BACK UP YOUR MODELS BEFORE USING THIS TOOL!
 - SpatialAdapter: http://github.com/pdeffendol/spatial_adapter
 - PostgisAdapter: http://github.com/nofxx/postgis_adapter
 
+
 == LICENSE:
 
 Released under the same license as Ruby. No Support. No Warranty.
+
 
 == AUTHORS:
 

@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'bundler'
-Bundler.setup
+begin
+  require 'bundler'
+  Bundler.setup
+rescue Exception => e
+end
 
 here = File.expand_path(File.dirname __FILE__)
 $:<< "#{here}/../lib"
@@ -14,6 +17,7 @@ rescue Exception => e
 end
 require 'rake'
 require 'annotate'
+require 'annotate/annotate_models'
 require 'annotate/annotate_routes'
 
 if File.exists?('Rakefile')
@@ -26,17 +30,21 @@ Annotate.load_tasks
 Rake::Task[:set_annotation_options].invoke
 
 target = {
-  :klass => AnnotateRoutes,
+  :klass => AnnotateModels,
   :task => :do_annotations,
 }
 has_set_position = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: annotate_routes [options]"
+  opts.banner = "Usage: annotate [options] [ModelName]*"
 
+  AnnotateModels::OPTIONS.call(opts)
   AnnotateRoutes::OPTIONS.call(opts)
-  Annotate::OPTIONS.call(opts, :routes, has_set_position, target)
+  Annotate::OPTIONS.call(opts, :both, has_set_position, target)
 end.parse!
 
+
+Annotate.eager_load
+require "annotate/active_record_patch"
 options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
 options[:require].each { |path| require path } if options[:require]
 target[:klass].send(task, options)

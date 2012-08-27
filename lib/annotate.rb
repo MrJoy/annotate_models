@@ -9,7 +9,14 @@ rescue Exception => e
 end
 
 module Annotate
-  OPTIONS = proc do |opts, mode, has_set_position, task|
+  OPTIONS = proc do |opts, mode, has_set_position, target|
+    if(mode == :both)
+      opts.on('-r', '--routes',
+              'Annotate the Routes.rb file instead of annotating other items like the model/test/fixture/factory.') do
+        target[:klass] = AnnotateRoutes
+      end
+    end
+
     opts.on('-p', '--position [before|after]', ['before', 'after'],
             "Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)") do |p|
       ENV['position'] = p
@@ -67,7 +74,7 @@ module Annotate
             "Remove annotations from all relevant files") do
       # Mutate the string, don't change the reference, or the value won't be
       # seen by the caller.
-      task.gsub!(/\A.*\Z/, 'remove_annotations')
+      target[:task] = :remove_annotations
     end
 
     opts.on('-v', '--version',

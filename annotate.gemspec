@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.date = "2012-08-27"
   s.description = "Annotates Rails/ActiveRecord Models, routes, fixtures, and others based on the database schema."
   s.email = ["alex@stinky.com", "ctran@pragmaquest.com", "x@nofxx.com", "turadg@aleahmad.net", "jon@cloudability.com"]
-  s.executables = ["annotate_models", "annotate_routes"]
+  s.executables = ["annotate", "annotate_models", "annotate_routes"]
   s.extra_rdoc_files = [
     "CHANGELOG.rdoc",
     "README.rdoc",
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "TODO.rdoc",
     "VERSION",
     "annotate.gemspec",
+    "bin/annotate",
     "bin/annotate_models",
     "bin/annotate_routes",
     "lib/annotate.rb",

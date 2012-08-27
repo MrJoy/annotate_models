@@ -8,9 +8,9 @@ module Annotate
 #
 # Table name: tasks
 #
+#  id         :integer          not null, primary key
 #  content    :string(255)
 #  created_at :datetime
-#  id         :integer          not null, primary key
 #  updated_at :datetime
 #
 RUBY

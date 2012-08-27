@@ -107,7 +107,7 @@ end
 
 namespace :gemsets do
   desc "Completely empty any gemsets used by scenarios, so they'll be perfectly clean on the next run."
-  task :empty => [:integration_environment, :'templates:rebuild'] do
+  task :empty => [:integration_environment] do
     Annotate::Integration::SCENARIOS.each do |test_rig, base_dir, test_name|
       Annotate::Integration.empty_gemset(test_rig)
     end

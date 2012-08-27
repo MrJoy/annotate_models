@@ -1,7 +1,7 @@
 source :rubygems
 
 gem 'rake', '>= 0.8.7', :require => false
-gem 'activesupport', '>= 2.3.0', :require => false
+gem 'activerecord', '>= 2.3.0', :require => false
 
 group :development do
   gem 'mg', :require => false

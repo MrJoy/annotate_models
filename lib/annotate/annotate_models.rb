@@ -15,7 +15,7 @@ module AnnotateModels
       ENV['simple_indexes'] = "yes"
     end
 
-    opts.on('--model-dir dir',
+    opts.on('-D', '--model-dir dir',
             "Annotate model files stored in dir rather than app/models, may be used multiple times") do |dir|
       if !ENV['model_dir'].blank?
         ENV['model_dir'] = ENV['model_dir'] + ",#{dir}"
@@ -24,12 +24,12 @@ module AnnotateModels
       end
     end
 
-    opts.on('--ignore-model-subdirs',
+    opts.on('-I', '--ignore-model-subdirs',
             "Ignore subdirectories of the models directory") do |dir|
       ENV['ignore_model_sub_dir'] = "yes"
     end
 
-    opts.on('--sort',
+    opts.on('-S', '--sort',
             "Sort columns in creation order rather than alphabetically") do |dir|
       ENV['sort'] = "yes"
     end
@@ -43,11 +43,11 @@ module AnnotateModels
       ENV["format_#{fmt}"] = 'yes'
     end
 
-    opts.on('--force', 'Force new annotations even if there are no changes.') do |force|
+    opts.on('-F', '--force', 'Force new annotations even if there are no changes.') do |force|
       ENV['force'] = 'yes'
     end
 
-    opts.on('--trace', 'If unable to annotate a file, print the full stack trace, not just the exception message.') do |value|
+    opts.on('-t', '--trace', 'If unable to annotate a file, print the full stack trace, not just the exception message.') do |value|
       ENV['trace'] = 'yes'
     end
   end

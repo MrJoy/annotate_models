@@ -34,6 +34,6 @@ OptionParser.new do |opts|
   Annotate::OPTIONS.call(opts, :routes, has_set_position, task)
 end.parse!
 
-options=Annotate.setup_options({ :is_rake => true })
+options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
 options[:require].each { |path| require path } if options[:require]
 AnnotateRoutes.send(task.to_sym, options)

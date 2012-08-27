@@ -65,7 +65,7 @@ module Annotate
     end
 
     def self.is_clean?(test_rig)
-      return `git status --porcelain #{SCENARIO_HOME}/rails_2.3/ | wc -l`.strip.to_i == 0
+      return `git status --porcelain #{test_rig}/ | wc -l`.strip.to_i == 0
     end
   end
 end

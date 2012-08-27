@@ -151,6 +151,21 @@ If you prefer to sort alphabetically so that the results of
 annotation are consistent regardless of what order migrations are executed in,
 use  --sort.
 
+== MARKDOWN
+
+The format produced is actually MultiMarkdown, making use of the syntax
+extension for tables.  It's recommended you use `kramdown` as your parser if
+you want to use this format.  If you're using `yard` to generate documentation,
+specify a format of markdown with `kramdown` as the provider by adding this to
+your `.yardopts` file:
+
+    --markup markdown
+    --markup-provider kramdown
+
+Be sure to add this to your `Gemfile` as well:
+
+    gem 'kramdown', :groups => [:development], :require => false
+
 == WARNING
 
 Note that this code will blow away the initial/final comment block in your

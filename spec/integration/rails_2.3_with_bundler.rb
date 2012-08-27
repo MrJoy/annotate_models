@@ -2,7 +2,7 @@ require 'common_validation'
 
 module Annotate
   module Validations
-    module Rails32NoAssetPipeline
+    module Rails23WithBundler
       SCHEMA_ANNOTATION=<<-RUBY
 # == Schema Information
 #
@@ -10,21 +10,21 @@ module Annotate
 #
 #  id         :integer          not null, primary key
 #  content    :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  created_at :datetime
+#  updated_at :datetime
 #
 RUBY
 
       ROUTE_ANNOTATION=<<-RUBY
 # == Route Map (Updated YYYY-MM-DD HH:MM)
 #
-#     tasks GET    /tasks(.:format)          tasks#index
-#           POST   /tasks(.:format)          tasks#create
-#  new_task GET    /tasks/new(.:format)      tasks#new
-# edit_task GET    /tasks/:id/edit(.:format) tasks#edit
-#      task GET    /tasks/:id(.:format)      tasks#show
-#           PUT    /tasks/:id(.:format)      tasks#update
-#           DELETE /tasks/:id(.:format)      tasks#destroy
+#     tasks GET    /tasks(.:format)          {:controller=>"tasks", :action=>"index"}
+#           POST   /tasks(.:format)          {:controller=>"tasks", :action=>"create"}
+#  new_task GET    /tasks/new(.:format)      {:controller=>"tasks", :action=>"new"}
+# edit_task GET    /tasks/:id/edit(.:format) {:controller=>"tasks", :action=>"edit"}
+#      task GET    /tasks/:id(.:format)      {:controller=>"tasks", :action=>"show"}
+#           PUT    /tasks/:id(.:format)      {:controller=>"tasks", :action=>"update"}
+#           DELETE /tasks/:id(.:format)      {:controller=>"tasks", :action=>"destroy"}
 #
 RUBY
 

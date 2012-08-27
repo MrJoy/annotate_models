@@ -5,4 +5,5 @@ TestApp::Application.config.secret_token = '4768b21141022d583b141fde0db7e0b31759
 TestApp::Application.config.session_store :cookie_store, key: '_session'
 
 # wrap_parameters.rb
+ActiveSupport.on_load(:action_controller) { wrap_parameters format: [:json] }
 ActiveSupport.on_load(:active_record) { self.include_root_in_json = false }

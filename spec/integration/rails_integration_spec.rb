@@ -7,6 +7,7 @@ require 'rake'
 include Files
 include Wrong::D
 
+BASEDIR=File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
 RVM_BIN = `which rvm`.chomp
 USING_RVM = (RVM_BIN != '')
 
@@ -44,8 +45,6 @@ describe "annotate inside Rails, using #{CURRENT_RUBY}" do
           exclusions = ["#{test_rig}/.", "#{test_rig}/.."]
           FileUtils.cp_r(FileList["#{test_rig}/*", "#{test_rig}/.*"] - exclusions, temp_dir)
 
-          Annotate::Integration.compile_templates(base_dir, temp_dir, false)
-
           # By default, rvm_ruby_string isn't inherited over properly, so let's
           # make sure it's there so our .rvmrc will work.
           ENV['rvm_ruby_string']=CURRENT_RUBY
@@ -56,6 +55,7 @@ describe "annotate inside Rails, using #{CURRENT_RUBY}" do
           Dir.chdir(temp_dir) do
             output = `
               (
+                export AUTOMATED_TEST="#{BASEDIR}"
                 source .rvmrc &&
                 #{klass.test_commands}
               ) 2>&1`.chomp

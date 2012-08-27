@@ -18,7 +18,8 @@ if [ "$(type rvm | head -1)" != "rvm is a function" ]; then
 fi
 
 # Now, switch to our preferred Ruby and gemset...
-rvm use --create ${rvm_ruby_string}@annotate_test_rails328
+GEMSET=annotate_test_$(basename $(pwd) | perl -pse 's/\.//g')
+rvm use --create ${rvm_ruby_string}@${GEMSET}
 
 # Early-out when we just want to wipe the gemsets clean...
 if [ "$SKIP_BUNDLER" != "1" ]; then

@@ -129,17 +129,6 @@ namespace :integration do
 end
 task :clobber => :'integration:clobber'
 
-namespace :templates do
-  desc "Rebuild templates used for interactive debugging of integration scenarios."
-  task :rebuild => :integration_environment do
-    Annotate::Integration::SCENARIOS.each do |test_rig, base_dir, test_name|
-      puts "Compiling interactive-debugging templates for #{test_name}..."
-      # Compile our debugging templates...
-      Annotate::Integration.compile_templates(base_dir, test_rig, true)
-    end
-  end
-end
-
 require 'yard'
 YARD::Rake::YardocTask.new do |t|
   # t.files   = ['features/**/*.feature', 'features/**/*.rb', 'lib/**/*.rb']

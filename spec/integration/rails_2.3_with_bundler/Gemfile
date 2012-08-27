@@ -11,19 +11,15 @@
 # and remove cruft that may interfere with the build.
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.2'
-
+gem 'bundler'
+gem 'rake', '~>0.8.7', :require => false
+gem 'rails', '~>2.3.14'
 gem 'sqlite3'
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
-  gem 'uglifier', '>= 1.0.3'
-end
-
 group :development do
-  gem 'annotate', :path => '%ANNOTATE_PATH%'
+  if(ENV['AUTOMATED_TEST'] && ENV['AUTOMATED_TEST'] != '')
+    gem 'annotate', :path => ENV['AUTOMATED_TEST']
+  else
+    gem 'annotate', :path => '../../..'
+  end
 end
-

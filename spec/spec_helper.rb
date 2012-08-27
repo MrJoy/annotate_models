@@ -67,20 +67,5 @@ module Annotate
     def self.is_clean?(test_rig)
       return `git status --porcelain #{SCENARIO_HOME}/rails_2.3/ | wc -l`.strip.to_i == 0
     end
-
-    def self.compile_templates(base_dir, output_dir, use_relative_path)
-      FileList[
-        File.join(SCENARIO_HOME, "template.#{base_dir}.*")
-      ].each do |template|
-        template_out = File.join(output_dir, template.sub("#{SCENARIO_HOME}/", '').sub("template.#{base_dir}.", ''))
-        File.open(template_out, "wb") do |fh|
-          fh.write(
-            File.read(template).
-              gsub('%ANNOTATE_PATH%', use_relative_path ? '../../..' : ABSOLUTE_GEM_ROOT).
-              gsub('%ANNOTATE_VERSION%', Annotate.version)
-          )
-        end
-      end
-    end
   end
 end

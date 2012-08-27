@@ -1,5 +1,8 @@
 $:.unshift(File.dirname(__FILE__))
 require 'annotate/version'
+require 'annotate/annotate_models'
+require 'annotate/annotate_routes'
+
 begin
   # ActiveSupport 3.x...
   require 'active_support/hash_with_indifferent_access'

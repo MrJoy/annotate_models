@@ -17,7 +17,6 @@ rescue Exception => e
 end
 require 'rake'
 require 'annotate'
-require 'annotate/annotate_models'
 
 if File.exists?('Rakefile')
   load './Rakefile'

@@ -126,6 +126,58 @@ namespace :integration do
     Annotate::Integration.reset_dirty_files
     Annotate::Integration.clear_untracked_files
   end
+
+  task :symlink => [:integration_environment] do
+    require 'digest/md5'
+
+    integration_dir = File.expand_path(File.join(File.dirname(__FILE__), 'spec', 'integration'))
+    fixture_dir = File.expand_path(File.join(File.dirname(__FILE__), 'spec', 'fixtures'))
+    target_dir = File.expand_path(ENV['TARGET']) if(ENV['TARGET'])
+    raise "Must specify TARGET=x, where x is an integration test scenario!" unless(target_dir && Dir.exist?(target_dir))
+    raise "TARGET directory must be within spec/integration/!" unless(target_dir.start_with?(integration_dir))
+    candidates = {}
+    FileList[
+      "#{target_dir}/.rvmrc",
+      "#{target_dir}/**/*"
+    ].select { |fname| !(File.symlink?(fname) || File.directory?(fname)) }.
+      map { |fname| fname.sub(integration_dir, '') }.
+      reject do |fname|
+        fname =~ /\/\.gitkeep$/ ||
+        fname =~ /\/app\/models\// ||
+        fname =~ /\/routes\.rb$/ ||
+        fname =~ /\/fixtures\// ||
+        fname =~ /\/factories\// ||
+        fname =~ /\.sqlite3$/ ||
+        (fname =~ /\/test\// && fname !~ /_helper\.rb$/) ||
+        (fname =~ /\/spec\// && fname !~ /_helper\.rb$/)
+      end.
+      map { |fname| "#{integration_dir}#{fname}"}.
+      each do |fname|
+        digest = Digest::MD5.hexdigest(File.read(fname))
+        candidates[digest] ||= []
+        candidates[digest] << fname
+      end
+    fixtures = {}
+    FileList["spec/fixtures/**/*"].each do |fname|
+      fixtures[Digest::MD5.hexdigest(File.read(fname))] = File.expand_path(fname)
+    end
+
+    candidates.keys.each do |digest|
+      if(fixtures.has_key?(digest))
+        candidates[digest].each do |fname|
+          # Double-check contents in case of hash collision...
+          if(FileUtils.identical?(fname, fixtures[digest]))
+            destination_dir = Pathname.new(File.dirname(fname))
+            relative_target = Pathname.new(fixtures[digest]).relative_path_from(destination_dir)
+            Dir.chdir(destination_dir) do
+              sh("ln", "-sfn", relative_target.to_s, File.basename(fname))
+            end
+          end
+        end
+      end
+    end
+  end
+#FileUtils.copy_entry(src, dest, preserve = false, dereference_root = false, remove_destination = false)
 end
 task :clobber => :'integration:clobber'
 

@@ -43,7 +43,10 @@ describe "annotate inside Rails, using #{CURRENT_RUBY}" do
 
           # Copy everything to our test directory...
           exclusions = ["#{test_rig}/.", "#{test_rig}/.."]
-          FileUtils.cp_r(FileList["#{test_rig}/*", "#{test_rig}/.*"] - exclusions, temp_dir)
+
+          files = (FileList["#{test_rig}/*", "#{test_rig}/.*"] - exclusions).to_a
+          # We want to NOT preserve symlinks during this copy...
+          system("rsync -aL #{files.shelljoin} #{temp_dir.shellescape}")
 
           # By default, rvm_ruby_string isn't inherited over properly, so let's
           # make sure it's there so our .rvmrc will work.

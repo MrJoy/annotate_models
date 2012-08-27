@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cuong Tran", "Alex Chaffee", "Marcos Piccinini", "Turadg Aleahmad", "Jon Frisby"]
-  s.date = "2012-08-22"
+  s.date = "2012-08-27"
   s.description = "Annotates Rails/ActiveRecord Models, routes, fixtures, and others based on the database schema."
   s.email = ["alex@stinky.com", "ctran@pragmaquest.com", "x@nofxx.com", "turadg@aleahmad.net", "jon@cloudability.com"]
   s.executables = ["annotate_models", "annotate_routes"]
@@ -32,9 +32,9 @@ Gem::Specification.new do |s|
     "lib/annotate/annotate_routes.rb",
     "lib/annotate/tasks.rb",
     "lib/annotate/version.rb",
-    "lib/generators/annotate_models/USAGE",
-    "lib/generators/annotate_models/install_generator.rb",
-    "lib/generators/annotate_models/templates/auto_annotate_models.rake",
+    "lib/generators/annotate/USAGE",
+    "lib/generators/annotate/install_generator.rb",
+    "lib/generators/annotate/templates/auto_annotate_models.rake",
     "lib/tasks/migrate.rake"
   ]
   s.homepage = "http://github.com/ctran/annotate_models"

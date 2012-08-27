@@ -13,7 +13,7 @@ your...
 - Machinist blueprints
 - Fabrication fabricators
 - Thoughtbot's factory_girl factories, i.e. the (spec|test)/factories/<model>_factory.rb files
-- routes.rb file
+- routes.rb file (for Rails projects)
 
 The schema comment looks like this:
 
@@ -46,7 +46,7 @@ Also, if you pass the -r option, it'll annotate routes.rb with the output of
 `rake routes`.
 
 
-== INSTALL
+== Install
 
 Into Gemfile from Github:
 
@@ -64,7 +64,7 @@ Into environment gems from Github checkout:
     gem install pkg/annotate-*.gem
 
 
-== COMMANDS
+== Commands
 
 (If you used the Gemfile install, prefix the below commands with `bundle exec`.)
 
@@ -80,7 +80,7 @@ additional functionality of annotating `routes.rb` so two binaries are
 provided, one for each task.
 
 
-== USAGE
+== Usage (Rails)
 
 To annotate all your models, tests, fixtures, and factories:
 
@@ -121,7 +121,15 @@ Or:
     annotate_routes --delete
 
 
-== Configuration
+== Usage (Outside of Rails)
+
+Everything above applies, except that --routes is not meaningful, and you will
+probably need to explicitly set one or more `--require` option(s), and/or one
+or more `--model-dir` options to inform annotate about the structure of your
+project and help it bootstrap and load the relevant code.
+
+
+== Configuration (Rails)
 
 To generate a configuration file (in the form of a `.rake` file), to set
 default options:
@@ -131,13 +139,16 @@ default options:
 Edit this file to control things like output format, where annotations are
 added (top or bottom of file), and in which artifacts.
 
+
+== Configuration (General)
+
 If you want to always skip annotations on a particular model, add this string
 anywhere in the file:
 
     # -*- SkipSchemaAnnotations
 
 
-== Integration
+== Rails Integration
 
 By default, once you've generated a configuration file, annotate will be
 executed whenever you run `rake db:migrate` (but only in development mode).
@@ -157,7 +168,7 @@ you can do so with a simple environment variable, instead of editing the
     skip_on_db_migrate=1 rake db:migrate
 
 
-== OPTIONS
+== Options
 
     Usage: annotate [options] [ModelName]*
         -m, --show-migration             Include the migration version number in the annotation
@@ -223,7 +234,7 @@ you can do so with a simple environment variable, instead of editing the
         -v, --version                    Show the current version of this gem
 
 
-== SORTING
+== Sorting
 
 By default, columns will be sorted in database order (i.e. the order in which
 migrations were run).
@@ -233,7 +244,7 @@ annotation are consistent regardless of what order migrations are executed in,
 use  --sort.
 
 
-== MARKDOWN
+== Markdown
 
 The format produced is actually MultiMarkdown, making use of the syntax
 extension for tables.  It's recommended you use `kramdown` as your parser if
@@ -258,7 +269,7 @@ to add additional text to an automatically created comment block.
 BACK UP YOUR MODELS BEFORE USING THIS TOOL!
 
 
-== LINKS
+== Links
 
 - Factory Girl: http://github.com/thoughtbot/factory_girl
 - Object Daddy: http://github.com/flogic/object_daddy
@@ -268,12 +279,12 @@ BACK UP YOUR MODELS BEFORE USING THIS TOOL!
 - PostgisAdapter: http://github.com/nofxx/postgis_adapter
 
 
-== LICENSE:
+== License
 
 Released under the same license as Ruby. No Support. No Warranty.
 
 
-== AUTHORS:
+== Authors
 
 - Original code by: Dave Thomas -- Pragmatic Programmers, LLC <http://agilewebdevelopment.com/plugins/annotate_models>
 - Overhauled by: Alex Chaffee <http://alexch.github.com> alex@stinky.com

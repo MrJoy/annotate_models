@@ -170,6 +170,29 @@ module Annotate
     end
   end
 
+  def self.bootstrap_rake
+    begin
+      require 'rake/dsl_definition'
+    rescue Exception => e
+      # We might just be on an old version of Rake...
+    end
+    require 'rake'
+
+    if File.exists?('./Rakefile')
+      load './Rakefile'
+    end
+    Rake::Task[:environment].invoke rescue nil
+    if(!defined?(Rails))
+      # Not in a Rails project, so time to load up the parts of
+      # ActiveSupport we need.
+      require 'active_support'
+      require 'active_support/core_ext/class/subclasses'
+      require 'active_support/core_ext/string/inflections'
+    end
+    self.load_tasks
+    Rake::Task[:set_annotation_options].invoke
+  end
+
 private
 
   def self.fallback(*args)

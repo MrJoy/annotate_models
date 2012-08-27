@@ -10,22 +10,8 @@ here = File.expand_path(File.dirname __FILE__)
 $:<< "#{here}/../lib"
 
 require 'optparse'
-begin
-  require 'rake/dsl_definition'
-rescue Exception => e
-  # We might just be on an old version of Rake...
-end
-require 'rake'
 require 'annotate'
-
-if File.exists?('Rakefile')
-  load './Rakefile'
-else
-  STDERR.puts "Can't find Rakefile. Are we in a Rails folder?"
-end
-Rake::Task[:environment].invoke
-Annotate.load_tasks
-Rake::Task[:set_annotation_options].invoke
+Annotate.bootstrap_rake
 
 target = {
   :klass => AnnotateModels,

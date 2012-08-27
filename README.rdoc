@@ -111,8 +111,19 @@ anywhere in the file:
 == OPTIONS
 
     Usage: annotate_models [options] [ModelName]*
-        -d, --delete                     Remove annotations from all model files
-        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory file(s)
+        -m, --show-migration             Include the migration version number in the annotation
+        -i, --show-indexes               List the table's database indexes in the annotation
+        -s, --simple-indexes             Concat the column's related indexes in the annotation
+            --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
+            --ignore-model-subdirs       Ignore subdirectories of the models directory
+            --sort                       Sort columns in creation order rather than alphabetically
+        -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
+            --exclude
+        -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
+            --format
+            --force                      Force new annotations even if there are no changes.
+            --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
+        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)
             --pc, --position-in-class [before|after]
                                          Place the annotations at the top (before) or the bottom (after) of the model file
             --pf, --position-in-factory [before|after]
@@ -121,26 +132,17 @@ anywhere in the file:
                                          Place the annotations at the top (before) or the bottom (after) of any fixture files
             --pt, --position-in-test [before|after]
                                          Place the annotations at the top (before) or the bottom (after) of any test files
-        -v, --version                    Show the current version of this gem
-        -m, --show-migration             Include the migration version number in the annotation
-        -i, --show-indexes               List the table's database indexes in the annotation
-        -s, --simple-indexes             Concat the column's related indexes in the annotation
-            --model-dir dir              Annotate model files stored in dir rather than app/models, may be used multiple times
-            --ignore-model-subdirects    Ignore subdirectories of the models directory
-            --sort                       Sort columns in creation order rather than alphabetically
         -R, --require path               Additional file to require before loading models, may be used multiple times
-        -e [tests,fixtures,factories],   Do not annotate fixtures, test files, and/or factories
-            --exclude
-        -f [bare|rdoc|markdown],         Render Schema Infomation as plain/RDoc/Markdown
-            --format
-            --force                      Force new annotations even if there are no changes.
-            --trace                      If unable to annotate a file, print the full stack trace, not just the exception message.
+        -d, --delete                     Remove annotations from all relevant files
+        -v, --version                    Show the current version of this gem
 
     Usage: annotate_routes [options]
-        -d, --delete                     Remove annotations from routes file
-        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the routes file
-        -v, --version                    Show the current version of this gem
+        -p, --position [before|after]    Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)
+            --pr, --position-in-routes [before|after]
+                                         Place the annotations at the top (before) or the bottom (after) of any test files
         -R, --require path               Additional file to require before loading models, may be used multiple times
+        -d, --delete                     Remove annotations from all relevant files
+        -v, --version                    Show the current version of this gem
 
 == SORTING
 

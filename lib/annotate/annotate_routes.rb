@@ -18,6 +18,14 @@
 # Released under the same license as Ruby. No Support. No Warranty.
 #
 module AnnotateRoutes
+  OPTIONS = proc do |opts|
+    # TODO: Implement this option...  Also, hoist it from here/AnnotateModels
+    # TODO: into common...
+    # opts.on('-f', '--format [bare|rdoc|markdown]', ['bare', 'rdoc', 'markdown'], 'Render Route Infomation as plain/RDoc/Markdown') do |fmt|
+    #   [:bare, :rdoc, :markdown].each { |fmt| ENV["format_#{fmt}"] = 'no' }
+    #   ENV["format_#{fmt}"] = 'yes'
+    # end
+  end
   PREFIX = "# == Route Map"
 
   def self.do_annotate(options={})

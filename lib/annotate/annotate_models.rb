@@ -1,4 +1,57 @@
 module AnnotateModels
+  OPTIONS = proc do |opts|
+    opts.on('-m', '--show-migration',
+            "Include the migration version number in the annotation") do
+      ENV['include_version'] = "yes"
+    end
+
+    opts.on('-i', '--show-indexes',
+            "List the table's database indexes in the annotation") do
+      ENV['show_indexes'] = "yes"
+    end
+
+    opts.on('-s', '--simple-indexes',
+            "Concat the column's related indexes in the annotation") do
+      ENV['simple_indexes'] = "yes"
+    end
+
+    opts.on('--model-dir dir',
+            "Annotate model files stored in dir rather than app/models, may be used multiple times") do |dir|
+      if !ENV['model_dir'].blank?
+        ENV['model_dir'] = ENV['model_dir'] + ",#{dir}"
+      else
+        ENV['model_dir'] = dir
+      end
+    end
+
+    opts.on('--ignore-model-subdirs',
+            "Ignore subdirectories of the models directory") do |dir|
+      ENV['ignore_model_sub_dir'] = "yes"
+    end
+
+    opts.on('--sort',
+            "Sort columns in creation order rather than alphabetically") do |dir|
+      ENV['sort'] = "yes"
+    end
+
+    opts.on('-e', '--exclude [tests,fixtures,factories]', ['tests','fixtures','factories'], "Do not annotate fixtures, test files, and/or factories") do |exclusions|
+      exclusions.each { |exclusion| ENV["exclude_#{exclusion}"] = "yes" }
+    end
+
+    opts.on('-f', '--format [bare|rdoc|markdown]', ['bare', 'rdoc', 'markdown'], 'Render Schema Infomation as plain/RDoc/Markdown') do |fmt|
+      [:bare, :rdoc, :markdown].each { |fmt| ENV["format_#{fmt}"] = 'no' }
+      ENV["format_#{fmt}"] = 'yes'
+    end
+
+    opts.on('--force', 'Force new annotations even if there are no changes.') do |force|
+      ENV['force'] = 'yes'
+    end
+
+    opts.on('--trace', 'If unable to annotate a file, print the full stack trace, not just the exception message.') do |value|
+      ENV['trace'] = 'yes'
+    end
+  end
+
   # Annotate Models plugin use this header
   COMPAT_PREFIX    = "== Schema Info"
   COMPAT_PREFIX_MD = "## Schema Info"
@@ -437,7 +490,7 @@ module AnnotateModels
     def resolve_filename(filename_template, model_name, table_name)
       return filename_template.
         gsub('%MODEL_NAME%', model_name).
-        gsub('%TABLE_NAME%', table_name)
+        gsub('%TABLE_NAME%', table_name || model_name.pluralize)
     end
   end
 end

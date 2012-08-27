@@ -9,6 +9,73 @@ rescue Exception => e
 end
 
 module Annotate
+  OPTIONS = proc do |opts, mode, has_set_position, task|
+    opts.on('-p', '--position [before|after]', ['before', 'after'],
+            "Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/routes file(s)") do |p|
+      ENV['position'] = p
+      [
+        'position_in_class','position_in_factory','position_in_fixture','position_in_test', 'position_in_routes'
+      ].each do |key|
+        ENV[key] = p unless(has_set_position[key])
+      end
+    end
+
+    if(mode == :models || mode == :both)
+      opts.on('--pc', '--position-in-class [before|after]', ['before', 'after'],
+              "Place the annotations at the top (before) or the bottom (after) of the model file") do |p|
+        ENV['position_in_class'] = p
+        has_set_position['position_in_class'] = true
+      end
+
+      opts.on('--pf', '--position-in-factory [before|after]', ['before', 'after'],
+              "Place the annotations at the top (before) or the bottom (after) of any factory files") do |p|
+        ENV['position_in_factory'] = p
+        has_set_position['position_in_factory'] = true
+      end
+
+      opts.on('--px', '--position-in-fixture [before|after]', ['before', 'after'],
+              "Place the annotations at the top (before) or the bottom (after) of any fixture files") do |p|
+        ENV['position_in_fixture'] = p
+        has_set_position['position_in_fixture'] = true
+      end
+
+      opts.on('--pt', '--position-in-test [before|after]', ['before', 'after'],
+              "Place the annotations at the top (before) or the bottom (after) of any test files") do |p|
+        ENV['position_in_test'] = p
+        has_set_position['position_in_test'] = true
+      end
+    end
+
+    if(mode == :routes || mode == :both)
+      opts.on('--pr', '--position-in-routes [before|after]', ['before', 'after'],
+              "Place the annotations at the top (before) or the bottom (after) of any test files") do |p|
+        ENV['position_in_routes'] = p
+        has_set_position['position_in_routes'] = true
+      end
+    end
+
+    opts.on('-R', '--require path',
+            "Additional file to require before loading models, may be used multiple times") do |path|
+      if !ENV['require'].blank?
+        ENV['require'] = ENV['require'] + ",#{path}"
+      else
+        ENV['require'] = path
+      end
+    end
+
+    opts.on('-d', '--delete',
+            "Remove annotations from all relevant files") do
+      # Mutate the string, don't change the reference, or the value won't be
+      # seen by the caller.
+      task.gsub!(/\A.*\Z/, 'remove_annotations')
+    end
+
+    opts.on('-v', '--version',
+            "Show the current version of this gem") do
+      puts "annotate v#{Annotate.version}"; exit
+    end
+  end
+
   ##
   # The set of available options to customize the behavior of Annotate.
   #

@@ -132,6 +132,10 @@ module Annotate
       options[key] = (!ENV[key.to_s].blank?) ? ENV[key.to_s].split(',') : []
     end
 
+    if(options[:model_dir].count == 0)
+      options[:model_dir] = ['app/models']
+    end
+
     return options
   end
 

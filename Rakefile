@@ -23,7 +23,13 @@ end
 require "./lib/annotate"
 
 require "mg"
-MG.new("annotate.gemspec")
+begin
+  MG.new("annotate.gemspec")
+rescue Exception => e
+  STDERR.puts("WARNING: Couldn't read gemspec.  As such, a number of tasks may be unavailable to you until you run 'rake gem:gemspec' to correct the issue.")
+  # Gemspec is probably in a broken state, so let's give ourselves a chance to
+  # build a new one...
+end
 DEVELOPMENT_GROUPS=[:development, :test]
 RUNTIME_GROUPS=Bundler.definition.groups - DEVELOPMENT_GROUPS
 namespace :gem do

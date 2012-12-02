@@ -26,7 +26,6 @@ OptionParser.new do |opts|
   Annotate::OPTIONS.call(opts, :both, has_set_position, target)
 end.parse!
 
-
 options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
 Annotate.eager_load(options)
 target[:klass].send(target[:task], options)

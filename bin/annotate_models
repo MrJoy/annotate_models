@@ -22,9 +22,9 @@ OptionParser.new do |opts|
   opts.banner = "Usage: annotate_models [options] [ModelName]*"
 
   AnnotateModels::OPTIONS.call(opts)
+
   Annotate::OPTIONS.call(opts, :models, has_set_position, target)
 end.parse!
-
 
 options=Annotate.setup_options({ :is_rake => !ENV['is_rake'].blank? })
 Annotate.eager_load(options)

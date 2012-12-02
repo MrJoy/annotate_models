@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'bundler'
-Bundler.setup
+begin
+  require 'bundler'
+  Bundler.setup
+rescue Exception => e
+end
 
 here = File.expand_path(File.dirname __FILE__)
 $:<< "#{here}/../lib"

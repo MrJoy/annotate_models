@@ -202,3 +202,21 @@ task :clobber => :'rubinius:clobber'
 
 # want other tests/tasks run by default? Add them to the list
 task :default => [:spec]
+
+namespace :fury do
+  desc "Push a build to GemFury.  Attempts to pick the latest unless you specify otherwise with GEM=x."
+  task :push do
+    raise "Must specify GEMFURY_ACCOUNT!" unless(ENV['GEMFURY_ACCOUNT'] && !ENV['GEMFURY_ACCOUNT'].nil?)
+    unless gem = ENV['GEM']
+      # Find the latest gem in the dist directory
+      sorted_list = Dir[File.expand_path('../dist/*.gem', __FILE__)].sort_by do |file_name|
+        version_info = file_name.match(/^.*-(?<version>[\d\.]+(\.\w+)?)\.gem$/)
+        version_info[:version]
+      end
+
+      gem = sorted_list.pop
+    end
+
+    sh "fury push #{gem} --as #{ENV['GEMFURY_ACCOUNT']}"
+  end
+end

@@ -23,6 +23,13 @@ rvm use --create ${rvm_ruby_string}@${GEMSET}
 
 # Early-out when we just want to wipe the gemsets clean...
 if [ "$SKIP_BUNDLER" != "1" ]; then
+  # If we're using rubygems-bundler, we may need to make sure binstubs are all up to date...
+  if [ ! $(which ruby_noexec_wrapper) ]; then
+    if [ $(($(gem list rubygems-bundler | grep rubygems-bundler | wc -l) + 0)) > 0 ]; then
+      gem regenerate_binstubs > /dev/null
+    fi
+  fi
+
   # ... and make sure everything's up-to-date, that it'll use the right Gemfile,
   # etc.
   if [ $(which bundle) == "" ]; then

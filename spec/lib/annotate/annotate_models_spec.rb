@@ -5,6 +5,9 @@ require 'annotate/active_record_patch'
 require 'active_support/core_ext/string'
 require 'tmpdir'
 
+RUBY_VERSION_NUMERIC = Gem::Version.new(RUBY_VERSION)
+RUBY_34 = Gem::Version.new('3.4.0')
+
 describe AnnotateModels do
   MAGIC_COMMENTS = [
     '# encoding: UTF-8',
@@ -3082,12 +3085,20 @@ describe AnnotateModels do
 
       it 'displays just the error message with trace disabled (default)' do
         expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        if RUBY_VERSION_NUMERIC >= RUBY_34
+          expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.not_to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
+        else
+          expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        end
       end
 
       it 'displays the error message and stacktrace with trace enabled' do
         expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        if RUBY_VERSION_NUMERIC >= RUBY_34
+          expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
+        else
+          expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        end
       end
     end
 

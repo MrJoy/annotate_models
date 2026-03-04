@@ -28,15 +28,15 @@ module AnnotateModels
 
   INDEX_CLAUSES = {
     unique: {
-      default: 'UNIQUE',
+      default:  'UNIQUE',
       markdown: '_unique_'
     },
-    where: {
-      default: 'WHERE',
+    where:  {
+      default:  'WHERE',
       markdown: '_where_'
     },
-    using: {
-      default: 'USING',
+    using:  {
+      default:  'USING',
       markdown: '_using_'
     }
   }.freeze

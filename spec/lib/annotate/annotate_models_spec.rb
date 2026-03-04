@@ -28,22 +28,22 @@ describe AnnotateModels do
 
   def mock_index(name, params = {})
     double('IndexKeyDefinition',
-           name:          name,
-           columns:       params[:columns] || [],
-           unique:        params[:unique] || false,
-           orders:        params[:orders] || {},
-           where:         params[:where],
-           using:         params[:using])
+           name:    name,
+           columns: params[:columns] || [],
+           unique:  params[:unique] || false,
+           orders:  params[:orders] || {},
+           where:   params[:where],
+           using:   params[:using])
   end
 
   def mock_foreign_key(name, from_column, to_table, to_column = 'id', constraints = {})
     double('ForeignKeyDefinition',
-           name:         name,
-           column:       from_column,
-           to_table:     to_table,
-           primary_key:  to_column,
-           on_delete:    constraints[:on_delete],
-           on_update:    constraints[:on_update])
+           name:        name,
+           column:      from_column,
+           to_table:    to_table,
+           primary_key: to_column,
+           on_delete:   constraints[:on_delete],
+           on_update:   constraints[:on_update])
   end
 
   def mock_check_constraint(name, expression)
@@ -54,24 +54,24 @@ describe AnnotateModels do
 
   def mock_connection(indexes = [], foreign_keys = [], check_constraints = [])
     double('Conn',
-           indexes:      indexes,
-           foreign_keys: foreign_keys,
-           check_constraints: check_constraints,
-           supports_foreign_keys?: true,
+           indexes:                     indexes,
+           foreign_keys:                foreign_keys,
+           check_constraints:           check_constraints,
+           supports_foreign_keys?:      true,
            supports_check_constraints?: true,
-           table_exists?: true)
+           table_exists?:               true)
   end
 
   # rubocop:disable Metrics/ParameterLists
   def mock_class(table_name, primary_key, columns, indexes = [], foreign_keys = [], check_constraints = [])
     options = {
-      connection:       mock_connection(indexes, foreign_keys, check_constraints),
-      table_exists?:    true,
-      table_name:       table_name,
-      primary_key:      primary_key,
-      column_names:     columns.map { |col| col.name.to_s },
-      columns:          columns,
-      column_defaults:  Hash[columns.map { |col| [col.name, col.default] }],
+      connection:        mock_connection(indexes, foreign_keys, check_constraints),
+      table_exists?:     true,
+      table_name:        table_name,
+      primary_key:       primary_key,
+      column_names:      columns.map { |col| col.name.to_s },
+      columns:           columns,
+      column_defaults:   Hash[columns.map { |col| [col.name, col.default] }],
       table_name_prefix: ''
     }
 
@@ -81,9 +81,9 @@ describe AnnotateModels do
 
   def mock_column(name, type, options = {})
     default_options = {
-      limit: nil,
-      null: false,
-      default: nil,
+      limit:    nil,
+      null:     false,
+      default:  nil,
       sql_type: type
     }
 
@@ -170,8 +170,8 @@ describe AnnotateModels do
   describe '.parse_options' do
     let(:options) do
       {
-        root_dir: '/root',
-        model_dir: 'app/models,app/one,  app/two   ,,app/three',
+        root_dir:                     '/root',
+        model_dir:                    'app/models,app/one,  app/two   ,,app/three',
         skip_subdirectory_model_load: false
       }
     end
@@ -212,8 +212,8 @@ describe AnnotateModels do
       context 'option is set to true' do
         let(:options) do
           {
-            root_dir: '/root',
-            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            root_dir:                     '/root',
+            model_dir:                    'app/models,app/one,  app/two   ,,app/three',
             skip_subdirectory_model_load: true
           }
         end
@@ -226,8 +226,8 @@ describe AnnotateModels do
       context 'option is set to false' do
         let(:options) do
           {
-            root_dir: '/root',
-            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            root_dir:                     '/root',
+            model_dir:                    'app/models,app/one,  app/two   ,,app/three',
             skip_subdirectory_model_load: false
           }
         end
@@ -422,7 +422,7 @@ describe AnnotateModels do
             context 'with Globalize gem' do # rubocop:disable RSpec/MultipleMemoizedHelpers
               let :translation_klass do
                 double('Folder::Post::Translation',
-                       to_s: 'Folder::Post::Translation',
+                       to_s:    'Folder::Post::Translation',
                        columns: [
                          mock_column(:id, :integer, limit: 8),
                          mock_column(:post_id, :integer, limit: 8),
@@ -567,7 +567,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: %w[firstname surname value],
-                                 orders: { 'surname' => :asc, 'value' => :desc })
+                                 orders:  { 'surname' => :asc, 'value' => :desc })
                     ]
                   end
 
@@ -610,7 +610,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: %w[firstname surname],
-                                 where: 'value IS NOT NULL')
+                                 where:   'value IS NOT NULL')
                     ]
                   end
 
@@ -653,7 +653,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: %w[firstname surname],
-                                 using: 'hash')
+                                 using:   'hash')
                     ]
                   end
 
@@ -747,7 +747,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 orders: { 'foreign_thing_id' => :desc })
+                                 orders:  { 'foreign_thing_id' => :desc })
                     ]
                   end
 
@@ -1297,7 +1297,7 @@ describe AnnotateModels do
                                   limit: { srid: 0, type: 'geometry' }),
                       mock_column(:non_srid, :geography,
                                   geometric_type: 'Point',
-                                  limit: { type: 'geometry' })
+                                  limit:          { type: 'geometry' })
                     ]
                   end
 
@@ -1437,7 +1437,7 @@ describe AnnotateModels do
                                   limit: { srid: 0, type: 'geometry' }),
                       mock_column(:non_srid, :geography,
                                   geometric_type: 'Point',
-                                  limit: { type: 'geometry' })
+                                  limit:          { type: 'geometry' })
                     ]
                   end
 
@@ -1606,7 +1606,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 unique: true)
+                                 unique:  true)
                     ]
                   end
 
@@ -1644,7 +1644,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 orders: { 'foreign_thing_id' => :desc })
+                                 orders:  { 'foreign_thing_id' => :desc })
                     ]
                   end
 
@@ -1682,8 +1682,8 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 unique: true,
-                                 where: 'name IS NOT NULL')
+                                 unique:  true,
+                                 where:   'name IS NOT NULL')
                     ]
                   end
 
@@ -1721,7 +1721,7 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 using: 'hash')
+                                 using:   'hash')
                     ]
                   end
 
@@ -3073,11 +3073,11 @@ describe AnnotateModels do
       it 'displays just the error message with trace disabled (default)' do
         expect do
           AnnotateModels.do_annotations model_dir: @model_dir,
-                                        is_rake: true
+                                        is_rake:   true
         end.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
         expect do
           AnnotateModels.do_annotations model_dir: @model_dir,
-                                        is_rake: true
+                                        is_rake:   true
         end.not_to output(a_string_including('/spec/annotate/annotate_models_spec.rb:')).to_stderr
       end
 
@@ -3107,17 +3107,17 @@ describe AnnotateModels do
       it 'displays just the error message with trace disabled (default)' do
         expect do
           AnnotateModels.remove_annotations model_dir: @model_dir,
-                                            is_rake: true
+                                            is_rake:   true
         end.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
         if RUBY_VERSION_NUMERIC >= RUBY_34
           expect do
             AnnotateModels.remove_annotations model_dir: @model_dir,
-                                              is_rake: true
+                                              is_rake:   true
           end.not_to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
         else
           expect do
             AnnotateModels.remove_annotations model_dir: @model_dir,
-                                              is_rake: true
+                                              is_rake:   true
           end.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
         end
       end

@@ -13,7 +13,7 @@ module Annotate
 
     DEFAULT_OPTIONS = {
       target_action: :do_annotations,
-      exit: false
+      exit:          false
     }.freeze
 
     ANNOTATION_POSITIONS = %w[before top after bottom].freeze

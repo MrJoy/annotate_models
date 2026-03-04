@@ -8,7 +8,7 @@ gem 'rake', require: false
 group :development do
   gem 'bump'
   gem 'mg', require: false
-  platforms :mri, :windows do
+  platforms :mri, :mingw do # N.B. Using mingw for testing against older Rubies!
     gem 'yard', require: false
   end
 end
@@ -29,7 +29,7 @@ group :development, :test do
 
   gem 'overcommit'
 
-  platforms :mri, :windows do
+  platforms :mri, :mingw do # N.B. Using mingw for testing against older Rubies!
     gem 'pry', require: false
     gem 'pry-byebug', require: false
   end

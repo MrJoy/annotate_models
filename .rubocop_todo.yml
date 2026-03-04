@@ -171,11 +171,6 @@ RSpec/ContextWording:
 # Configuration parameters: IgnoredMetadata.
 RSpec/DescribeClass:
   Exclude:
-    - '**/spec/features/**/*'
-    - '**/spec/requests/**/*'
-    - '**/spec/routing/**/*'
-    - '**/spec/system/**/*'
-    - '**/spec/views/**/*'
     - 'spec/lib/tasks/annotate_models_migrate_spec.rb'
 
 # Offense count: 18
@@ -308,8 +303,6 @@ Style/CollectionQuerying:
 # Configuration parameters: AllowedConstants.
 Style/Documentation:
   Exclude:
-    - 'spec/**/*'
-    - 'test/**/*'
     - 'lib/annotate.rb'
     - 'lib/annotate/active_record_patch.rb'
     - 'lib/annotate/annotate_models.rb'
@@ -375,7 +368,6 @@ Style/MultilineBlockChain:
 # SupportedStyles: predicate, comparison
 Style/NumericPredicate:
   Exclude:
-    - 'spec/**/*'
     - 'lib/annotate.rb'
     - 'lib/annotate/annotate_models.rb'
 

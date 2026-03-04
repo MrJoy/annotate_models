@@ -510,7 +510,7 @@ module AnnotateModels
     end
 
     def matched_types(options)
-      types = +MATCHED_TYPES.dup
+      types = MATCHED_TYPES.dup
       types << 'admin' if options[:active_admin] =~ Annotate::Constants::TRUE_RE && !types.include?('admin')
       types << 'additional_file_patterns' if options[:additional_file_patterns].present?
 

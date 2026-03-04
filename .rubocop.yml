@@ -17,3 +17,8 @@ AllCops:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+# N.B. This cop's autocorrections are NOT perfectly semantically identical to the code being
+# replaced!  In particular, helpers_spec.rb will turn up failures if we let this do its thing!
+Style/FetchEnvVar:
+  Enabled: false

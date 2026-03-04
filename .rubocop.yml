@@ -1,13 +1,38 @@
 inherit_from:
   - .rubocop_todo.yml
 
+plugins:
+  - rubocop-rake
+  - rubocop-rspec
+
 AllCops:
+  TargetRubyVersion: 3.0
   Exclude:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'
     - 'tmp/**/*'
     - 'spec/integration/**/*'
+  NewCops: enable
+
+Layout/HashAlignment:
+  EnforcedColonStyle: table
+  EnforcedHashRocketStyle: table
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Exclude:
+    - 'spec/spec_helper.rb'
 
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+
+# N.B. This cop's autocorrections are NOT perfectly semantically identical to the code being
+# replaced!  In particular, helpers_spec.rb will turn up failures if we let this do its thing!
+Style/FetchEnvVar:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 10

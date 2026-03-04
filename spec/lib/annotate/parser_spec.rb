@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require_relative '../../spec_helper'
 
 module Annotate # rubocop:disable Metrics/ModuleLength
   describe Parser do
-    before(:example) do
+    before do
       ENV.clear
     end
 
     context 'when given empty args' do
       it 'returns an options hash with defaults' do
-        result = Parser.parse([])
+        result = described_class.parse([])
         expect(result).to be_a(Hash)
         expect(result).to include(target_action: :do_annotations)
       end
@@ -19,7 +21,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
         it 'sets array of paths to :additional_file_patterns' do
           paths = 'foo/bar,baz'
           allow(ENV).to receive(:[]=)
-          Parser.parse([option, paths])
+          described_class.parse([option, paths])
           expect(ENV).to have_received(:[]=).with('additional_file_patterns', ['foo/bar', 'baz'])
         end
       end
@@ -28,7 +30,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
     %w[-d --delete].each do |option|
       describe option do
         it 'sets target_action to :remove_annotations' do
-          result = Parser.parse([option])
+          result = described_class.parse([option])
           expect(result).to include(target_action: :remove_annotations)
         end
       end
@@ -40,20 +42,20 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "#{position} position is an option" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(Parser::ANNOTATION_POSITIONS).to include(position)
             end
 
             it "sets ENV['position'] to be position" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
 
               expect(ENV).to have_received(:[]=).with('position', position)
             end
 
             it 'sets the value in ENV for the different file types' do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
 
               Parser::FILE_TYPE_POSITIONS.each do |file_type|
                 expect(ENV).to have_received(:[]=).with(file_type, position)
@@ -71,7 +73,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           position_command = %w[-p bottom]
           options = other_commands + position_command
 
-          Parser.parse(options)
+          described_class.parse(options)
           expect(ENV['position_in_class']).to eq('top')
           expect(ENV['position']).to eq('bottom')
         end
@@ -86,7 +88,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying '#{position}'" do
             it "sets the ENV variable to '#{position}'" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -102,7 +104,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "sets the ENV variable to #{position}" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -118,7 +120,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "sets the ENV variable to #{position}" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -134,7 +136,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "sets the ENV variable to #{position}" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -150,7 +152,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "sets the ENV variable to #{position}" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -166,7 +168,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
           context "when specifying #{position}" do
             it "sets the ENV variable to #{position}" do
               allow(ENV).to receive(:[]=)
-              Parser.parse([option, position])
+              described_class.parse([option, position])
               expect(ENV).to have_received(:[]=).with(env_key, position)
             end
           end
@@ -178,9 +180,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'wrapper' }
         let(:set_value) { 'STR' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option, set_value])
+          described_class.parse([option, set_value])
         end
       end
     end
@@ -189,9 +192,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'wrapper_open' }
         let(:set_value) { 'STR' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option, set_value])
+          described_class.parse([option, set_value])
         end
       end
     end
@@ -200,9 +204,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'wrapper_close' }
         let(:set_value) { 'STR' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option, set_value])
+          described_class.parse([option, set_value])
         end
       end
     end
@@ -211,9 +216,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'routes' }
         let(:set_value) { 'true' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -222,9 +228,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'models' }
         let(:set_value) { 'true' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -233,9 +240,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'active_admin' }
         let(:set_value) { 'true' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -243,8 +251,8 @@ module Annotate # rubocop:disable Metrics/ModuleLength
     %w[-v --version].each do |option|
       describe option do
         it 'sets the ENV variable' do
-          expect { Parser.parse([option]) }.to output("annotate v#{Annotate.version}\n").to_stdout
-          expect(Parser.parse([option])).to include(exit: true)
+          expect { described_class.parse([option]) }.to output("annotate v#{Annotate.version}\n").to_stdout
+          expect(described_class.parse([option])).to include(exit: true)
         end
       end
     end
@@ -253,9 +261,22 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'include_version' }
         let(:set_value) { 'yes' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
+        end
+      end
+    end
+
+    %w[-c --show-check-constraints].each do |option|
+      describe option do
+        let(:env_key) { 'show_check_constraints' }
+        let(:set_value) { 'yes' }
+
+        it 'sets the ENV variable' do
+          expect(ENV).to receive(:[]=).with(env_key, set_value)
+          described_class.parse([option])
         end
       end
     end
@@ -264,9 +285,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'show_foreign_keys' }
         let(:set_value) { 'yes' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -275,7 +297,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         it 'sets the ENV variable' do
           allow(ENV).to receive(:[]=)
-          Parser.parse([option])
+          described_class.parse([option])
 
           expect(ENV).to have_received(:[]=).with('show_foreign_keys', 'yes')
           expect(ENV).to have_received(:[]=).with('show_complete_foreign_keys', 'yes')
@@ -287,9 +309,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'show_indexes' }
         let(:set_value) { 'yes' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -298,9 +321,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'simple_indexes' }
         let(:set_value) { 'yes' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option])
+          described_class.parse([option])
         end
       end
     end
@@ -309,9 +333,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--model-dir' }
       let(:env_key) { 'model_dir' }
       let(:set_value) { 'some_dir/' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option, set_value])
+        described_class.parse([option, set_value])
       end
     end
 
@@ -319,9 +344,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--root-dir' }
       let(:env_key) { 'root_dir' }
       let(:set_value) { 'some_dir/' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option, set_value])
+        described_class.parse([option, set_value])
       end
     end
 
@@ -329,9 +355,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--ignore-model-subdirects' }
       let(:env_key) { 'ignore_model_sub_dir' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -339,9 +366,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--sort' }
       let(:env_key) { 'sort' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -349,9 +377,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--classified-sort' }
       let(:env_key) { 'classified_sort' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -359,17 +388,19 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       describe option do
         let(:env_key) { 'require' }
         let(:set_value) { 'another_dir' }
+
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, set_value)
-          Parser.parse([option, set_value])
+          described_class.parse([option, set_value])
         end
 
         context "when ENV['require'] is already set" do
           let(:preset_require_value) { 'some_dir/' }
+
           it "appends the path to ENV['require']" do
             env = { 'require' => preset_require_value }
             expect(ENV).to receive(:[]=).with(env_key, "#{preset_require_value},#{set_value}")
-            Parser.parse([option, set_value], env)
+            described_class.parse([option, set_value], env)
           end
         end
       end
@@ -399,7 +430,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
         it "sets the exclusion ENV variables for 'tests', 'fixtures', 'factories', and 'serializers'" do
           allow(ENV).to receive(:[]=)
-          Parser.parse([option])
+          described_class.parse([option])
 
           expect(ENV).to have_received(:[]=).with('exclude_tests', set_value)
           expect(ENV).to have_received(:[]=).with('exclude_fixtures', set_value)
@@ -408,20 +439,20 @@ module Annotate # rubocop:disable Metrics/ModuleLength
         end
 
         context 'when a type is passed in' do
-          let(:exclusions) { "tests" }
+          let(:exclusions) { 'tests' }
 
           it "sets the exclusion ENV variable for 'tests' only" do
             expect(ENV).to receive(:[]=).with('exclude_tests', set_value)
-            Parser.parse([option, exclusions])
+            described_class.parse([option, exclusions])
           end
         end
 
         context 'when two types are passed in' do
-          let(:exclusions) { "tests,fixtures" }
+          let(:exclusions) { 'tests,fixtures' }
 
           it "sets the exclusion ENV variable for 'tests' and 'fixtures'" do
             allow(ENV).to receive(:[]=)
-            Parser.parse([option, exclusions])
+            described_class.parse([option, exclusions])
             expect(ENV).to have_received(:[]=).with('exclude_tests', set_value)
             expect(ENV).to have_received(:[]=).with('exclude_fixtures', set_value)
           end
@@ -438,7 +469,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
             it 'sets the ENV variable' do
               expect(ENV).to receive(:[]=).with(env_key, set_value)
-              Parser.parse([option, format_type])
+              described_class.parse([option, format_type])
             end
           end
         end
@@ -449,9 +480,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--force' }
       let(:env_key) { 'force' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -459,9 +491,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--frozen' }
       let(:env_key) { 'frozen' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -469,9 +502,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--timestamp' }
       let(:env_key) { 'timestamp' }
       let(:set_value) { 'true' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -479,9 +513,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--trace' }
       let(:env_key) { 'trace' }
       let(:set_value) { 'yes' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -492,7 +527,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
         it 'sets the ENV variable' do
           expect(ENV).to receive(:[]=).with(env_key, regex)
-          Parser.parse([option, regex])
+          described_class.parse([option, regex])
         end
       end
     end
@@ -504,7 +539,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, regex)
-        Parser.parse([option, regex])
+        described_class.parse([option, regex])
       end
     end
 
@@ -515,7 +550,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, values)
-        Parser.parse([option, values])
+        described_class.parse([option, values])
       end
     end
 
@@ -526,7 +561,7 @@ module Annotate # rubocop:disable Metrics/ModuleLength
 
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, values)
-        Parser.parse([option, values])
+        described_class.parse([option, values])
       end
     end
 
@@ -534,9 +569,10 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--ignore-unknown-models' }
       let(:env_key) { 'ignore_unknown_models' }
       let(:set_value) { 'true' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
       end
     end
 
@@ -544,9 +580,21 @@ module Annotate # rubocop:disable Metrics/ModuleLength
       let(:option) { '--with-comment' }
       let(:env_key) { 'with_comment' }
       let(:set_value) { 'true' }
+
       it 'sets the ENV variable' do
         expect(ENV).to receive(:[]=).with(env_key, set_value)
-        Parser.parse([option])
+        described_class.parse([option])
+      end
+    end
+
+    describe '--with-comment-column' do
+      let(:option) { '--with-comment-column' }
+      let(:env_key) { 'with_comment_column' }
+      let(:set_value) { 'true' }
+
+      it 'sets the ENV variable' do
+        expect(ENV).to receive(:[]=).with(env_key, set_value)
+        described_class.parse([option])
       end
     end
   end

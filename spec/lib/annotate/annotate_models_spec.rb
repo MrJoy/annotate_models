@@ -1,73 +1,89 @@
-# encoding: utf-8
+# frozen_string_literal: true
+
 require_relative '../../spec_helper'
 require 'annotate/annotate_models'
 require 'annotate/active_record_patch'
 require 'active_support/core_ext/string'
-require 'files'
 require 'tmpdir'
 
+RUBY_VERSION_NUMERIC = Gem::Version.new(RUBY_VERSION)
+RUBY_34 = Gem::Version.new('3.4.0')
+
 describe AnnotateModels do
-  MAGIC_COMMENTS = [
-    '# encoding: UTF-8',
-    '# coding: UTF-8',
-    '# -*- coding: UTF-8 -*-',
-    '#encoding: utf-8',
-    '# encoding: utf-8',
-    '# -*- encoding : utf-8 -*-',
-    "# encoding: utf-8\n# frozen_string_literal: true",
-    "# frozen_string_literal: true\n# encoding: utf-8",
-    '# frozen_string_literal: true',
-    '#frozen_string_literal: false',
-    '# -*- frozen_string_literal : true -*-'
-  ].freeze
+  unless const_defined?(:MAGIC_COMMENTS)
+    MAGIC_COMMENTS = [
+      '# encoding: UTF-8',
+      '# coding: UTF-8',
+      '# -*- coding: UTF-8 -*-',
+      '#encoding: utf-8',
+      '# encoding: utf-8',
+      '# -*- encoding : utf-8 -*-',
+      "# encoding: utf-8\n# frozen_string_literal: true",
+      "# frozen_string_literal: true\n# encoding: utf-8",
+      '# frozen_string_literal: true',
+      '#frozen_string_literal: false',
+      '# -*- frozen_string_literal : true -*-'
+    ].freeze
+  end
 
   def mock_index(name, params = {})
     double('IndexKeyDefinition',
-           name:          name,
-           columns:       params[:columns] || [],
-           unique:        params[:unique] || false,
-           orders:        params[:orders] || {},
-           where:         params[:where],
-           using:         params[:using])
+           name:    name,
+           columns: params[:columns] || [],
+           unique:  params[:unique] || false,
+           orders:  params[:orders] || {},
+           where:   params[:where],
+           using:   params[:using])
   end
 
   def mock_foreign_key(name, from_column, to_table, to_column = 'id', constraints = {})
     double('ForeignKeyDefinition',
-           name:         name,
-           column:       from_column,
-           to_table:     to_table,
-           primary_key:  to_column,
-           on_delete:    constraints[:on_delete],
-           on_update:    constraints[:on_update])
+           name:        name,
+           column:      from_column,
+           to_table:    to_table,
+           primary_key: to_column,
+           on_delete:   constraints[:on_delete],
+           on_update:   constraints[:on_update])
   end
 
-  def mock_connection(indexes = [], foreign_keys = [])
+  def mock_check_constraint(name, expression)
+    double('CheckConstraintDefinition',
+           name:       name,
+           expression: expression)
+  end
+
+  def mock_connection(indexes = [], foreign_keys = [], check_constraints = [])
     double('Conn',
-           indexes:      indexes,
-           foreign_keys: foreign_keys,
-           supports_foreign_keys?: true)
+           indexes:                     indexes,
+           foreign_keys:                foreign_keys,
+           check_constraints:           check_constraints,
+           supports_foreign_keys?:      true,
+           supports_check_constraints?: true,
+           table_exists?:               true)
   end
 
-  def mock_class(table_name, primary_key, columns, indexes = [], foreign_keys = [])
+  # rubocop:disable Metrics/ParameterLists
+  def mock_class(table_name, primary_key, columns, indexes = [], foreign_keys = [], check_constraints = [])
     options = {
-      connection:       mock_connection(indexes, foreign_keys),
-      table_exists?:    true,
-      table_name:       table_name,
-      primary_key:      primary_key,
-      column_names:     columns.map { |col| col.name.to_s },
-      columns:          columns,
-      column_defaults:  Hash[columns.map { |col| [col.name, col.default] }],
+      connection:        mock_connection(indexes, foreign_keys, check_constraints),
+      table_exists?:     true,
+      table_name:        table_name,
+      primary_key:       primary_key,
+      column_names:      columns.map { |col| col.name.to_s },
+      columns:           columns,
+      column_defaults:   Hash[columns.map { |col| [col.name, col.default] }],
       table_name_prefix: ''
     }
 
     double('An ActiveRecord class', options)
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def mock_column(name, type, options = {})
     default_options = {
-      limit: nil,
-      null: false,
-      default: nil,
+      limit:    nil,
+      null:     false,
+      default:  nil,
       sql_type: type
     }
 
@@ -81,64 +97,72 @@ describe AnnotateModels do
 
   describe '.quote' do
     subject do
-      AnnotateModels.quote(value)
+      described_class.quote(value)
     end
 
     context 'when the argument is nil' do
       let(:value) { nil }
+
       it 'returns string "NULL"' do
-        is_expected.to eq('NULL')
+        expect(subject).to eq('NULL')
       end
     end
 
     context 'when the argument is true' do
       let(:value) { true }
+
       it 'returns string "TRUE"' do
-        is_expected.to eq('TRUE')
+        expect(subject).to eq('TRUE')
       end
     end
 
     context 'when the argument is false' do
       let(:value) { false }
+
       it 'returns string "FALSE"' do
-        is_expected.to eq('FALSE')
+        expect(subject).to eq('FALSE')
       end
     end
 
     context 'when the argument is an integer' do
       let(:value) { 25 }
+
       it 'returns the integer as a string' do
-        is_expected.to eq('25')
+        expect(subject).to eq('25')
       end
     end
 
     context 'when the argument is a float number' do
       context 'when the argument is like 25.6' do
         let(:value) { 25.6 }
+
         it 'returns the float number as a string' do
-          is_expected.to eq('25.6')
+          expect(subject).to eq('25.6')
         end
       end
 
       context 'when the argument is like 1e-20' do
         let(:value) { 1e-20 }
+
         it 'returns the float number as a string' do
-          is_expected.to eq('1.0e-20')
+          expect(subject).to eq('1.0e-20')
         end
       end
     end
 
     context 'when the argument is a BigDecimal number' do
       let(:value) { BigDecimal('1.2') }
+
       it 'returns the float number as a string' do
-        is_expected.to eq('1.2')
+        expect(subject).to eq('1.2')
       end
     end
 
     context 'when the argument is an array' do
       let(:value) { [BigDecimal('1.2')] }
+
       it 'returns an array of which elements are converted to string' do
-        is_expected.to eq(['1.2'])
+        expect(subject).to eq(['1.2'])
       end
     end
   end
@@ -146,66 +170,70 @@ describe AnnotateModels do
   describe '.parse_options' do
     let(:options) do
       {
-        root_dir: '/root',
-        model_dir: 'app/models,app/one,  app/two   ,,app/three',
+        root_dir:                     '/root',
+        model_dir:                    'app/models,app/one,  app/two   ,,app/three',
         skip_subdirectory_model_load: false
       }
     end
 
-    before :each do
-      AnnotateModels.send(:parse_options, options)
+    before do
+      described_class.parse_options(options)
+    end
+
+    after do
+      described_class.parse_options({ skip_subdirectory_model_load: false })
     end
 
     describe '@root_dir' do
       subject do
-        AnnotateModels.instance_variable_get(:@root_dir)
+        described_class.instance_variable_get(:@root_dir)
       end
 
       it 'sets @root_dir' do
-        is_expected.to eq('/root')
+        expect(subject).to eq('/root')
       end
     end
 
     describe '@model_dir' do
       subject do
-        AnnotateModels.instance_variable_get(:@model_dir)
+        described_class.instance_variable_get(:@model_dir)
       end
 
       it 'separates option "model_dir" with commas and sets @model_dir as an array of string' do
-        is_expected.to eq(['app/models', 'app/one', 'app/two', 'app/three'])
+        expect(subject).to eq(['app/models', 'app/one', 'app/two', 'app/three'])
       end
     end
 
     describe '@skip_subdirectory_model_load' do
       subject do
-        AnnotateModels.instance_variable_get(:@skip_subdirectory_model_load)
+        described_class.instance_variable_get(:@skip_subdirectory_model_load)
       end
 
       context 'option is set to true' do
         let(:options) do
           {
-            root_dir: '/root',
-            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            root_dir:                     '/root',
+            model_dir:                    'app/models,app/one,  app/two   ,,app/three',
             skip_subdirectory_model_load: true
           }
         end
 
         it 'sets skip_subdirectory_model_load to true' do
-          is_expected.to eq(true)
+          expect(subject).to eq(true)
         end
       end
 
       context 'option is set to false' do
         let(:options) do
           {
-            root_dir: '/root',
-            model_dir: 'app/models,app/one,  app/two   ,,app/three',
+            root_dir:                     '/root',
+            model_dir:                    'app/models,app/one,  app/two   ,,app/three',
             skip_subdirectory_model_load: false
           }
         end
 
         it 'sets skip_subdirectory_model_load to false' do
-          is_expected.to eq(false)
+          expect(subject).to eq(false)
         end
       end
     end
@@ -213,11 +241,11 @@ describe AnnotateModels do
 
   describe '.get_schema_info' do
     subject do
-      AnnotateModels.get_schema_info(klass, header, **options)
+      described_class.get_schema_info(klass, header, **options)
     end
 
     let :klass do
-      mock_class(:users, primary_key, columns, indexes, foreign_keys)
+      mock_class(:users, primary_key, columns, indexes, foreign_keys, check_constraints)
     end
 
     let :indexes do
@@ -225,6 +253,10 @@ describe AnnotateModels do
     end
 
     let :foreign_keys do
+      []
+    end
+
+    let :check_constraints do
       []
     end
 
@@ -252,7 +284,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -260,11 +292,11 @@ describe AnnotateModels do
                 #  id   :integer          not null
                 #  name :string(50)       not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
-              is_expected.to eq(expected_result)
+              expect(subject).to eq(expected_result)
             end
           end
 
@@ -272,12 +304,12 @@ describe AnnotateModels do
             let :columns do
               [
                 mock_column(:id, :integer),
-                mock_column(:name, :enum, limit: [:enum1, :enum2])
+                mock_column(:name, :enum, limit: %i[enum1 enum2])
               ]
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -285,11 +317,11 @@ describe AnnotateModels do
                 #  id   :integer          not null
                 #  name :enum             not null, (enum1, enum2)
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
-              is_expected.to eq(expected_result)
+              expect(subject).to eq(expected_result)
             end
           end
 
@@ -301,12 +333,12 @@ describe AnnotateModels do
                 mock_column(:bigint,  :integer, unsigned?: true, bigint?: true),
                 mock_column(:bigint,  :bigint,  unsigned?: true),
                 mock_column(:float,   :float,   unsigned?: true),
-                mock_column(:decimal, :decimal, unsigned?: true, precision: 10, scale: 2),
+                mock_column(:decimal, :decimal, unsigned?: true, precision: 10, scale: 2)
               ]
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -318,11 +350,11 @@ describe AnnotateModels do
                 #  float   :float            unsigned, not null
                 #  decimal :decimal(10, 2)   unsigned, not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
-              is_expected.to eq(expected_result)
+              expect(subject).to eq(expected_result)
             end
           end
         end
@@ -343,7 +375,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: users
@@ -352,11 +384,11 @@ describe AnnotateModels do
                   #  name  :string(50)       not null
                   #  notes :text(55)         not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info' do
-                is_expected.to eq(expected_result)
+                expect(subject).to eq(expected_result)
               end
             end
 
@@ -370,7 +402,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: users
@@ -379,23 +411,23 @@ describe AnnotateModels do
                   #  size :integer          default(20), not null
                   #  flag :boolean          default(FALSE), not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info with default values' do
-                is_expected.to eq(expected_result)
+                expect(subject).to eq(expected_result)
               end
             end
 
-            context 'with Globalize gem' do
+            context 'with Globalize gem' do # rubocop:disable RSpec/MultipleMemoizedHelpers
               let :translation_klass do
                 double('Folder::Post::Translation',
-                       to_s: 'Folder::Post::Translation',
+                       to_s:    'Folder::Post::Translation',
                        columns: [
                          mock_column(:id, :integer, limit: 8),
                          mock_column(:post_id, :integer, limit: 8),
                          mock_column(:locale, :string, limit: 50),
-                         mock_column(:title, :string, limit: 50),
+                         mock_column(:title, :string, limit: 50)
                        ])
               end
 
@@ -408,12 +440,12 @@ describe AnnotateModels do
               let :columns do
                 [
                   mock_column(:id, :integer, limit: 8),
-                  mock_column(:author_name, :string, limit: 50),
+                  mock_column(:author_name, :string, limit: 50)
                 ]
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: posts
@@ -422,18 +454,18 @@ describe AnnotateModels do
                   #  author_name :string(50)       not null
                   #  title       :string(50)       not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info' do
-                is_expected.to eq expected_result
+                expect(subject).to eq expected_result
               end
             end
           end
 
           context 'when the primary key is an array (using composite_primary_keys)' do
             let :primary_key do
-              [:a_id, :b_id]
+              %i[a_id b_id]
             end
 
             let :columns do
@@ -445,7 +477,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -454,11 +486,11 @@ describe AnnotateModels do
                 #  b_id :integer          not null, primary key
                 #  name :string(50)       not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
-              is_expected.to eq(expected_result)
+              expect(subject).to eq(expected_result)
             end
           end
         end
@@ -499,7 +531,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -512,21 +544,21 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (foreign_thing_id)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
-                context 'when one of indexes includes orderd index key' do
+                context 'when one of indexes includes ordered index key' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -534,13 +566,13 @@ describe AnnotateModels do
                     [
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
-                                 columns: %w(firstname surname value),
-                                 orders: { 'surname' => :asc, 'value' => :desc })
+                                 columns: %w[firstname surname value],
+                                 orders:  { 'surname' => :asc, 'value' => :desc })
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -555,21 +587,21 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname ASC,value DESC)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
                 context 'when one of indexes includes "where" clause' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -577,13 +609,13 @@ describe AnnotateModels do
                     [
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
-                                 columns: %w(firstname surname),
-                                 where: 'value IS NOT NULL')
+                                 columns: %w[firstname surname],
+                                 where:   'value IS NOT NULL')
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -598,21 +630,21 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname) WHERE value IS NOT NULL
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
                 context 'when one of indexes includes "using" clause other than "btree"' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("firstname", :string),
-                      mock_column("surname", :string),
-                      mock_column("value", :string)
+                      mock_column('id', :integer),
+                      mock_column('firstname', :string),
+                      mock_column('surname', :string),
+                      mock_column('value', :string)
                     ]
                   end
 
@@ -620,13 +652,13 @@ describe AnnotateModels do
                     [
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
-                                 columns: %w(firstname surname),
-                                 using: 'hash')
+                                 columns: %w[firstname surname],
+                                 using:   'hash')
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -641,11 +673,11 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname) USING hash
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -662,7 +694,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -670,11 +702,28 @@ describe AnnotateModels do
                       #  id               :integer          not null, primary key
                       #  foreign_thing_id :integer          not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info without index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
+                  end
+
+                  context 'when the unprefixed table name does not exist' do
+                    let :klass do
+                      mock_class(:users, primary_key, columns, indexes, foreign_keys).tap do |mock_klass|
+                        allow(mock_klass).to receive(:table_name_prefix).and_return('my_prefix_')
+                        allow(mock_klass.connection).to receive(:table_exists?).with('users').and_return(false)
+                        allow(mock_klass.connection)
+                          .to receive(:indexes).with('users').and_raise('error fetching indexes on nonexistent table')
+                      end
+                    end
+
+                    it 'returns schema info without index information' do
+                      expect(subject).to eq expected_result
+                      expect(klass).to have_received(:table_name_prefix).at_least(:once)
+                      expect(klass.connection).to have_received(:table_exists?).with('users')
+                    end
                   end
                 end
               end
@@ -697,12 +746,12 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 orders: { 'foreign_thing_id' => :desc })
+                                 orders:  { 'foreign_thing_id' => :desc })
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -710,19 +759,19 @@ describe AnnotateModels do
                       #  id               :integer          not null, primary key
                       #  foreign_thing_id :integer          not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
                 context 'when one of indexes is in string form' do
                   let :columns do
                     [
-                      mock_column("id", :integer),
-                      mock_column("name", :string)
+                      mock_column('id', :integer),
+                      mock_column('name', :string)
                     ]
                   end
 
@@ -734,7 +783,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -742,11 +791,87 @@ describe AnnotateModels do
                       #  id   :integer          not null, primary key, indexed
                       #  name :string           not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
+                  end
+                end
+              end
+            end
+
+            context 'when check constraints exist' do
+              let :columns do
+                [
+                  mock_column(:id, :integer),
+                  mock_column(:age, :integer)
+                ]
+              end
+
+              context 'when option "show_check_constraints" is true' do
+                let :options do
+                  { show_check_constraints: true }
+                end
+
+                context 'when check constraints are defined' do
+                  let :check_constraints do
+                    [
+                      mock_check_constraint('alive', 'age < 150'),
+                      mock_check_constraint('must_be_adult', 'age >= 18'),
+                      mock_check_constraint('missing_expression', nil),
+                      mock_check_constraint('multiline_test', <<~SQL)
+                        CASE
+                          WHEN (age >= 18) THEN (age <= 21)
+                          ELSE true
+                        END
+                      SQL
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id  :integer          not null, primary key
+                      #  age :integer          not null
+                      #
+                      # Check Constraints
+                      #
+                      #  alive               (age < 150)
+                      #  missing_expression
+                      #  multiline_test      (CASE WHEN (age >= 18) THEN (age <= 21) ELSE true END)
+                      #  must_be_adult       (age >= 18)
+                      #
+                    CORPUS
+                  end
+
+                  it 'returns schema info with check constraint information' do
+                    expect(subject).to eq expected_result
+                  end
+                end
+
+                context 'when check constraint is not defined' do
+                  let :check_constraints do
+                    []
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id  :integer          not null, primary key
+                      #  age :integer          not null
+                      #
+                    CORPUS
+                  end
+
+                  it 'returns schema info without check constraint information' do
+                    expect(subject).to eq expected_result
                   end
                 end
               end
@@ -775,7 +900,7 @@ describe AnnotateModels do
 
                 context 'when foreign_keys does not have option' do
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -789,11 +914,11 @@ describe AnnotateModels do
                       #  fk_rails_...    (foreign_thing_id => foreign_things.id)
                       #  fk_rails_...    (third_thing_id => third_things.id)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign keys' do
-                    is_expected.to eq(expected_result)
+                    expect(subject).to eq(expected_result)
                   end
                 end
 
@@ -810,7 +935,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -822,11 +947,11 @@ describe AnnotateModels do
                       #
                       #  fk_rails_...  (foreign_thing_id => foreign_things.id) ON DELETE => on_delete_value ON UPDATE => on_update_value
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign keys' do
-                    is_expected.to eq(expected_result)
+                    expect(subject).to eq(expected_result)
                   end
                 end
               end
@@ -837,7 +962,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -851,11 +976,11 @@ describe AnnotateModels do
                     #  fk_rails_a70234b26c  (third_thing_id => third_things.id)
                     #  fk_rails_cf2568e89e  (foreign_thing_id => foreign_things.id)
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info with foreign keys' do
-                  is_expected.to eq(expected_result)
+                  expect(subject).to eq(expected_result)
                 end
               end
             end
@@ -876,7 +1001,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -886,11 +1011,11 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
 
@@ -900,7 +1025,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -910,11 +1035,11 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
 
@@ -924,7 +1049,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -934,11 +1059,11 @@ describe AnnotateModels do
                     #  name   :string           not null
                     #  notes  :text             not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
             end
@@ -958,7 +1083,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -967,11 +1092,11 @@ describe AnnotateModels do
                     #  settings   :jsonb            not null
                     #  parameters :hstore           not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_default_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
 
@@ -981,7 +1106,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -990,11 +1115,11 @@ describe AnnotateModels do
                     #  settings   :jsonb            default({}), not null
                     #  parameters :hstore           default({}), not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_default_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
 
@@ -1004,7 +1129,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1013,11 +1138,11 @@ describe AnnotateModels do
                     #  settings   :jsonb            default({}), not null
                     #  parameters :hstore           default({}), not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
             end
@@ -1037,7 +1162,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1046,11 +1171,11 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "classified_sort"' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
             end
@@ -1073,7 +1198,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1084,11 +1209,11 @@ describe AnnotateModels do
                       #  notes(Notes)   :text(55)         not null
                       #  no_comment     :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1108,7 +1233,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1123,11 +1248,11 @@ describe AnnotateModels do
                       #  no_comment                         :text(20)         not null
                       #  location                           :geometry_collect not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1141,7 +1266,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1150,11 +1275,11 @@ describe AnnotateModels do
                       #  notes(Notes.\\nMay include things like notes.):text(55)         not null
                       #  no_comment                                   :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1171,12 +1296,12 @@ describe AnnotateModels do
                                   limit: { srid: 0, type: 'geometry' }),
                       mock_column(:non_srid, :geography,
                                   geometric_type: 'Point',
-                                  limit: { type: 'geometry' })
+                                  limit:          { type: 'geometry' })
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1187,11 +1312,151 @@ describe AnnotateModels do
                       #  location :geography        not null, point, 0
                       #  non_srid :geography        not null, point
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
+                  end
+                end
+              end
+
+              context 'when "with_comment_column" is specified in options' do
+                let :options do
+                  { with_comment_column: 'yes' }
+                end
+
+                context 'when columns have comments' do
+                  let :columns do
+                    [
+                      mock_column(:id,         :integer, limit: 8,  comment: 'ID'),
+                      mock_column(:active,     :boolean, limit: 1,  comment: 'Active'),
+                      mock_column(:name,       :string,  limit: 50, comment: 'Name'),
+                      mock_column(:notes,      :text,    limit: 55, comment: 'Notes'),
+                      mock_column(:no_comment, :text,    limit: 20, comment: nil)
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id         :integer          not null, primary key   ID
+                      #  active     :boolean          not null                Active
+                      #  name       :string(50)       not null                Name
+                      #  notes      :text(55)         not null                Notes
+                      #  no_comment :text(20)         not null
+                      #
+                    CORPUS
+                  end
+
+                  it 'works with option "with_comment_column"' do
+                    expect(subject).to eq expected_result
+                  end
+                end
+
+                context 'when columns have multibyte comments' do
+                  let :columns do
+                    [
+                      mock_column(:id,         :integer, limit: 8,  comment: 'ＩＤ'),
+                      mock_column(:active,     :boolean, limit: 1,  comment: 'ＡＣＴＩＶＥ'),
+                      mock_column(:name,       :string,  limit: 50, comment: 'ＮＡＭＥ'),
+                      mock_column(:notes,      :text,    limit: 55, comment: 'ＮＯＴＥＳ'),
+                      mock_column(:cyrillic,   :text,    limit: 30, comment: 'Кириллица'),
+                      mock_column(:japanese,   :text,    limit: 60, comment: '熊本大学　イタリア　宝島'),
+                      mock_column(:arabic,     :text,    limit: 20, comment: 'لغة'),
+                      mock_column(:no_comment, :text,    limit: 20, comment: nil),
+                      mock_column(:location,   :geometry_collection, limit: nil, comment: nil)
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id         :integer          not null, primary key   ＩＤ
+                      #  active     :boolean          not null                ＡＣＴＩＶＥ
+                      #  name       :string(50)       not null                ＮＡＭＥ
+                      #  notes      :text(55)         not null                ＮＯＴＥＳ
+                      #  cyrillic   :text(30)         not null                Кириллица
+                      #  japanese   :text(60)         not null                熊本大学　イタリア　宝島
+                      #  arabic     :text(20)         not null                لغة
+                      #  no_comment :text(20)         not null
+                      #  location   :geometry_collect not null
+                      #
+                    CORPUS
+                  end
+
+                  it 'works with option "with_comment_column"' do
+                    expect(subject).to eq expected_result
+                  end
+                end
+
+                context 'when columns have multiline comments' do
+                  let :columns do
+                    [
+                      mock_column(:id,         :integer, limit: 8,  comment: 'ID'),
+                      mock_column(:notes,      :text,    limit: 55, comment: "Notes.\nMay include things like notes."),
+                      mock_column(:no_comment, :text,    limit: 20, comment: nil)
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id         :integer          not null, primary key   ID
+                      #  notes      :text(55)         not null                Notes.\\nMay include things like notes.
+                      #  no_comment :text(20)         not null
+                      #
+                    CORPUS
+                  end
+
+                  it 'works with option "with_comment_column"' do
+                    expect(subject).to eq expected_result
+                  end
+                end
+
+                context 'when geometry columns are included' do
+                  let :columns do
+                    [
+                      mock_column(:id,       :integer,  limit: 8),
+                      mock_column(:active,   :boolean,  default: false, null: false),
+                      mock_column(:geometry, :geometry,
+                                  geometric_type: 'Geometry', srid: 4326,
+                                  limit: { srid: 4326, type: 'geometry' }),
+                      mock_column(:location, :geography,
+                                  geometric_type: 'Point', srid: 0,
+                                  limit: { srid: 0, type: 'geometry' }),
+                      mock_column(:non_srid, :geography,
+                                  geometric_type: 'Point',
+                                  limit:          { type: 'geometry' })
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # Schema Info
+                      #
+                      # Table name: users
+                      #
+                      #  id       :integer          not null, primary key
+                      #  active   :boolean          default(FALSE), not null
+                      #  geometry :geometry         not null, geometry, 4326
+                      #  location :geography        not null, point, 0
+                      #  non_srid :geography        not null, point
+                      #
+                    CORPUS
+                  end
+
+                  it 'works with option "with_comment_column"' do
+                    expect(subject).to eq expected_result
                   end
                 end
               end
@@ -1224,7 +1489,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # == Schema Information
                   #
                   # Table name: users
@@ -1234,11 +1499,11 @@ describe AnnotateModels do
                   #--
                   # == Schema Information End
                   #++
-                EOS
+                CORPUS
               end
 
               it 'returns schema info in RDoc format' do
-                is_expected.to eq(expected_result)
+                expect(subject).to eq(expected_result)
               end
             end
 
@@ -1248,7 +1513,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # == Schema Information
                   #
                   # Table name: users
@@ -1258,11 +1523,11 @@ describe AnnotateModels do
                   # @!attribute name
                   #   @return [String]
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info in YARD format' do
-                is_expected.to eq(expected_result)
+                expect(subject).to eq(expected_result)
               end
             end
 
@@ -1273,7 +1538,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1285,11 +1550,11 @@ describe AnnotateModels do
                     # **`id`**    | `integer`          | `not null, primary key`
                     # **`name`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
-                  is_expected.to eq(expected_result)
+                  expect(subject).to eq(expected_result)
                 end
               end
 
@@ -1307,7 +1572,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1326,11 +1591,11 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8`:
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1340,12 +1605,12 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 unique: true)
+                                 unique:  true)
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1364,11 +1629,11 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_unique_):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1378,12 +1643,12 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 orders: { 'foreign_thing_id' => :desc })
+                                 orders:  { 'foreign_thing_id' => :desc })
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1402,11 +1667,11 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8`:
                       #     * **`foreign_thing_id DESC`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1416,13 +1681,13 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 unique: true,
-                                 where: 'name IS NOT NULL')
+                                 unique:  true,
+                                 where:   'name IS NOT NULL')
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1441,11 +1706,11 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_unique_ _where_ name IS NOT NULL):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
                   end
                 end
 
@@ -1455,12 +1720,12 @@ describe AnnotateModels do
                       mock_index('index_rails_02e851e3b7', columns: ['id']),
                       mock_index('index_rails_02e851e3b8',
                                  columns: ['foreign_thing_id'],
-                                 using: 'hash')
+                                 using:   'hash')
                     ]
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1479,11 +1744,58 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_using_ hash):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
-                    is_expected.to eq expected_result
+                    expect(subject).to eq expected_result
+                  end
+                end
+              end
+
+              context 'when option "show_check_constraints" is true' do
+                let :options do
+                  { format_markdown: true, show_check_constraints: true }
+                end
+
+                context 'when check constraints are defined' do
+                  let :check_constraints do
+                    [
+                      mock_check_constraint('min_name_length', 'LENGTH(name) > 2'),
+                      mock_check_constraint('missing_expression', nil),
+                      mock_check_constraint('multiline_test', <<~SQL)
+                        CASE
+                          WHEN (age >= 18) THEN (age <= 21)
+                          ELSE true
+                        END
+                      SQL
+                    ]
+                  end
+
+                  let :expected_result do
+                    <<~CORPUS
+                      # == Schema Information
+                      #
+                      # Table name: `users`
+                      #
+                      # ### Columns
+                      #
+                      # Name        | Type               | Attributes
+                      # ----------- | ------------------ | ---------------------------
+                      # **`id`**    | `integer`          | `not null, primary key`
+                      # **`name`**  | `string(50)`       | `not null`
+                      #
+                      # ### Check Constraints
+                      #
+                      # * `min_name_length`: `(LENGTH(name) > 2)`
+                      # * `missing_expression`
+                      # * `multiline_test`: `(CASE WHEN (age >= 18) THEN (age <= 21) ELSE true END)`
+                      #
+                    CORPUS
+                  end
+
+                  it 'returns schema info with check constraint information in Markdown format' do
+                    expect(subject).to eq expected_result
                   end
                 end
               end
@@ -1513,7 +1825,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1530,11 +1842,11 @@ describe AnnotateModels do
                       # * `fk_rails_...` (_ON DELETE => on_delete_value ON UPDATE => on_update_value_):
                       #     * **`foreign_thing_id => foreign_things.id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign_keys in Markdown format' do
-                    is_expected.to eq(expected_result)
+                    expect(subject).to eq(expected_result)
                   end
                 end
               end
@@ -1554,7 +1866,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: users
@@ -1564,11 +1876,11 @@ describe AnnotateModels do
                     #--
                     # == Schema Information End
                     #++
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in RDoc format' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
             end
@@ -1587,7 +1899,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1599,11 +1911,11 @@ describe AnnotateModels do
                     # **`id(ID)`**      | `integer`          | `not null, primary key`
                     # **`name(Name)`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
 
@@ -1616,7 +1928,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1628,11 +1940,11 @@ describe AnnotateModels do
                     # **`id(ＩＤ)`**        | `integer`          | `not null, primary key`
                     # **`name(ＮＡＭＥ)`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
-                  is_expected.to eq expected_result
+                  expect(subject).to eq expected_result
                 end
               end
             end
@@ -1647,9 +1959,13 @@ describe AnnotateModels do
       Annotate::Helpers.true?(ENV['show_complete_foreign_keys'])
     end
 
+    after do
+      ENV.delete('show_complete_foreign_keys')
+    end
+
     context 'when default value of "show_complete_foreign_keys" is not set' do
       it 'returns false' do
-        is_expected.to be(false)
+        expect(subject).to be(false)
       end
     end
 
@@ -1658,18 +1974,18 @@ describe AnnotateModels do
         Annotate.set_defaults('show_complete_foreign_keys' => 'true')
       end
 
-      it 'returns true' do
-        is_expected.to be(true)
+      after do
+        Annotate.instance_variable_set('@has_set_defaults', false)
       end
-    end
 
-    after :each do
-      ENV.delete('show_complete_foreign_keys')
+      it 'returns true' do
+        expect(subject).to be(true)
+      end
     end
   end
 
   describe '.get_patterns' do
-    subject { AnnotateModels.get_patterns(options, pattern_type) }
+    subject { described_class.get_patterns(options, pattern_type) }
 
     context 'when pattern_type is "additional_file_patterns"' do
       let(:pattern_type) { 'additional_file_patterns' }
@@ -1685,7 +2001,7 @@ describe AnnotateModels do
         let(:options) { { additional_file_patterns: additional_file_patterns } }
 
         it 'returns additional_file_patterns in the argument "options"' do
-          is_expected.to eq(additional_file_patterns)
+          expect(subject).to eq(additional_file_patterns)
         end
       end
 
@@ -1693,7 +2009,7 @@ describe AnnotateModels do
         let(:options) { {} }
 
         it 'returns an empty array' do
-          is_expected.to eq([])
+          expect(subject).to eq([])
         end
       end
     end
@@ -1729,7 +2045,7 @@ describe AnnotateModels do
           let(:options) { {} }
 
           it 'returns all model files under `model_dir` directory' do
-            is_expected.to contain_exactly(
+            expect(subject).to contain_exactly(
               [model_dir, 'foo.rb'],
               [model_dir, File.join('bar', 'baz.rb')],
               [model_dir, File.join('bar', 'qux', 'quux.rb')]
@@ -1741,7 +2057,7 @@ describe AnnotateModels do
           let(:options) { { ignore_model_sub_dir: true } }
 
           it 'returns model files just below `model_dir` directory' do
-            is_expected.to contain_exactly([model_dir, 'foo.rb'])
+            expect(subject).to contain_exactly([model_dir, 'foo.rb'])
           end
         end
       end
@@ -1766,7 +2082,7 @@ describe AnnotateModels do
             end
 
             it 'returns specified files' do
-              is_expected.to contain_exactly(
+              expect(subject).to contain_exactly(
                 [model_dir, 'foo.rb'],
                 [additional_model_dir, 'corge/grault.rb']
               )
@@ -1775,12 +2091,10 @@ describe AnnotateModels do
 
           context 'when a model file outside `model_dir` directory is specified' do
             it 'exits with the status code' do
-              begin
-                subject
-                raise
-              rescue SystemExit => e
-                expect(e.status).to eq(1)
-              end
+              subject
+              raise
+            rescue SystemExit => e
+              expect(e.status).to eq(1)
             end
           end
         end
@@ -1789,7 +2103,7 @@ describe AnnotateModels do
           let(:options) { { is_rake: true } }
 
           it 'returns all model files under `model_dir` directory' do
-            is_expected.to contain_exactly(
+            expect(subject).to contain_exactly(
               [model_dir, 'foo.rb'],
               [model_dir, File.join('bar', 'baz.rb')],
               [model_dir, File.join('bar', 'qux', 'quux.rb')]
@@ -1804,19 +2118,23 @@ describe AnnotateModels do
       let(:options) { {} }
 
       it 'exits with the status code' do
-        begin
-          subject
-          raise
-        rescue SystemExit => e
-          expect(e.status).to eq(1)
-        end
+        subject
+        raise
+      rescue SystemExit => e
+        expect(e.status).to eq(1)
       end
     end
   end
 
   describe '.get_model_class' do
-    before :all do
-      AnnotateModels.model_dir = Dir.mktmpdir('annotate_models')
+    before do
+      @model_dir = Dir.mktmpdir('annotate_models')
+      described_class.model_dir = @model_dir
+      create(filename, file_content)
+    end
+
+    after do
+      FileUtils.remove_dir(@model_dir, true)
     end
 
     # TODO: use 'files' gem instead
@@ -1829,12 +2147,8 @@ describe AnnotateModels do
       end
     end
 
-    before :each do
-      create(filename, file_content)
-    end
-
     let :klass do
-      AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename))
+      described_class.get_model_class(File.join(described_class.model_dir[0], filename))
     end
 
     context 'when class Foo is defined in "foo.rb"' do
@@ -1843,10 +2157,10 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'works' do
@@ -1861,10 +2175,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithCAPITALS < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -1880,12 +2194,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             module Bar
               class FooInsideBar < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -1901,12 +2215,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             module BAR
               class FooInsideCapitalsBAR < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -1922,11 +2236,11 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithMacro < ActiveRecord::Base
               acts_as_awesome :yah
             end
-          EOS
+          CORPUS
         end
 
         it 'works and does not care about known macros' do
@@ -1941,11 +2255,11 @@ describe AnnotateModels do
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class FooWithCAPITALS < ActiveRecord::Base
                 acts_as_awesome :yah
               end
-            EOS
+            CORPUS
           end
 
           it 'works' do
@@ -1962,11 +2276,11 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithKnownMacro < ActiveRecord::Base
               has_many :yah
             end
-          EOS
+          CORPUS
         end
 
         it 'works and does not care about known macros' do
@@ -1982,12 +2296,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             # encoding: utf-8
             class FooWithUtf8 < ActiveRecord::Base
               UTF8STRINGS = %w[résumé façon âge]
             end
-          EOS
+          CORPUS
         end
 
         it 'works without complaining of invalid multibyte chars' do
@@ -2003,10 +2317,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class NonNamespacedFooInsideBar < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -2015,16 +2329,16 @@ describe AnnotateModels do
       end
 
       context 'when class name is not capitalized normally' do
-        context 'when class NonNamespacedFooWithCapitalsInsideBar is defined in "bar/non_namespaced_foo_with_capitals_inside_bar.rb"' do
+        context 'when class NonNamespacedFooWithCapitalsInsideBar is defined in "bar/non_namespaced_foo_with_capitals_inside_bar.rb"' do # rubocop:disable Layout/LineLength
           let :filename do
             'bar/non_namespaced_foo_with_capitals_inside_bar.rb'
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class NonNamespacedFooWithCapitalsInsideBar < ActiveRecord::Base
               end
-            EOS
+            CORPUS
           end
 
           it 'works' do
@@ -2041,15 +2355,15 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class LoadedClass < ActiveRecord::Base
               CONSTANT = 1
             end
-          EOS
+          CORPUS
         end
 
-        before :each do
-          path = File.expand_path(filename, AnnotateModels.model_dir[0])
+        before do
+          path = File.expand_path(filename, described_class.model_dir[0])
           Kernel.load(path)
           expect(Kernel).not_to receive(:require)
         end
@@ -2063,10 +2377,10 @@ describe AnnotateModels do
         dir = Array.new(8) { (0..9).to_a.sample(random: Random.new) }.join
 
         context "when class SubdirLoadedClass is defined in \"#{dir}/subdir_loaded_class.rb\"" do
-          before :each do
-            $LOAD_PATH.unshift(File.join(AnnotateModels.model_dir[0], dir))
+          before do
+            $LOAD_PATH.unshift(File.join(described_class.model_dir[0], dir))
 
-            path = File.expand_path(filename, AnnotateModels.model_dir[0])
+            path = File.expand_path(filename, described_class.model_dir[0])
             Kernel.load(path)
             expect(Kernel).not_to receive(:require)
           end
@@ -2076,11 +2390,11 @@ describe AnnotateModels do
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class SubdirLoadedClass < ActiveRecord::Base
                 CONSTANT = 1
               end
-            EOS
+            CORPUS
           end
 
           it 'does not require model file twice' do
@@ -2091,7 +2405,7 @@ describe AnnotateModels do
     end
 
     context 'when two class exist' do
-      before :each do
+      before do
         create(filename_2, file_content_2)
       end
 
@@ -2101,10 +2415,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Foo < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2112,14 +2426,16 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<-EOS
-            class Bar::Foo < ActiveRecord::Base
+          <<-CORPUS
+            module Bar
+              class Foo < ActiveRecord::Base
+              end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2134,10 +2450,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Foo < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2145,14 +2461,16 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<-EOS
-            class Bar::Foo < ActiveRecord::Base
+          <<-CORPUS
+            module Bar
+              class Foo < ActiveRecord::Base
+              end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2161,18 +2479,20 @@ describe AnnotateModels do
         end
 
         it 'attempts to load the model path without expanding if skip_subdirectory_model_load is false' do
-          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(false)
-          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
-          expect(File).to_not receive(:expand_path).with(full_path)
-          AnnotateModels.get_model_class(full_path)
+          allow(described_class).to receive(:skip_subdirectory_model_load).and_return(false)
+          full_path = File.join(described_class.model_dir[0], filename_2)
+          Kernel.load(full_path)
+          expect(File).not_to receive(:expand_path).with(full_path)
+          described_class.get_model_class(full_path)
         end
 
         it 'does not attempt to load the model path without expanding if skip_subdirectory_model_load is true' do
-          $LOAD_PATH.unshift(AnnotateModels.model_dir[0])
-          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(true)
-          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
+          $LOAD_PATH.unshift(described_class.model_dir[0])
+          allow(described_class).to receive(:skip_subdirectory_model_load).and_return(true)
+          full_path = File.join(described_class.model_dir[0], filename_2)
+          Kernel.load(full_path)
           expect(File).to receive(:expand_path).with(full_path).and_call_original
-          AnnotateModels.get_model_class(full_path)
+          described_class.get_model_class(full_path)
         end
       end
 
@@ -2182,10 +2502,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Voucher < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2193,16 +2513,16 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<~EOS
+          <<~CORPUS
             class Voucher
               class Foo < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2215,7 +2535,11 @@ describe AnnotateModels do
 
   describe '.remove_annotation_of_file' do
     subject do
-      AnnotateModels.remove_annotation_of_file(path)
+      described_class.remove_annotation_of_file(path)
+    end
+
+    after do
+      FileUtils.remove_dir(tmpdir, true)
     end
 
     let :tmpdir do
@@ -2236,10 +2560,10 @@ describe AnnotateModels do
     end
 
     let :expected_result do
-      <<~EOS
+      <<~CORPUS
         class Foo < ActiveRecord::Base
         end
-      EOS
+      CORPUS
     end
 
     context 'when annotation is before main content' do
@@ -2248,7 +2572,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # == Schema Information
           #
           # Table name: foo
@@ -2260,7 +2584,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2274,7 +2598,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # == Schema Information
           #
           # Table name: foo\r\n#
@@ -2285,7 +2609,7 @@ describe AnnotateModels do
           \r\n
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2294,12 +2618,16 @@ describe AnnotateModels do
     end
 
     context 'when annotation is before main content and with opening wrapper' do
+      subject do
+        described_class.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+      end
+
       let :filename do
         'opening_wrapper.rb'
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # wrapper
           # == Schema Information
           #
@@ -2312,11 +2640,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
-      end
-
-      subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2325,12 +2649,16 @@ describe AnnotateModels do
     end
 
     context 'when annotation is before main content and with opening wrapper' do
+      subject do
+        described_class.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+      end
+
       let :filename do
         'opening_wrapper.rb'
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # wrapper\r\n# == Schema Information
           #
           # Table name: foo
@@ -2342,11 +2670,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
-      end
-
-      subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2360,7 +2684,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
 
@@ -2373,7 +2697,7 @@ describe AnnotateModels do
           #  updated_at          :datetime
           #
 
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2382,12 +2706,16 @@ describe AnnotateModels do
     end
 
     context 'when annotation is after main content and with closing wrapper' do
+      subject do
+        described_class.remove_annotation_of_file(path, wrapper_close: 'wrapper')
+      end
+
       let :filename do
         'closing_wrapper.rb'
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
 
@@ -2401,11 +2729,7 @@ describe AnnotateModels do
           #
           # wrapper
 
-        EOS
-      end
-
-      subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_close: 'wrapper')
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2419,7 +2743,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # -*- SkipSchemaAnnotations
           # == Schema Information
           #
@@ -2432,7 +2756,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       let :expected_result do
@@ -2447,7 +2771,7 @@ describe AnnotateModels do
 
   describe '.resolve_filename' do
     subject do
-      AnnotateModels.resolve_filename(filename_template, model_name, table_name)
+      described_class.resolve_filename(filename_template, model_name, table_name)
     end
 
     context 'When model_name is "example_model" and table_name is "example_models"' do
@@ -2458,7 +2782,7 @@ describe AnnotateModels do
         let(:filename_template) { 'test/unit/%MODEL_NAME%_test.rb' }
 
         it 'returns the test path for a model' do
-          is_expected.to eq 'test/unit/example_model_test.rb'
+          expect(subject).to eq 'test/unit/example_model_test.rb'
         end
       end
 
@@ -2466,7 +2790,7 @@ describe AnnotateModels do
         let(:filename_template) { '/foo/bar/%MODEL_NAME%/testing.rb' }
 
         it 'returns the additional glob' do
-          is_expected.to eq '/foo/bar/example_model/testing.rb'
+          expect(subject).to eq '/foo/bar/example_model/testing.rb'
         end
       end
 
@@ -2474,7 +2798,7 @@ describe AnnotateModels do
         let(:filename_template) { '/foo/bar/%PLURALIZED_MODEL_NAME%/testing.rb' }
 
         it 'returns the additional glob' do
-          is_expected.to eq '/foo/bar/example_models/testing.rb'
+          expect(subject).to eq '/foo/bar/example_models/testing.rb'
         end
       end
 
@@ -2482,7 +2806,7 @@ describe AnnotateModels do
         let(:filename_template) { 'test/fixtures/%TABLE_NAME%.yml' }
 
         it 'returns the fixture path for a model' do
-          is_expected.to eq 'test/fixtures/example_models.yml'
+          expect(subject).to eq 'test/fixtures/example_models.yml'
         end
       end
     end
@@ -2495,7 +2819,7 @@ describe AnnotateModels do
         let(:filename_template) { 'test/fixtures/%PLURALIZED_MODEL_NAME%.yml' }
 
         it 'returns the fixture path for a nested model' do
-          is_expected.to eq 'test/fixtures/parent/children.yml'
+          expect(subject).to eq 'test/fixtures/parent/children.yml'
         end
       end
     end
@@ -2504,10 +2828,10 @@ describe AnnotateModels do
   describe 'annotating a file' do
     before do
       @model_dir = Dir.mktmpdir('annotate_models')
-      (@model_file_name, @file_content) = write_model 'user.rb', <<~EOS
+      (@model_file_name, @file_content) = write_model 'user.rb', <<~CORPUS
         class User < ActiveRecord::Base
         end
-      EOS
+      CORPUS
 
       @klass = mock_class(:users,
                           :id,
@@ -2515,14 +2839,18 @@ describe AnnotateModels do
                             mock_column(:id, :integer),
                             mock_column(:name, :string, limit: 50)
                           ])
-      @schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+      @schema_info = described_class.get_schema_info(@klass, '== Schema Info')
       Annotate::Helpers.reset_options(Annotate::Constants::ALL_ANNOTATE_OPTIONS)
+    end
+
+    after do
+      FileUtils.remove_dir(@model_dir, true)
     end
 
     def write_model(file_name, file_content)
       fname = File.join(@model_dir, file_name)
       FileUtils.mkdir_p(File.dirname(fname))
-      File.open(fname, 'wb') { |f| f.write file_content }
+      File.binwrite(fname, file_content)
 
       [fname, file_content]
     end
@@ -2531,7 +2859,7 @@ describe AnnotateModels do
       Annotate.set_defaults(options)
       options = Annotate.setup_options(options)
       AnnotateModels.annotate_one_file(@model_file_name, @schema_info, :position_in_class, options)
-
+    ensure
       # Wipe settings so the next call will pick up new values...
       Annotate.instance_variable_set('@has_set_defaults', false)
       Annotate::Constants::POSITION_OPTIONS.each { |key| ENV[key.to_s] = '' }
@@ -2540,7 +2868,7 @@ describe AnnotateModels do
     end
 
     ['before', :before, 'top', :top].each do |position|
-      it "should put annotation before class if :position == #{position}" do
+      it "puts annotation before class if :position == #{position}" do
         annotate_one_file position: position
         expect(File.read(@model_file_name))
           .to eq("#{@schema_info}#{@file_content}")
@@ -2548,14 +2876,14 @@ describe AnnotateModels do
     end
 
     ['after', :after, 'bottom', :bottom].each do |position|
-      it "should put annotation after class if position: #{position}" do
+      it "puts annotation after class if position: #{position}" do
         annotate_one_file position: position
         expect(File.read(@model_file_name))
           .to eq("#{@file_content}\n#{@schema_info}")
       end
     end
 
-    it 'should wrap annotation if wrapper is specified' do
+    it 'wraps annotation if wrapper is specified' do
       annotate_one_file wrapper_open: 'START', wrapper_close: 'END'
       expect(File.read(@model_file_name))
         .to eq("# START\n#{@schema_info}# END\n#{@file_content}")
@@ -2578,11 +2906,11 @@ describe AnnotateModels do
                                                 'id',
                                                 on_delete: :cascade)
                              ])
-          @schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
+          @schema_info = described_class.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
           annotate_one_file
         end
 
-        it 'should update foreign key constraint' do
+        it 'updates foreign key constraint' do
           klass = mock_class(:users,
                              :id,
                              [
@@ -2597,7 +2925,7 @@ describe AnnotateModels do
                                                 'id',
                                                 on_delete: :restrict)
                              ])
-          @schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
+          @schema_info = described_class.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
           annotate_one_file
           expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
         end
@@ -2607,21 +2935,22 @@ describe AnnotateModels do
     describe 'with existing annotation => :before' do
       before do
         annotate_one_file position: :before
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
       end
 
-      it 'should retain current position' do
+      it 'retains current position' do
         annotate_one_file
         expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
       end
 
-      it 'should retain current position even when :position is changed to :after' do
+      it 'retains current position even when :position is changed to :after' do
         annotate_one_file position: :after
         expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
       end
 
-      it 'should change position to :after when force: true' do
+      it 'changes position to :after when force: true' do
         annotate_one_file position: :after, force: true
         expect(File.read(@model_file_name)).to eq("#{@file_content}\n#{@schema_info}")
       end
@@ -2630,56 +2959,57 @@ describe AnnotateModels do
     describe 'with existing annotation => :after' do
       before do
         annotate_one_file position: :after
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
       end
 
-      it 'should retain current position' do
+      it 'retains current position' do
         annotate_one_file
         expect(File.read(@model_file_name)).to eq("#{@file_content}\n#{@schema_info}")
       end
 
-      it 'should retain current position even when :position is changed to :before' do
+      it 'retains current position even when :position is changed to :before' do
         annotate_one_file position: :before
         expect(File.read(@model_file_name)).to eq("#{@file_content}\n#{@schema_info}")
       end
 
-      it 'should change position to :before when force: true' do
+      it 'changes position to :before when force: true' do
         annotate_one_file position: :before, force: true
         expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
       end
     end
 
-    it 'should skip columns with option[:ignore_columns] set' do
-      output = AnnotateModels.get_schema_info(@klass, '== Schema Info',
-                                              :ignore_columns => '(id|updated_at|created_at)')
+    it 'skips columns with option[:ignore_columns] set' do
+      output = described_class.get_schema_info(@klass, '== Schema Info',
+                                               ignore_columns: '(id|updated_at|created_at)')
       expect(output.match(/id/)).to be_nil
     end
 
     it 'works with namespaced models (i.e. models inside modules/subdirectories)' do
-      (model_file_name, file_content) = write_model 'foo/user.rb', <<~EOS
+      (model_file_name, file_content) = write_model 'foo/user.rb', <<~CORPUS
         class Foo::User < ActiveRecord::Base
         end
-      EOS
+      CORPUS
 
-      klass = mock_class(:'foo_users',
+      klass = mock_class(:foo_users,
                          :id,
                          [
                            mock_column(:id, :integer),
                            mock_column(:name, :string, limit: 50)
                          ])
-      schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info')
-      AnnotateModels.annotate_one_file(model_file_name, schema_info, position: :before)
+      schema_info = described_class.get_schema_info(klass, '== Schema Info')
+      described_class.annotate_one_file(model_file_name, schema_info, position: :before)
       expect(File.read(model_file_name)).to eq("#{schema_info}#{file_content}")
     end
 
-    it 'should not touch magic comments' do
+    it 'does not touch magic comments' do
       MAGIC_COMMENTS.each do |magic_comment|
-        write_model 'user.rb', <<~EOS
+        write_model 'user.rb', <<~CORPUS
           #{magic_comment}
           class User < ActiveRecord::Base
           end
-        EOS
+        CORPUS
 
         annotate_one_file position: :before
 
@@ -2698,7 +3028,7 @@ describe AnnotateModels do
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n#{content}"
 
         annotate_one_file position: :before
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
 
         expect(File.read(model_file_name)).to eq("#{magic_comment}\n\n#{schema_info}#{content}")
       end
@@ -2707,7 +3037,7 @@ describe AnnotateModels do
     it 'only keeps a single empty line around the annotation (position :before)' do
       content = "class User < ActiveRecord::Base\nend\n"
       MAGIC_COMMENTS.each do |magic_comment|
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n\n\n\n#{content}"
 
         annotate_one_file position: :before
@@ -2722,7 +3052,7 @@ describe AnnotateModels do
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n#{content}"
 
         annotate_one_file position: :after
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
 
         expect(File.read(model_file_name)).to eq("#{magic_comment}\n#{content}\n#{schema_info}")
       end
@@ -2730,62 +3060,107 @@ describe AnnotateModels do
 
     describe "if a file can't be annotated" do
       before do
-        allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
+        allow(described_class).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
-        write_model('user.rb', <<~EOS)
+        write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
             raise "oops"
           end
-        EOS
+        CORPUS
       end
 
       it 'displays just the error message with trace disabled (default)' do
-        expect { AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true }.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true }.not_to output(a_string_including('/spec/annotate/annotate_models_spec.rb:')).to_stderr
+        expect do
+          described_class.do_annotations model_dir: @model_dir,
+                                         is_rake:   true
+        end.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
+        expect do
+          described_class.do_annotations model_dir: @model_dir,
+                                         is_rake:   true
+        end.not_to output(a_string_including('/spec/annotate/annotate_models_spec.rb:')).to_stderr
       end
 
       it 'displays the error message and stacktrace with trace enabled' do
-        expect { AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including('/spec/lib/annotate/annotate_models_spec.rb:')).to_stderr
+        expect do
+          described_class.do_annotations model_dir: @model_dir, is_rake: true,
+                                         trace: true
+        end.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
+        expect do
+          described_class.do_annotations model_dir: @model_dir, is_rake: true,
+                                         trace: true
+        end.to output(a_string_including('/spec/lib/annotate/annotate_models_spec.rb:')).to_stderr
       end
     end
 
     describe "if a file can't be deannotated" do
       before do
-        allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
+        allow(described_class).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
-        write_model('user.rb', <<~EOS)
+        write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
             raise "oops"
           end
-        EOS
+        CORPUS
       end
 
       it 'displays just the error message with trace disabled (default)' do
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true }.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        expect do
+          described_class.remove_annotations model_dir: @model_dir,
+                                             is_rake:   true
+        end.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
+        if RUBY_VERSION_NUMERIC >= RUBY_34
+          expect do
+            described_class.remove_annotations model_dir: @model_dir,
+                                               is_rake:   true
+          end.not_to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
+        else
+          expect do
+            described_class.remove_annotations model_dir: @model_dir,
+                                               is_rake:   true
+          end.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        end
       end
 
       it 'displays the error message and stacktrace with trace enabled' do
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
-        expect { AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true, trace: true }.to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        expect do
+          described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                             trace: true
+        end.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
+        if RUBY_VERSION_NUMERIC >= RUBY_34
+          expect do
+            described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                               trace: true
+          end.to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
+        else
+          expect do
+            described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                               trace: true
+          end.to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
+        end
       end
     end
 
     describe 'frozen option' do
-      it "should abort without existing annotation when frozen: true " do
-        expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
+      it 'aborts without existing annotation when frozen: true' do
+        expect do
+          annotate_one_file frozen: true
+        end.to raise_error SystemExit,
+                           /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should abort with different annotation when frozen: true " do
+      it 'aborts with different annotation when frozen: true' do
         annotate_one_file
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
 
-        expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
+        expect do
+          annotate_one_file frozen: true
+        end.to raise_error SystemExit,
+                           /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should NOT abort with same annotation when frozen: true " do
+      it 'does not abort with same annotation when frozen: true' do
         annotate_one_file
         expect { annotate_one_file frozen: true }.not_to raise_error
       end
@@ -2793,26 +3168,26 @@ describe AnnotateModels do
   end
 
   describe '.annotate_model_file' do
-    before do
-      class Foo < ActiveRecord::Base; end
-      allow(AnnotateModels).to receive(:get_model_class).with('foo.rb') { Foo }
-      allow(Foo).to receive(:table_exists?) { false }
+    subject do
+      described_class.annotate_model_file([], 'foo.rb', nil, {})
     end
 
-    subject do
-      AnnotateModels.annotate_model_file([], 'foo.rb', nil, {})
+    before do
+      class Foo < ActiveRecord::Base; end
+      allow(described_class).to receive(:get_model_class).with('foo.rb').and_return(Foo)
+      allow(Foo).to receive(:table_exists?).and_return(false)
     end
 
     after { Object.send :remove_const, 'Foo' }
 
     it 'skips attempt to annotate if no table exists for model' do
-      is_expected.to eq nil
+      expect(subject).to eq nil
     end
 
     context 'with a non-class' do
       before do
-        NotAClass = 'foo'.freeze # rubocop:disable Naming/ConstantName
-        allow(AnnotateModels).to receive(:get_model_class).with('foo.rb') { NotAClass }
+        NotAClass = 'foo' # rubocop:disable Naming/ConstantName
+        allow(described_class).to receive(:get_model_class).with('foo.rb').and_return(NotAClass)
       end
 
       after { Object.send :remove_const, 'NotAClass' }

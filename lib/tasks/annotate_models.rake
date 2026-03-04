@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 annotate_lib = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
 unless ENV['is_cli']
@@ -10,7 +12,7 @@ task annotate_models: :environment do
   require "#{annotate_lib}/annotate/annotate_models"
   require "#{annotate_lib}/annotate/active_record_patch"
 
-  options = {is_rake: true}
+  options = { is_rake: true }
   ENV['position'] = options[:position] = Annotate::Helpers.fallback(ENV['position'], 'before')
   options[:additional_file_patterns] = ENV['additional_file_patterns'] ? ENV['additional_file_patterns'].split(',') : []
   options[:position_in_class] = Annotate::Helpers.fallback(ENV['position_in_class'], ENV['position'])
@@ -18,6 +20,7 @@ task annotate_models: :environment do
   options[:position_in_factory] = Annotate::Helpers.fallback(ENV['position_in_factory'], ENV['position'])
   options[:position_in_test] = Annotate::Helpers.fallback(ENV['position_in_test'], ENV['position'])
   options[:position_in_serializer] = Annotate::Helpers.fallback(ENV['position_in_serializer'], ENV['position'])
+  options[:show_check_constraints] = Annotate::Helpers.true?(ENV['show_check_constraints'])
   options[:show_foreign_keys] = Annotate::Helpers.true?(ENV['show_foreign_keys'])
   options[:show_complete_foreign_keys] = Annotate::Helpers.true?(ENV['show_complete_foreign_keys'])
   options[:show_indexes] = Annotate::Helpers.true?(ENV['show_indexes'])
@@ -51,6 +54,7 @@ task annotate_models: :environment do
   options[:hide_limit_column_types] = Annotate::Helpers.fallback(ENV['hide_limit_column_types'], '')
   options[:hide_default_column_types] = Annotate::Helpers.fallback(ENV['hide_default_column_types'], '')
   options[:with_comment] = Annotate::Helpers.true?(ENV['with_comment'])
+  options[:with_comment_column] = Annotate::Helpers.true?(ENV['with_comment_column'])
   options[:ignore_unknown_models] = Annotate::Helpers.true?(ENV.fetch('ignore_unknown_models', 'false'))
 
   AnnotateModels.do_annotations(options)
@@ -61,7 +65,7 @@ task remove_annotation: :environment do
   require "#{annotate_lib}/annotate/annotate_models"
   require "#{annotate_lib}/annotate/active_record_patch"
 
-  options = {is_rake: true}
+  options = { is_rake: true }
   options[:model_dir] = ENV['model_dir']
   options[:root_dir] = ENV['root_dir']
   options[:require] = ENV['require'] ? ENV['require'].split(',') : []

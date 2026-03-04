@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'optparse'
 
 module Annotate
@@ -11,11 +13,12 @@ module Annotate
 
     DEFAULT_OPTIONS = {
       target_action: :do_annotations,
-      exit: false
+      exit:          false
     }.freeze
 
     ANNOTATION_POSITIONS = %w[before top after bottom].freeze
-    FILE_TYPE_POSITIONS = %w[position_in_class position_in_factory position_in_fixture position_in_test position_in_routes position_in_serializer].freeze
+    FILE_TYPE_POSITIONS = %w[position_in_class position_in_factory position_in_fixture position_in_test
+                             position_in_routes position_in_serializer].freeze
     EXCLUSION_LIST = %w[tests fixtures factories serializers].freeze
     FORMAT_TYPES = %w[bare rdoc yard markdown].freeze
 
@@ -48,14 +51,14 @@ module Annotate
       end
     end
 
-    def add_options_to_parser(option_parser) # rubocop:disable Metrics/MethodLength
+    def add_options_to_parser(option_parser) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       has_set_position = {}
 
       option_parser.banner = 'Usage: annotate [options] [model_file]*'
 
       option_parser.on('--additional-file-patterns path1,path2,path3',
                        Array,
-                       "Additional file paths or globs to annotate, separated by commas (e.g. `/foo/bar/%model_name%/*.rb,/baz/%model_name%.rb`)") do |additional_file_patterns|
+                       'Additional file paths or globs to annotate, separated by commas (e.g. `/foo/bar/%model_name%/*.rb,/baz/%model_name%.rb`)') do |additional_file_patterns| # rubocop:disable Layout/LineLength
         ENV['additional_file_patterns'] = additional_file_patterns
       end
 
@@ -68,7 +71,7 @@ module Annotate
       option_parser.on('-p',
                        '--position [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/route/serializer file(s)') do |position|
+                       'Place the annotations at the top (before) or the bottom (after) of the model/test/fixture/factory/route/serializer file(s)') do |position| # rubocop:disable Layout/LineLength
         env['position'] = position
 
         FILE_TYPE_POSITIONS.each do |key|
@@ -79,7 +82,7 @@ module Annotate
       option_parser.on('--pc',
                        '--position-in-class [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of the model file') do |position_in_class|
+                       'Place the annotations at the top (before) or the bottom (after) of the model file') do |position_in_class| # rubocop:disable Layout/LineLength
         env['position_in_class'] = position_in_class
         has_set_position['position_in_class'] = true
       end
@@ -87,7 +90,7 @@ module Annotate
       option_parser.on('--pf',
                        '--position-in-factory [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of any factory files') do |position_in_factory|
+                       'Place the annotations at the top (before) or the bottom (after) of any factory files') do |position_in_factory| # rubocop:disable Layout/LineLength
         env['position_in_factory'] = position_in_factory
         has_set_position['position_in_factory'] = true
       end
@@ -95,7 +98,7 @@ module Annotate
       option_parser.on('--px',
                        '--position-in-fixture [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of any fixture files') do |position_in_fixture|
+                       'Place the annotations at the top (before) or the bottom (after) of any fixture files') do |position_in_fixture| # rubocop:disable Layout/LineLength
         env['position_in_fixture'] = position_in_fixture
         has_set_position['position_in_fixture'] = true
       end
@@ -103,7 +106,7 @@ module Annotate
       option_parser.on('--pt',
                        '--position-in-test [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of any test files') do |position_in_test|
+                       'Place the annotations at the top (before) or the bottom (after) of any test files') do |position_in_test| # rubocop:disable Layout/LineLength
         env['position_in_test'] = position_in_test
         has_set_position['position_in_test'] = true
       end
@@ -111,7 +114,7 @@ module Annotate
       option_parser.on('--pr',
                        '--position-in-routes [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of the routes.rb file') do |position_in_routes|
+                       'Place the annotations at the top (before) or the bottom (after) of the routes.rb file') do |position_in_routes| # rubocop:disable Layout/LineLength
         env['position_in_routes'] = position_in_routes
         has_set_position['position_in_routes'] = true
       end
@@ -119,7 +122,7 @@ module Annotate
       option_parser.on('--ps',
                        '--position-in-serializer [before|top|after|bottom]',
                        ANNOTATION_POSITIONS,
-                       'Place the annotations at the top (before) or the bottom (after) of the serializer files') do |position_in_serializer|
+                       'Place the annotations at the top (before) or the bottom (after) of the serializer files') do |position_in_serializer| # rubocop:disable Layout/LineLength
         env['position_in_serializer'] = position_in_serializer
         has_set_position['position_in_serializer'] = true
       end
@@ -150,7 +153,7 @@ module Annotate
       end
 
       option_parser.on('--models',
-                       "Annotate ActiveRecord models") do
+                       'Annotate ActiveRecord models') do
         env['models'] = 'true'
       end
 
@@ -171,6 +174,12 @@ module Annotate
                        '--show-migration',
                        'Include the migration version number in the annotation') do
         env['include_version'] = 'yes'
+      end
+
+      option_parser.on('-c',
+                       '--show-check-constraints',
+                       "List the table's check constraints in the annotation") do
+        env['show_check_constraints'] = 'yes'
       end
 
       option_parser.on('-k',
@@ -199,33 +208,33 @@ module Annotate
       end
 
       option_parser.on('--model-dir dir',
-                       "Annotate model files stored in dir rather than app/models, separate multiple dirs with commas") do |dir|
+                       'Annotate model files stored in dir rather than app/models, separate multiple dirs with commas') do |dir| # rubocop:disable Layout/LineLength
         env['model_dir'] = dir
       end
 
       option_parser.on('--root-dir dir',
-                       "Annotate files stored within root dir projects, separate multiple dirs with commas") do |dir|
+                       'Annotate files stored within root dir projects, separate multiple dirs with commas') do |dir|
         env['root_dir'] = dir
       end
 
       option_parser.on('--ignore-model-subdirects',
-                       "Ignore subdirectories of the models directory") do
+                       'Ignore subdirectories of the models directory') do
         env['ignore_model_sub_dir'] = 'yes'
       end
 
       option_parser.on('--sort',
-                       "Sort columns alphabetically, rather than in creation order") do
+                       'Sort columns alphabetically, rather than in creation order') do
         env['sort'] = 'yes'
       end
 
       option_parser.on('--classified-sort',
-                       "Sort columns alphabetically, but first goes id, then the rest columns, then the timestamp columns and then the association columns") do
+                       'Sort columns alphabetically, but first goes id, then the rest columns, then the timestamp columns and then the association columns') do # rubocop:disable Layout/LineLength
         env['classified_sort'] = 'yes'
       end
 
       option_parser.on('-R',
                        '--require path',
-                       "Additional file to require before loading models, may be used multiple times") do |path|
+                       'Additional file to require before loading models, may be used multiple times') do |path|
         env['require'] = if env['require'].present?
                            "#{env['require']},#{path}"
                          else
@@ -236,7 +245,7 @@ module Annotate
       option_parser.on('-e',
                        '--exclude [tests,fixtures,factories,serializers]',
                        Array,
-                       "Do not annotate fixtures, test files, factories, and/or serializers") do |exclusions|
+                       'Do not annotate fixtures, test files, factories, and/or serializers') do |exclusions|
         exclusions ||= EXCLUSION_LIST
         exclusions.each { |exclusion| env["exclude_#{exclusion}"] = 'yes' }
       end
@@ -254,7 +263,7 @@ module Annotate
       end
 
       option_parser.on('--frozen',
-                       'Do not allow to change annotations. Exits non-zero if there are going to be changes to files.') do
+                       'Do not allow to change annotations. Exits non-zero if there are going to be changes to files.') do # rubocop:disable Layout/LineLength
         env['frozen'] = 'yes'
       end
 
@@ -270,22 +279,22 @@ module Annotate
 
       option_parser.on('-I',
                        '--ignore-columns REGEX',
-                       "don't annotate columns that match a given REGEX (i.e., `annotate -I '^(id|updated_at|created_at)'`") do |regex|
+                       "don't annotate columns that match a given REGEX (i.e., `annotate -I '^(id|updated_at|created_at)'`") do |regex| # rubocop:disable Layout/LineLength
         env['ignore_columns'] = regex
       end
 
       option_parser.on('--ignore-routes REGEX',
-                       "don't annotate routes that match a given REGEX (i.e., `annotate -I '(mobile|resque|pghero)'`") do |regex|
+                       "don't annotate routes that match a given REGEX (i.e., `annotate -I '(mobile|resque|pghero)'`") do |regex| # rubocop:disable Layout/LineLength
         env['ignore_routes'] = regex
       end
 
       option_parser.on('--hide-limit-column-types VALUES',
-                       "don't show limit for given column types, separated by commas (i.e., `integer,boolean,text`)") do |values|
+                       "don't show limit for given column types, separated by commas (i.e., `integer,boolean,text`)") do |values| # rubocop:disable Layout/LineLength
         env['hide_limit_column_types'] = values.to_s
       end
 
       option_parser.on('--hide-default-column-types VALUES',
-                       "don't show default for given column types, separated by commas (i.e., `json,jsonb,hstore`)") do |values|
+                       "don't show default for given column types, separated by commas (i.e., `json,jsonb,hstore`)") do |values| # rubocop:disable Layout/LineLength
         env['hide_default_column_types'] = values.to_s
       end
 
@@ -295,8 +304,13 @@ module Annotate
       end
 
       option_parser.on('--with-comment',
-                       "include database comments in model annotations") do
+                       'include database comments in model annotations') do
         env['with_comment'] = 'true'
+      end
+
+      option_parser.on('--with-comment-column',
+                       'include database comments in model annotations, as its own column, after all others') do
+        env['with_comment_column'] = 'true'
       end
     end
   end

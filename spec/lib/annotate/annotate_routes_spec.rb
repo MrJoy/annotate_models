@@ -42,9 +42,9 @@ describe AnnotateRoutes do
       end
 
       it 'does not annotates any file' do
-        expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_NOT_FOUND)
+        expect(described_class).to receive(:puts).with(MESSAGE_NOT_FOUND)
 
-        AnnotateRoutes.do_annotations
+        described_class.do_annotations
       end
     end
 
@@ -89,9 +89,9 @@ describe AnnotateRoutes do
                 it 'annotates normally' do
                   expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
-                  expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                  expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                  AnnotateRoutes.do_annotations
+                  described_class.do_annotations
                 end
               end
 
@@ -112,9 +112,9 @@ describe AnnotateRoutes do
                 it 'annotates in Markdown format' do
                   expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
-                  expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                  expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                  AnnotateRoutes.do_annotations(format_markdown: true)
+                  described_class.do_annotations(format_markdown: true)
                 end
               end
 
@@ -136,9 +136,9 @@ describe AnnotateRoutes do
                 it 'annotates and wraps annotation with specified words' do
                   expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
-                  expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                  expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                  AnnotateRoutes.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
+                  described_class.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
                 end
               end
             end
@@ -180,9 +180,9 @@ describe AnnotateRoutes do
                     it 'annotates normally' do
                       expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
-                      expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                      expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                      AnnotateRoutes.do_annotations
+                      described_class.do_annotations
                     end
                   end
 
@@ -204,9 +204,9 @@ describe AnnotateRoutes do
                     it 'annotates in Markdown format' do
                       expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
-                      expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                      expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                      AnnotateRoutes.do_annotations(format_markdown: true)
+                      described_class.do_annotations(format_markdown: true)
                     end
                   end
 
@@ -229,9 +229,9 @@ describe AnnotateRoutes do
                     it 'annotates and wraps annotation with specified words' do
                       expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
-                      expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                      expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                      AnnotateRoutes.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
+                      described_class.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
                     end
                   end
                 end
@@ -271,9 +271,9 @@ describe AnnotateRoutes do
               it 'annotates with an empty line' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations
+                described_class.do_annotations
               end
             end
 
@@ -299,9 +299,9 @@ describe AnnotateRoutes do
               it 'annotates without an empty line' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations
+                described_class.do_annotations
               end
             end
           end
@@ -338,9 +338,9 @@ describe AnnotateRoutes do
                 it 'annotates with an empty line' do
                   expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
-                  expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                  expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                  AnnotateRoutes.do_annotations
+                  described_class.do_annotations
                 end
               end
             end
@@ -368,9 +368,9 @@ describe AnnotateRoutes do
               it 'annotates without an empty line' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations
+                described_class.do_annotations
               end
             end
 
@@ -389,9 +389,9 @@ describe AnnotateRoutes do
               it 'annotates with the timestamp and an empty line' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations timestamp: true
+                described_class.do_annotations timestamp: true
               end
             end
           end
@@ -421,9 +421,9 @@ describe AnnotateRoutes do
               it 'inserts annotations' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations
+                described_class.do_annotations
               end
             end
 
@@ -439,9 +439,9 @@ describe AnnotateRoutes do
               it 'inserts annotations' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations(ignore_routes: 'my_route')
+                described_class.do_annotations(ignore_routes: 'my_route')
               end
             end
 
@@ -456,9 +456,9 @@ describe AnnotateRoutes do
               it 'inserts annotations' do
                 expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations(position_in_routes: 'top')
+                described_class.do_annotations(position_in_routes: 'top')
               end
             end
           end
@@ -476,9 +476,9 @@ describe AnnotateRoutes do
               it 'skips annotations if file does already contain annotation' do
                 expect(File).not_to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file)
                 expect(mock_file).not_to receive(:puts)
-                expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_UNCHANGED).once
+                expect(described_class).to receive(:puts).with(MESSAGE_UNCHANGED).once
 
-                AnnotateRoutes.do_annotations
+                described_class.do_annotations
               end
             end
           end
@@ -510,9 +510,9 @@ describe AnnotateRoutes do
                   it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
                     expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                     expect(mock_file).to receive(:puts).with(expected_result).once
-                    expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                    expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                    AnnotateRoutes.do_annotations(position_in_routes: 'top')
+                    described_class.do_annotations(position_in_routes: 'top')
                   end
                 end
 
@@ -530,9 +530,9 @@ describe AnnotateRoutes do
                   it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
                     expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
                     expect(mock_file).to receive(:puts).with(expected_result).once
-                    expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
+                    expect(described_class).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                    AnnotateRoutes.do_annotations(position_in_routes: 'bottom')
+                    described_class.do_annotations(position_in_routes: 'bottom')
                   end
                 end
               end
@@ -550,9 +550,9 @@ describe AnnotateRoutes do
                 it 'skips annotations' do
                   expect(File).not_to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file)
                   expect(mock_file).not_to receive(:puts)
-                  expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_UNCHANGED).once
+                  expect(described_class).to receive(:puts).with(MESSAGE_UNCHANGED).once
 
-                  AnnotateRoutes.do_annotations
+                  described_class.do_annotations
                 end
               end
             end
@@ -588,7 +588,7 @@ describe AnnotateRoutes do
         end
 
         it 'aborts' do
-          expect { AnnotateRoutes.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
+          expect { described_class.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
         end
       end
 
@@ -604,7 +604,7 @@ describe AnnotateRoutes do
         end
 
         it 'aborts' do
-          expect { AnnotateRoutes.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
+          expect { described_class.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
         end
       end
 
@@ -621,7 +621,7 @@ describe AnnotateRoutes do
         end
 
         it 'does NOT abort' do
-          expect { AnnotateRoutes.do_annotations(frozen: true) }.not_to raise_error
+          expect { described_class.do_annotations(frozen: true) }.not_to raise_error
         end
       end
     end
@@ -663,9 +663,9 @@ describe AnnotateRoutes do
 
       it 'removes trailing annotation and trim trailing newlines, but leave leading newlines alone' do
         expect(mock_file).to receive(:puts).with(expected_result).once
-        expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
+        expect(described_class).to receive(:puts).with(MESSAGE_REMOVED).once
 
-        AnnotateRoutes.remove_annotations
+        described_class.remove_annotations
       end
     end
 
@@ -702,9 +702,9 @@ describe AnnotateRoutes do
 
       it 'removes prepended annotation and trim leading newlines, but leave trailing newlines alone' do
         expect(mock_file).to receive(:puts).with(expected_result).once
-        expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
+        expect(described_class).to receive(:puts).with(MESSAGE_REMOVED).once
 
-        AnnotateRoutes.remove_annotations
+        described_class.remove_annotations
       end
     end
 
@@ -733,9 +733,9 @@ describe AnnotateRoutes do
 
       it 'does not remove custom comments above route map' do
         expect(mock_file).to receive(:puts).with(expected_result).once
-        expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
+        expect(described_class).to receive(:puts).with(MESSAGE_REMOVED).once
 
-        AnnotateRoutes.remove_annotations
+        described_class.remove_annotations
       end
     end
   end

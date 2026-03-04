@@ -97,7 +97,7 @@ describe AnnotateModels do
 
   describe '.quote' do
     subject do
-      AnnotateModels.quote(value)
+      described_class.quote(value)
     end
 
     context 'when the argument is nil' do
@@ -177,16 +177,16 @@ describe AnnotateModels do
     end
 
     before do
-      AnnotateModels.parse_options(options)
+      described_class.parse_options(options)
     end
 
     after do
-      AnnotateModels.parse_options({ skip_subdirectory_model_load: false })
+      described_class.parse_options({ skip_subdirectory_model_load: false })
     end
 
     describe '@root_dir' do
       subject do
-        AnnotateModels.instance_variable_get(:@root_dir)
+        described_class.instance_variable_get(:@root_dir)
       end
 
       it 'sets @root_dir' do
@@ -196,7 +196,7 @@ describe AnnotateModels do
 
     describe '@model_dir' do
       subject do
-        AnnotateModels.instance_variable_get(:@model_dir)
+        described_class.instance_variable_get(:@model_dir)
       end
 
       it 'separates option "model_dir" with commas and sets @model_dir as an array of string' do
@@ -206,7 +206,7 @@ describe AnnotateModels do
 
     describe '@skip_subdirectory_model_load' do
       subject do
-        AnnotateModels.instance_variable_get(:@skip_subdirectory_model_load)
+        described_class.instance_variable_get(:@skip_subdirectory_model_load)
       end
 
       context 'option is set to true' do
@@ -241,7 +241,7 @@ describe AnnotateModels do
 
   describe '.get_schema_info' do
     subject do
-      AnnotateModels.get_schema_info(klass, header, **options)
+      described_class.get_schema_info(klass, header, **options)
     end
 
     let :klass do
@@ -1986,7 +1986,7 @@ describe AnnotateModels do
   end
 
   describe '.get_patterns' do
-    subject { AnnotateModels.get_patterns(options, pattern_type) }
+    subject { described_class.get_patterns(options, pattern_type) }
 
     context 'when pattern_type is "additional_file_patterns"' do
       let(:pattern_type) { 'additional_file_patterns' }
@@ -2130,7 +2130,7 @@ describe AnnotateModels do
   describe '.get_model_class' do
     before do
       @model_dir = Dir.mktmpdir('annotate_models')
-      AnnotateModels.model_dir = @model_dir
+      described_class.model_dir = @model_dir
       create(filename, file_content)
     end
 
@@ -2149,7 +2149,7 @@ describe AnnotateModels do
     end
 
     let :klass do
-      AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename))
+      described_class.get_model_class(File.join(described_class.model_dir[0], filename))
     end
 
     context 'when class Foo is defined in "foo.rb"' do
@@ -2364,7 +2364,7 @@ describe AnnotateModels do
         end
 
         before do
-          path = File.expand_path(filename, AnnotateModels.model_dir[0])
+          path = File.expand_path(filename, described_class.model_dir[0])
           Kernel.load(path)
           expect(Kernel).not_to receive(:require)
         end
@@ -2379,9 +2379,9 @@ describe AnnotateModels do
 
         context "when class SubdirLoadedClass is defined in \"#{dir}/subdir_loaded_class.rb\"" do
           before do
-            $LOAD_PATH.unshift(File.join(AnnotateModels.model_dir[0], dir))
+            $LOAD_PATH.unshift(File.join(described_class.model_dir[0], dir))
 
-            path = File.expand_path(filename, AnnotateModels.model_dir[0])
+            path = File.expand_path(filename, described_class.model_dir[0])
             Kernel.load(path)
             expect(Kernel).not_to receive(:require)
           end
@@ -2436,7 +2436,7 @@ describe AnnotateModels do
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2471,7 +2471,7 @@ describe AnnotateModels do
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2480,20 +2480,20 @@ describe AnnotateModels do
         end
 
         it 'attempts to load the model path without expanding if skip_subdirectory_model_load is false' do
-          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(false)
-          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
+          allow(described_class).to receive(:skip_subdirectory_model_load).and_return(false)
+          full_path = File.join(described_class.model_dir[0], filename_2)
           Kernel.load(full_path)
           expect(File).not_to receive(:expand_path).with(full_path)
-          AnnotateModels.get_model_class(full_path)
+          described_class.get_model_class(full_path)
         end
 
         it 'does not attempt to load the model path without expanding if skip_subdirectory_model_load is true' do
-          $LOAD_PATH.unshift(AnnotateModels.model_dir[0])
-          allow(AnnotateModels).to receive(:skip_subdirectory_model_load).and_return(true)
-          full_path = File.join(AnnotateModels.model_dir[0], filename_2)
+          $LOAD_PATH.unshift(described_class.model_dir[0])
+          allow(described_class).to receive(:skip_subdirectory_model_load).and_return(true)
+          full_path = File.join(described_class.model_dir[0], filename_2)
           Kernel.load(full_path)
           expect(File).to receive(:expand_path).with(full_path).and_call_original
-          AnnotateModels.get_model_class(full_path)
+          described_class.get_model_class(full_path)
         end
       end
 
@@ -2523,7 +2523,7 @@ describe AnnotateModels do
         end
 
         let :klass_2 do
-          AnnotateModels.get_model_class(File.join(AnnotateModels.model_dir[0], filename_2))
+          described_class.get_model_class(File.join(described_class.model_dir[0], filename_2))
         end
 
         it 'finds valid model' do
@@ -2536,7 +2536,7 @@ describe AnnotateModels do
 
   describe '.remove_annotation_of_file' do
     subject do
-      AnnotateModels.remove_annotation_of_file(path)
+      described_class.remove_annotation_of_file(path)
     end
 
     after do
@@ -2620,7 +2620,7 @@ describe AnnotateModels do
 
     context 'when annotation is before main content and with opening wrapper' do
       subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+        described_class.remove_annotation_of_file(path, wrapper_open: 'wrapper')
       end
 
       let :filename do
@@ -2651,7 +2651,7 @@ describe AnnotateModels do
 
     context 'when annotation is before main content and with opening wrapper' do
       subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_open: 'wrapper')
+        described_class.remove_annotation_of_file(path, wrapper_open: 'wrapper')
       end
 
       let :filename do
@@ -2708,7 +2708,7 @@ describe AnnotateModels do
 
     context 'when annotation is after main content and with closing wrapper' do
       subject do
-        AnnotateModels.remove_annotation_of_file(path, wrapper_close: 'wrapper')
+        described_class.remove_annotation_of_file(path, wrapper_close: 'wrapper')
       end
 
       let :filename do
@@ -2772,7 +2772,7 @@ describe AnnotateModels do
 
   describe '.resolve_filename' do
     subject do
-      AnnotateModels.resolve_filename(filename_template, model_name, table_name)
+      described_class.resolve_filename(filename_template, model_name, table_name)
     end
 
     context 'When model_name is "example_model" and table_name is "example_models"' do
@@ -2840,7 +2840,7 @@ describe AnnotateModels do
                             mock_column(:id, :integer),
                             mock_column(:name, :string, limit: 50)
                           ])
-      @schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+      @schema_info = described_class.get_schema_info(@klass, '== Schema Info')
       Annotate::Helpers.reset_options(Annotate::Constants::ALL_ANNOTATE_OPTIONS)
     end
 
@@ -2907,7 +2907,7 @@ describe AnnotateModels do
                                                 'id',
                                                 on_delete: :cascade)
                              ])
-          @schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
+          @schema_info = described_class.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
           annotate_one_file
         end
 
@@ -2926,7 +2926,7 @@ describe AnnotateModels do
                                                 'id',
                                                 on_delete: :restrict)
                              ])
-          @schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
+          @schema_info = described_class.get_schema_info(klass, '== Schema Info', show_foreign_keys: true)
           annotate_one_file
           expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
         end
@@ -2936,8 +2936,8 @@ describe AnnotateModels do
     describe 'with existing annotation => :before' do
       before do
         annotate_one_file position: :before
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
-                                                             '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
       end
 
@@ -2960,8 +2960,8 @@ describe AnnotateModels do
     describe 'with existing annotation => :after' do
       before do
         annotate_one_file position: :after
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
-                                                             '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
       end
 
@@ -2982,8 +2982,8 @@ describe AnnotateModels do
     end
 
     it 'skips columns with option[:ignore_columns] set' do
-      output = AnnotateModels.get_schema_info(@klass, '== Schema Info',
-                                              ignore_columns: '(id|updated_at|created_at)')
+      output = described_class.get_schema_info(@klass, '== Schema Info',
+                                               ignore_columns: '(id|updated_at|created_at)')
       expect(output.match(/id/)).to be_nil
     end
 
@@ -2999,8 +2999,8 @@ describe AnnotateModels do
                            mock_column(:id, :integer),
                            mock_column(:name, :string, limit: 50)
                          ])
-      schema_info = AnnotateModels.get_schema_info(klass, '== Schema Info')
-      AnnotateModels.annotate_one_file(model_file_name, schema_info, position: :before)
+      schema_info = described_class.get_schema_info(klass, '== Schema Info')
+      described_class.annotate_one_file(model_file_name, schema_info, position: :before)
       expect(File.read(model_file_name)).to eq("#{schema_info}#{file_content}")
     end
 
@@ -3029,7 +3029,7 @@ describe AnnotateModels do
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n#{content}"
 
         annotate_one_file position: :before
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
 
         expect(File.read(model_file_name)).to eq("#{magic_comment}\n\n#{schema_info}#{content}")
       end
@@ -3038,7 +3038,7 @@ describe AnnotateModels do
     it 'only keeps a single empty line around the annotation (position :before)' do
       content = "class User < ActiveRecord::Base\nend\n"
       MAGIC_COMMENTS.each do |magic_comment|
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n\n\n\n#{content}"
 
         annotate_one_file position: :before
@@ -3053,7 +3053,7 @@ describe AnnotateModels do
         model_file_name, = write_model 'user.rb', "#{magic_comment}\n#{content}"
 
         annotate_one_file position: :after
-        schema_info = AnnotateModels.get_schema_info(@klass, '== Schema Info')
+        schema_info = described_class.get_schema_info(@klass, '== Schema Info')
 
         expect(File.read(model_file_name)).to eq("#{magic_comment}\n#{content}\n#{schema_info}")
       end
@@ -3061,7 +3061,7 @@ describe AnnotateModels do
 
     describe "if a file can't be annotated" do
       before do
-        allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
+        allow(described_class).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
         write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
@@ -3072,30 +3072,30 @@ describe AnnotateModels do
 
       it 'displays just the error message with trace disabled (default)' do
         expect do
-          AnnotateModels.do_annotations model_dir: @model_dir,
-                                        is_rake:   true
+          described_class.do_annotations model_dir: @model_dir,
+                                         is_rake:   true
         end.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
         expect do
-          AnnotateModels.do_annotations model_dir: @model_dir,
-                                        is_rake:   true
+          described_class.do_annotations model_dir: @model_dir,
+                                         is_rake:   true
         end.not_to output(a_string_including('/spec/annotate/annotate_models_spec.rb:')).to_stderr
       end
 
       it 'displays the error message and stacktrace with trace enabled' do
         expect do
-          AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true,
-                                        trace: true
+          described_class.do_annotations model_dir: @model_dir, is_rake: true,
+                                         trace: true
         end.to output(a_string_including("Unable to annotate #{@model_dir}/user.rb: oops")).to_stderr
         expect do
-          AnnotateModels.do_annotations model_dir: @model_dir, is_rake: true,
-                                        trace: true
+          described_class.do_annotations model_dir: @model_dir, is_rake: true,
+                                         trace: true
         end.to output(a_string_including('/spec/lib/annotate/annotate_models_spec.rb:')).to_stderr
       end
     end
 
     describe "if a file can't be deannotated" do
       before do
-        allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
+        allow(described_class).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
         write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
@@ -3106,36 +3106,36 @@ describe AnnotateModels do
 
       it 'displays just the error message with trace disabled (default)' do
         expect do
-          AnnotateModels.remove_annotations model_dir: @model_dir,
-                                            is_rake:   true
+          described_class.remove_annotations model_dir: @model_dir,
+                                             is_rake:   true
         end.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
         if RUBY_VERSION_NUMERIC >= RUBY_34
           expect do
-            AnnotateModels.remove_annotations model_dir: @model_dir,
-                                              is_rake:   true
+            described_class.remove_annotations model_dir: @model_dir,
+                                               is_rake:   true
           end.not_to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
         else
           expect do
-            AnnotateModels.remove_annotations model_dir: @model_dir,
-                                              is_rake:   true
+            described_class.remove_annotations model_dir: @model_dir,
+                                               is_rake:   true
           end.not_to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
         end
       end
 
       it 'displays the error message and stacktrace with trace enabled' do
         expect do
-          AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true,
-                                            trace: true
+          described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                             trace: true
         end.to output(a_string_including("Unable to deannotate #{@model_dir}/user.rb: oops")).to_stderr
         if RUBY_VERSION_NUMERIC >= RUBY_34
           expect do
-            AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true,
-                                              trace: true
+            described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                               trace: true
           end.to output(a_string_including("/user.rb:2:in '<class:User>'")).to_stderr
         else
           expect do
-            AnnotateModels.remove_annotations model_dir: @model_dir, is_rake: true,
-                                              trace: true
+            described_class.remove_annotations model_dir: @model_dir, is_rake: true,
+                                               trace: true
           end.to output(a_string_including("/user.rb:2:in `<class:User>'")).to_stderr
         end
       end
@@ -3151,8 +3151,8 @@ describe AnnotateModels do
 
       it 'aborts with different annotation when frozen: true' do
         annotate_one_file
-        another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
-                                                             '== Schema Info')
+        another_schema_info = described_class.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]),
+                                                              '== Schema Info')
         @schema_info = another_schema_info
 
         expect do
@@ -3170,12 +3170,12 @@ describe AnnotateModels do
 
   describe '.annotate_model_file' do
     subject do
-      AnnotateModels.annotate_model_file([], 'foo.rb', nil, {})
+      described_class.annotate_model_file([], 'foo.rb', nil, {})
     end
 
     before do
       class Foo < ActiveRecord::Base; end
-      allow(AnnotateModels).to receive(:get_model_class).with('foo.rb').and_return(Foo)
+      allow(described_class).to receive(:get_model_class).with('foo.rb').and_return(Foo)
       allow(Foo).to receive(:table_exists?).and_return(false)
     end
 
@@ -3188,7 +3188,7 @@ describe AnnotateModels do
     context 'with a non-class' do
       before do
         NotAClass = 'foo' # rubocop:disable Naming/ConstantName
-        allow(AnnotateModels).to receive(:get_model_class).with('foo.rb').and_return(NotAClass)
+        allow(described_class).to receive(:get_model_class).with('foo.rb').and_return(NotAClass)
       end
 
       after { Object.send :remove_const, 'NotAClass' }

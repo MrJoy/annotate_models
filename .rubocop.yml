@@ -30,3 +30,6 @@ Metrics/BlockLength:
 # replaced!  In particular, helpers_spec.rb will turn up failures if we let this do its thing!
 Style/FetchEnvVar:
   Enabled: false
+
+RSpec/NestedGroups:
+  Max: 10

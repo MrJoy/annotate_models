@@ -709,7 +709,6 @@ describe AnnotateModels do
                     expect(subject).to eq expected_result
                   end
 
-                  # rubocop:disable RSpec/NestedGroups
                   context 'when the unprefixed table name does not exist' do
                     let :klass do
                       mock_class(:users, primary_key, columns, indexes, foreign_keys).tap do |mock_klass|
@@ -725,7 +724,6 @@ describe AnnotateModels do
                       expect(klass.connection).to have_received(:table_exists?).with('users')
                     end
                   end
-                  # rubocop:enable RSpec/NestedGroups
                 end
               end
 

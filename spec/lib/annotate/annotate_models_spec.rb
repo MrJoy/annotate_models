@@ -9,6 +9,7 @@ require 'tmpdir'
 RUBY_VERSION_NUMERIC = Gem::Version.new(RUBY_VERSION)
 RUBY_34 = Gem::Version.new('3.4.0')
 
+# rubocop:disable RSpec/MultipleMemoizedHelpers
 describe AnnotateModels do
   unless const_defined?(:MAGIC_COMMENTS)
     MAGIC_COMMENTS = [
@@ -419,7 +420,7 @@ describe AnnotateModels do
               end
             end
 
-            context 'with Globalize gem' do # rubocop:disable RSpec/MultipleMemoizedHelpers
+            context 'with Globalize gem' do
               let :translation_klass do
                 double('Folder::Post::Translation',
                        to_s:    'Folder::Post::Translation',
@@ -3198,3 +3199,4 @@ describe AnnotateModels do
     end
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers

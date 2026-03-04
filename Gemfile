@@ -29,7 +29,7 @@ group :development, :test do
   gem 'coveralls'
 
   gem 'overcommit'
-  gem 'ruby_dep', '1.5.0'
+  # gem 'ruby_dep', '1.5.0'
 
   platforms :mri, :windows do
     gem 'pry', require: false

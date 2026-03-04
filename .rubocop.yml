@@ -6,7 +6,7 @@ plugins:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 3.4
+  TargetRubyVersion: 3.0
   Exclude:
     - 'vendor/**/*'
     - 'spec/fixtures/**/*'

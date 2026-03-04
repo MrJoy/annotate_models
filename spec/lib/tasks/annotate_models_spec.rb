@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative '../../spec_helper'
 
 describe 'Annotate annotate_models rake task and Annotate.set_defaults' do # rubocop:disable RSpec/DescribeClass

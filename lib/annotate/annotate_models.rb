@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rubocop:disable  Metrics/ModuleLength
 
 require 'bigdecimal'
@@ -8,13 +9,13 @@ require_relative 'annotate_models/file_patterns'
 
 module AnnotateModels
   # Annotate Models plugin use this header
-  COMPAT_PREFIX    = '== Schema Info'.freeze
-  COMPAT_PREFIX_MD = '## Schema Info'.freeze
-  PREFIX           = '== Schema Information'.freeze
-  PREFIX_MD        = '## Schema Information'.freeze
-  END_MARK         = '== Schema Information End'.freeze
+  COMPAT_PREFIX    = '== Schema Info'
+  COMPAT_PREFIX_MD = '## Schema Info'
+  PREFIX           = '== Schema Information'
+  PREFIX_MD        = '## Schema Information'
+  END_MARK         = '== Schema Information End'
 
-  SKIP_ANNOTATION_PREFIX = '# -\*- SkipSchemaAnnotations'.freeze
+  SKIP_ANNOTATION_PREFIX = '# -\*- SkipSchemaAnnotations'
 
   MATCHED_TYPES = %w[test fixture factory serializer scaffold controller helper].freeze
 
@@ -134,7 +135,7 @@ module AnnotateModels
     # each column. The line contains the column name,
     # the type (and length), and any optional attributes
     def get_schema_info(klass, header, options = {}) # rubocop:disable Metrics/MethodLength
-      info = +"# #{header}\n"
+      info = "# #{header}\n"
       info << get_schema_header_text(klass, options)
 
       max_size = max_schema_info_width(klass, options)
@@ -223,7 +224,7 @@ module AnnotateModels
     end
 
     def get_schema_footer_text(_klass, options = {})
-      info = +""
+      info = +''
       if options[:format_rdoc]
         info << "#--\n"
         info << "# #{END_MARK}\n"
@@ -367,7 +368,7 @@ module AnnotateModels
       max_size = foreign_keys.map(&format_name).map(&:size).max + 1
       foreign_keys.sort_by { |fk| [format_name.call(fk), fk.column] }.each do |fk|
         ref_info = "#{fk.column} => #{fk.to_table}.#{fk.primary_key}"
-        constraints_info = +""
+        constraints_info = +''
         constraints_info += "ON DELETE => #{fk.on_delete} " if fk.on_delete
         constraints_info += "ON UPDATE => #{fk.on_update} " if fk.on_update
         constraints_info.strip!

@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 require_relative 'helpers'
 
 module AnnotateRoutes
   class HeaderGenerator
-    PREFIX = '== Route Map'.freeze
-    PREFIX_MD = '## Route Map'.freeze
+    PREFIX = '== Route Map'
+    PREFIX_MD = '## Route Map'
     HEADER_ROW = ['Prefix', 'Verb', 'URI Pattern', 'Controller#Action'].freeze
 
     class << self

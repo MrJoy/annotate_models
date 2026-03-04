@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # monkey patches
 
 module ::ActiveRecord

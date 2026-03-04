@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Annotate
   # Class for holding helper methods. Done to make lib/annotate.rb less bloated.
   class Helpers

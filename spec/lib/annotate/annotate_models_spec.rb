@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative '../../spec_helper'
 require 'annotate/annotate_models'
 require 'annotate/active_record_patch'
@@ -3186,7 +3187,7 @@ describe AnnotateModels do
 
     context 'with a non-class' do
       before do
-        NotAClass = 'foo'.freeze # rubocop:disable Naming/ConstantName
+        NotAClass = 'foo' # rubocop:disable Naming/ConstantName
         allow(AnnotateModels).to receive(:get_model_class).with('foo.rb').and_return(NotAClass)
       end
 

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # These tasks are added to the project if you install annotate as a Rails plugin.
 # (They are not used to build annotate itself.)
 

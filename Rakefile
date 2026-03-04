@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 def exit_exception(e)
   warn e.message
   exit e.status_code

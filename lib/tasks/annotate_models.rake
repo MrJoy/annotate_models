@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 annotate_lib = File.expand_path(File.dirname(File.dirname(__FILE__)))
 
 unless ENV['is_cli']

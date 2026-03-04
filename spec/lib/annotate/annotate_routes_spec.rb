@@ -1,9 +1,10 @@
 # frozen_string_literal: true
+
 require_relative '../../spec_helper'
 require 'annotate/annotate_routes'
 
 describe AnnotateRoutes do
-  ROUTE_FILE = 'config/routes.rb'.freeze
+  ROUTE_FILE = 'config/routes.rb'
 
   MESSAGE_ANNOTATED = "#{ROUTE_FILE} was annotated.".freeze
   MESSAGE_UNCHANGED = "#{ROUTE_FILE} was not changed.".freeze

@@ -147,7 +147,7 @@ module Files
   end
 end
 
-def Files(options = ::Files.default_options, &block)
-  files = ::Files.create options, &block
+def Files(options = Files.default_options, &)
+  files = Files.create(options, &)
   files.root
 end

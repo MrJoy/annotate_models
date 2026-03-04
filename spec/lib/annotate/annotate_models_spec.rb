@@ -3092,11 +3092,11 @@ describe AnnotateModels do
     end
 
     describe 'frozen option' do
-      it "should abort without existing annotation when frozen: true " do
+      it "should abort without existing annotation when frozen: true" do
         expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should abort with different annotation when frozen: true " do
+      it "should abort with different annotation when frozen: true" do
         annotate_one_file
         another_schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), '== Schema Info')
         @schema_info = another_schema_info
@@ -3104,7 +3104,7 @@ describe AnnotateModels do
         expect { annotate_one_file frozen: true }.to raise_error SystemExit, /user.rb needs to be updated, but annotate was run with `--frozen`./
       end
 
-      it "should NOT abort with same annotation when frozen: true " do
+      it "should NOT abort with same annotation when frozen: true" do
         annotate_one_file
         expect { annotate_one_file frozen: true }.not_to raise_error
       end

@@ -859,6 +859,7 @@ module AnnotateModels
         col_comment
       ).rstrip + "\n"
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def width(string)
       string.chars.inject(0) { |acc, elem| acc + (elem.bytesize == 3 ? 2 : 1) }
@@ -998,3 +999,5 @@ module AnnotateModels
     end
   end
 end
+
+# rubocop:enable  Metrics/ModuleLength

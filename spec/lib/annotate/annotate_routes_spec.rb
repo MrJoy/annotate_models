@@ -60,12 +60,12 @@ describe AnnotateRoutes do
         context 'When the result of `rake routes` does not contain Rake version' do
           context 'When the file does not contain magic comment' do
             let :rake_routes_result do
-              <<-EOS
+              <<-CORPUS
                                       Prefix Verb       URI Pattern                                               Controller#Action
                                    myaction1 GET        /url1(.:format)                                           mycontroller1#action
                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-              EOS
+              CORPUS
             end
 
             let :route_file_content do
@@ -75,7 +75,7 @@ describe AnnotateRoutes do
             context 'When the file does not contain annotation yet' do
               context 'When no option is passed' do
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
 
                     # == Route Map
                     #
@@ -83,7 +83,7 @@ describe AnnotateRoutes do
                     #                                    myaction1 GET        /url1(.:format)                                           mycontroller1#action
                     #                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                     #                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-                  EOS
+                  CORPUS
                 end
 
                 it 'annotates normally' do
@@ -97,7 +97,7 @@ describe AnnotateRoutes do
 
               context 'When the option "format_markdown" is passed' do
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
 
                     # ## Route Map
                     #
@@ -106,7 +106,7 @@ describe AnnotateRoutes do
                     # myaction1 | GET        | /url1(.:format) | mycontroller1#action
                     # myaction2 | POST       | /url2(.:format) | mycontroller2#action
                     # myaction3 | DELETE-GET | /url3(.:format) | mycontroller3#action
-                  EOS
+                  CORPUS
                 end
 
                 it 'annotates in Markdown format' do
@@ -120,7 +120,7 @@ describe AnnotateRoutes do
 
               context 'When the options "wrapper_open" and "wrapper_close" are passed' do
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
 
                     # START
                     # == Route Map
@@ -130,7 +130,7 @@ describe AnnotateRoutes do
                     #                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                     #                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
                     # END
-                  EOS
+                  CORPUS
                 end
 
                 it 'annotates and wraps annotation with specified words' do
@@ -148,24 +148,24 @@ describe AnnotateRoutes do
             MAGIC_COMMENTS.each do |magic_comment|
               describe "magic comment: #{magic_comment.inspect}" do
                 let :route_file_content do
-                  <<~EOS
+                  <<~CORPUS
                     #{magic_comment}
-                  EOS
+                  CORPUS
                 end
 
                 let :rake_routes_result do
-                  <<-EOS
+                  <<-CORPUS
                                       Prefix Verb       URI Pattern                                               Controller#Action
                                    myaction1 GET        /url1(.:format)                                           mycontroller1#action
                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-                  EOS
+                  CORPUS
                 end
 
                 context 'When the file does not contain annotation yet' do
                   context 'When no option is passed' do
                     let :expected_result do
-                      <<~EOS
+                      <<~CORPUS
                         #{magic_comment}
 
                         # == Route Map
@@ -174,7 +174,7 @@ describe AnnotateRoutes do
                         #                                    myaction1 GET        /url1(.:format)                                           mycontroller1#action
                         #                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                         #                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-                      EOS
+                      CORPUS
                     end
 
                     it 'annotates normally' do
@@ -188,7 +188,7 @@ describe AnnotateRoutes do
 
                   context 'When the option "format_markdown" is passed' do
                     let :expected_result do
-                      <<~EOS
+                      <<~CORPUS
                         #{magic_comment}
 
                         # ## Route Map
@@ -198,7 +198,7 @@ describe AnnotateRoutes do
                         # myaction1 | GET        | /url1(.:format) | mycontroller1#action
                         # myaction2 | POST       | /url2(.:format) | mycontroller2#action
                         # myaction3 | DELETE-GET | /url3(.:format) | mycontroller3#action
-                      EOS
+                      CORPUS
                     end
 
                     it 'annotates in Markdown format' do
@@ -212,7 +212,7 @@ describe AnnotateRoutes do
 
                   context 'When the options "wrapper_open" and "wrapper_close" are passed' do
                     let :expected_result do
-                      <<~EOS
+                      <<~CORPUS
                         #{magic_comment}
 
                         # START
@@ -223,7 +223,7 @@ describe AnnotateRoutes do
                         #                                    myaction2 POST       /url2(.:format)                                           mycontroller2#action
                         #                                    myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
                         # END
-                      EOS
+                      CORPUS
                     end
 
                     it 'annotates and wraps annotation with specified words' do
@@ -243,29 +243,29 @@ describe AnnotateRoutes do
         context 'When the result of `rake routes` contains Rake version' do
           context 'with older Rake versions' do
             let :rake_routes_result do
-              <<~EOS.chomp
+              <<~CORPUS.chomp
                 (in /bad/line)
                 good line
-              EOS
+              CORPUS
             end
 
             context 'When the route file does not end with an empty line' do
               let :route_file_content do
-                <<~EOS.chomp
+                <<~CORPUS.chomp
                   ActionController::Routing...
                   foo
-                EOS
+                CORPUS
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   ActionController::Routing...
                   foo
 
                   # == Route Map
                   #
                   # good line
-                EOS
+                CORPUS
               end
 
               it 'annotates with an empty line' do
@@ -279,21 +279,21 @@ describe AnnotateRoutes do
 
             context 'When the route file ends with an empty line' do
               let :route_file_content do
-                <<~EOS
+                <<~CORPUS
                   ActionController::Routing...
                   foo
-                EOS
+                CORPUS
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   ActionController::Routing...
                   foo
 
                   # == Route Map
                   #
                   # good line
-                EOS
+                CORPUS
               end
 
               it 'annotates without an empty line' do
@@ -308,23 +308,23 @@ describe AnnotateRoutes do
 
           context 'with newer Rake versions' do
             let :rake_routes_result do
-              <<~EOS.chomp
+              <<~CORPUS.chomp
                 another good line
                 good line
-              EOS
+              CORPUS
             end
 
             context 'When the route file does not end with an empty line' do
               context 'When no option is passed' do
                 let :route_file_content do
-                  <<~EOS.chomp
+                  <<~CORPUS.chomp
                     ActionController::Routing...
                     foo
-                  EOS
+                  CORPUS
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     ActionController::Routing...
                     foo
 
@@ -332,7 +332,7 @@ describe AnnotateRoutes do
                     #
                     # another good line
                     # good line
-                  EOS
+                  CORPUS
                 end
 
                 it 'annotates with an empty line' do
@@ -347,14 +347,14 @@ describe AnnotateRoutes do
 
             context 'When the route file ends with an empty line' do
               let :route_file_content do
-                <<~EOS
+                <<~CORPUS
                   ActionController::Routing...
                   foo
-                EOS
+                CORPUS
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   ActionController::Routing...
                   foo
 
@@ -362,7 +362,7 @@ describe AnnotateRoutes do
                   #
                   # another good line
                   # good line
-                EOS
+                CORPUS
               end
 
               it 'annotates without an empty line' do
@@ -376,10 +376,10 @@ describe AnnotateRoutes do
 
             context 'When option "timestamp" is passed' do
               let :route_file_content do
-                <<~EOS.chomp
+                <<~CORPUS.chomp
                   ActionController::Routing...
                   foo
-                EOS
+                CORPUS
               end
 
               let :expected_result do
@@ -411,11 +411,11 @@ describe AnnotateRoutes do
 
             context 'When no option is specified' do
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
 
                   # == Route Map
                   #
-                EOS
+                CORPUS
               end
 
               it 'inserts annotations' do
@@ -429,11 +429,11 @@ describe AnnotateRoutes do
 
             context 'When the option "ignore_routes" is specified' do
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
 
                   # == Route Map
                   #
-                EOS
+                CORPUS
               end
 
               it 'inserts annotations' do
@@ -447,10 +447,10 @@ describe AnnotateRoutes do
 
             context 'When the option "position_in_routes" is specified as "top"' do
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # == Route Map
                   #
-                EOS
+                CORPUS
               end
 
               it 'inserts annotations' do
@@ -466,11 +466,11 @@ describe AnnotateRoutes do
           context 'When the file already contains annotation' do
             context 'When no option is specified' do
               let :route_file_content do
-                <<~EOS
+                <<~CORPUS
 
                   # == Route Map
                   #
-                EOS
+                CORPUS
               end
 
               it 'skips annotations if file does already contain annotation' do
@@ -488,23 +488,23 @@ describe AnnotateRoutes do
           MAGIC_COMMENTS.each do |magic_comment|
             describe "magic comment: #{magic_comment.inspect}" do
               let :route_file_content do
-                <<~EOS
+                <<~CORPUS
                   #{magic_comment}
                   Something
-                EOS
+                CORPUS
               end
 
               context 'When the file does not contain annotation yet' do
                 context 'When the option "position_in_routes" is specified as "top"' do
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       #{magic_comment}
 
                       # == Route Map
                       #
 
                       Something
-                    EOS
+                    CORPUS
                   end
 
                   it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
@@ -518,13 +518,13 @@ describe AnnotateRoutes do
 
                 context 'When the option "position_in_routes" is specified as "bottom"' do
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       #{magic_comment}
                       Something
 
                       # == Route Map
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
@@ -539,12 +539,12 @@ describe AnnotateRoutes do
 
               context 'When the file already contains annotation' do
                 let :route_file_content do
-                  <<~EOS
+                  <<~CORPUS
                     #{magic_comment}
 
                     # == Route Map
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'skips annotations' do
@@ -567,12 +567,12 @@ describe AnnotateRoutes do
       end
 
       let :rake_routes_result do
-        <<-EOS
+        <<-CORPUS
                                 Prefix Verb       URI Pattern                                               Controller#Action
                              myaction1 GET        /url1(.:format)                                           mycontroller1#action
                              myaction2 POST       /url2(.:format)                                           mycontroller2#action
                              myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-        EOS
+        CORPUS
       end
 
       before do
@@ -594,13 +594,13 @@ describe AnnotateRoutes do
 
       context 'when annotation exists but is not updated' do
         let :route_file_content do
-          <<~EOS
+          <<~CORPUS
             # == Route Map
             #
             #                                 Prefix Verb       URI Pattern                                               Controller#Action
             #                              myaction2 POST       /url2(.:format)                                           mycontroller2#action
             #                              myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-          EOS
+          CORPUS
         end
 
         it 'aborts' do
@@ -610,14 +610,14 @@ describe AnnotateRoutes do
 
       context 'when annotation exists and is already updated' do
         let :route_file_content do
-          <<~EOS
+          <<~CORPUS
             # == Route Map
             #
             #                                 Prefix Verb       URI Pattern                                               Controller#Action
             #                              myaction1 GET        /url1(.:format)                                           mycontroller1#action
             #                              myaction2 POST       /url2(.:format)                                           mycontroller2#action
             #                              myaction3 DELETE|GET /url3(.:format)                                           mycontroller3#action
-          EOS
+          CORPUS
         end
 
         it 'does NOT abort' do
@@ -636,7 +636,7 @@ describe AnnotateRoutes do
 
     context 'When trailing annotation exists' do
       let :route_file_content do
-        <<~EOS
+        <<~CORPUS
 
 
 
@@ -648,17 +648,17 @@ describe AnnotateRoutes do
           #
           # another good line
           # good line
-        EOS
+        CORPUS
       end
 
       let :expected_result do
-        <<~EOS
+        <<~CORPUS
 
 
 
           ActionController::Routing...
           foo
-        EOS
+        CORPUS
       end
 
       it 'removes trailing annotation and trim trailing newlines, but leave leading newlines alone' do
@@ -671,7 +671,7 @@ describe AnnotateRoutes do
 
     context 'When prepended annotation exists' do
       let :route_file_content do
-        <<~EOS
+        <<~CORPUS
           # == Route Map
           #
           # another good line
@@ -686,18 +686,18 @@ describe AnnotateRoutes do
 
 
 
-        EOS
+        CORPUS
       end
 
       let :expected_result do
-        <<~EOS
+        <<~CORPUS
           Rails.application.routes.draw do
             root 'root#index'
           end
 
 
 
-        EOS
+        CORPUS
       end
 
       it 'removes prepended annotation and trim leading newlines, but leave trailing newlines alone' do
@@ -710,7 +710,7 @@ describe AnnotateRoutes do
 
     context 'When custom comments are above route map' do
       let :route_file_content do
-        <<~EOS
+        <<~CORPUS
           # My comment
           # == Route Map
           #
@@ -719,16 +719,16 @@ describe AnnotateRoutes do
           Rails.application.routes.draw do
             root 'root#index'
           end
-        EOS
+        CORPUS
       end
 
       let :expected_result do
-        <<~EOS
+        <<~CORPUS
           # My comment
           Rails.application.routes.draw do
             root 'root#index'
           end
-        EOS
+        CORPUS
       end
 
       it 'does not remove custom comments above route map' do

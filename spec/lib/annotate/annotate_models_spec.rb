@@ -284,7 +284,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -292,7 +292,7 @@ describe AnnotateModels do
                 #  id   :integer          not null
                 #  name :string(50)       not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
@@ -309,7 +309,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -317,7 +317,7 @@ describe AnnotateModels do
                 #  id   :integer          not null
                 #  name :enum             not null, (enum1, enum2)
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
@@ -338,7 +338,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -350,7 +350,7 @@ describe AnnotateModels do
                 #  float   :float            unsigned, not null
                 #  decimal :decimal(10, 2)   unsigned, not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
@@ -375,7 +375,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: users
@@ -384,7 +384,7 @@ describe AnnotateModels do
                   #  name  :string(50)       not null
                   #  notes :text(55)         not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info' do
@@ -402,7 +402,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: users
@@ -411,7 +411,7 @@ describe AnnotateModels do
                   #  size :integer          default(20), not null
                   #  flag :boolean          default(FALSE), not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info with default values' do
@@ -445,7 +445,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # Schema Info
                   #
                   # Table name: posts
@@ -454,7 +454,7 @@ describe AnnotateModels do
                   #  author_name :string(50)       not null
                   #  title       :string(50)       not null
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info' do
@@ -477,7 +477,7 @@ describe AnnotateModels do
             end
 
             let :expected_result do
-              <<~EOS
+              <<~CORPUS
                 # Schema Info
                 #
                 # Table name: users
@@ -486,7 +486,7 @@ describe AnnotateModels do
                 #  b_id :integer          not null, primary key
                 #  name :string(50)       not null
                 #
-              EOS
+              CORPUS
             end
 
             it 'returns schema info' do
@@ -531,7 +531,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -544,7 +544,7 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (foreign_thing_id)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -572,7 +572,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -587,7 +587,7 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname ASC,value DESC)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -615,7 +615,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -630,7 +630,7 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname) WHERE value IS NOT NULL
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -658,7 +658,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -673,7 +673,7 @@ describe AnnotateModels do
                       #  index_rails_02e851e3b7  (id)
                       #  index_rails_02e851e3b8  (firstname,surname) USING hash
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -694,7 +694,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -702,7 +702,7 @@ describe AnnotateModels do
                       #  id               :integer          not null, primary key
                       #  foreign_thing_id :integer          not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info without index information' do
@@ -752,7 +752,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -760,7 +760,7 @@ describe AnnotateModels do
                       #  id               :integer          not null, primary key
                       #  foreign_thing_id :integer          not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -784,7 +784,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -792,7 +792,7 @@ describe AnnotateModels do
                       #  id   :integer          not null, primary key, indexed
                       #  name :string           not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information' do
@@ -831,7 +831,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -846,7 +846,7 @@ describe AnnotateModels do
                       #  multiline_test      (CASE WHEN (age >= 18) THEN (age <= 21) ELSE true END)
                       #  must_be_adult       (age >= 18)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with check constraint information' do
@@ -860,7 +860,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -868,7 +868,7 @@ describe AnnotateModels do
                       #  id  :integer          not null, primary key
                       #  age :integer          not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info without check constraint information' do
@@ -901,7 +901,7 @@ describe AnnotateModels do
 
                 context 'when foreign_keys does not have option' do
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -915,7 +915,7 @@ describe AnnotateModels do
                       #  fk_rails_...    (foreign_thing_id => foreign_things.id)
                       #  fk_rails_...    (third_thing_id => third_things.id)
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign keys' do
@@ -936,7 +936,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -948,7 +948,7 @@ describe AnnotateModels do
                       #
                       #  fk_rails_...  (foreign_thing_id => foreign_things.id) ON DELETE => on_delete_value ON UPDATE => on_update_value
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign keys' do
@@ -963,7 +963,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -977,7 +977,7 @@ describe AnnotateModels do
                     #  fk_rails_a70234b26c  (third_thing_id => third_things.id)
                     #  fk_rails_cf2568e89e  (foreign_thing_id => foreign_things.id)
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info with foreign keys' do
@@ -1002,7 +1002,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1012,7 +1012,7 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
@@ -1026,7 +1026,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1036,7 +1036,7 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
@@ -1050,7 +1050,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1060,7 +1060,7 @@ describe AnnotateModels do
                     #  name   :string           not null
                     #  notes  :text             not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
@@ -1084,7 +1084,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1093,7 +1093,7 @@ describe AnnotateModels do
                     #  settings   :jsonb            not null
                     #  parameters :hstore           not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_default_column_types"' do
@@ -1107,7 +1107,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1116,7 +1116,7 @@ describe AnnotateModels do
                     #  settings   :jsonb            default({}), not null
                     #  parameters :hstore           default({}), not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_default_column_types"' do
@@ -1130,7 +1130,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1139,7 +1139,7 @@ describe AnnotateModels do
                     #  settings   :jsonb            default({}), not null
                     #  parameters :hstore           default({}), not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "hide_limit_column_types"' do
@@ -1163,7 +1163,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # Schema Info
                     #
                     # Table name: users
@@ -1172,7 +1172,7 @@ describe AnnotateModels do
                     #  name   :string(50)       not null
                     #  notes  :text(55)         not null
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'works with option "classified_sort"' do
@@ -1199,7 +1199,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1210,7 +1210,7 @@ describe AnnotateModels do
                       #  notes(Notes)   :text(55)         not null
                       #  no_comment     :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
@@ -1234,7 +1234,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1249,7 +1249,7 @@ describe AnnotateModels do
                       #  no_comment                         :text(20)         not null
                       #  location                           :geometry_collect not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
@@ -1267,7 +1267,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1276,7 +1276,7 @@ describe AnnotateModels do
                       #  notes(Notes.\\nMay include things like notes.):text(55)         not null
                       #  no_comment                                   :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
@@ -1302,7 +1302,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1313,7 +1313,7 @@ describe AnnotateModels do
                       #  location :geography        not null, point, 0
                       #  non_srid :geography        not null, point
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment"' do
@@ -1339,7 +1339,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1350,7 +1350,7 @@ describe AnnotateModels do
                       #  notes      :text(55)         not null                Notes
                       #  no_comment :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment_column"' do
@@ -1374,7 +1374,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1389,7 +1389,7 @@ describe AnnotateModels do
                       #  no_comment :text(20)         not null
                       #  location   :geometry_collect not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment_column"' do
@@ -1407,7 +1407,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1416,7 +1416,7 @@ describe AnnotateModels do
                       #  notes      :text(55)         not null                Notes.\\nMay include things like notes.
                       #  no_comment :text(20)         not null
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment_column"' do
@@ -1442,7 +1442,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # Schema Info
                       #
                       # Table name: users
@@ -1453,7 +1453,7 @@ describe AnnotateModels do
                       #  location :geography        not null, point, 0
                       #  non_srid :geography        not null, point
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'works with option "with_comment_column"' do
@@ -1490,7 +1490,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # == Schema Information
                   #
                   # Table name: users
@@ -1500,7 +1500,7 @@ describe AnnotateModels do
                   #--
                   # == Schema Information End
                   #++
-                EOS
+                CORPUS
               end
 
               it 'returns schema info in RDoc format' do
@@ -1514,7 +1514,7 @@ describe AnnotateModels do
               end
 
               let :expected_result do
-                <<~EOS
+                <<~CORPUS
                   # == Schema Information
                   #
                   # Table name: users
@@ -1524,7 +1524,7 @@ describe AnnotateModels do
                   # @!attribute name
                   #   @return [String]
                   #
-                EOS
+                CORPUS
               end
 
               it 'returns schema info in YARD format' do
@@ -1539,7 +1539,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1551,7 +1551,7 @@ describe AnnotateModels do
                     # **`id`**    | `integer`          | `not null, primary key`
                     # **`name`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
@@ -1573,7 +1573,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1592,7 +1592,7 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8`:
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
@@ -1611,7 +1611,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1630,7 +1630,7 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_unique_):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
@@ -1649,7 +1649,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1668,7 +1668,7 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8`:
                       #     * **`foreign_thing_id DESC`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
@@ -1688,7 +1688,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1707,7 +1707,7 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_unique_ _where_ name IS NOT NULL):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
@@ -1726,7 +1726,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1745,7 +1745,7 @@ describe AnnotateModels do
                       # * `index_rails_02e851e3b8` (_using_ hash):
                       #     * **`foreign_thing_id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with index information in Markdown format' do
@@ -1774,7 +1774,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1792,7 +1792,7 @@ describe AnnotateModels do
                       # * `missing_expression`
                       # * `multiline_test`: `(CASE WHEN (age >= 18) THEN (age <= 21) ELSE true END)`
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with check constraint information in Markdown format' do
@@ -1826,7 +1826,7 @@ describe AnnotateModels do
                   end
 
                   let :expected_result do
-                    <<~EOS
+                    <<~CORPUS
                       # == Schema Information
                       #
                       # Table name: `users`
@@ -1843,7 +1843,7 @@ describe AnnotateModels do
                       # * `fk_rails_...` (_ON DELETE => on_delete_value ON UPDATE => on_update_value_):
                       #     * **`foreign_thing_id => foreign_things.id`**
                       #
-                    EOS
+                    CORPUS
                   end
 
                   it 'returns schema info with foreign_keys in Markdown format' do
@@ -1867,7 +1867,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: users
@@ -1877,7 +1877,7 @@ describe AnnotateModels do
                     #--
                     # == Schema Information End
                     #++
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in RDoc format' do
@@ -1900,7 +1900,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1912,7 +1912,7 @@ describe AnnotateModels do
                     # **`id(ID)`**      | `integer`          | `not null, primary key`
                     # **`name(Name)`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
@@ -1929,7 +1929,7 @@ describe AnnotateModels do
                 end
 
                 let :expected_result do
-                  <<~EOS
+                  <<~CORPUS
                     # == Schema Information
                     #
                     # Table name: `users`
@@ -1941,7 +1941,7 @@ describe AnnotateModels do
                     # **`id(ＩＤ)`**        | `integer`          | `not null, primary key`
                     # **`name(ＮＡＭＥ)`**  | `string(50)`       | `not null`
                     #
-                  EOS
+                  CORPUS
                 end
 
                 it 'returns schema info in Markdown format' do
@@ -2158,10 +2158,10 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'works' do
@@ -2176,10 +2176,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithCAPITALS < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -2195,12 +2195,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             module Bar
               class FooInsideBar < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -2216,12 +2216,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             module BAR
               class FooInsideCapitalsBAR < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -2237,11 +2237,11 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithMacro < ActiveRecord::Base
               acts_as_awesome :yah
             end
-          EOS
+          CORPUS
         end
 
         it 'works and does not care about known macros' do
@@ -2256,11 +2256,11 @@ describe AnnotateModels do
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class FooWithCAPITALS < ActiveRecord::Base
                 acts_as_awesome :yah
               end
-            EOS
+            CORPUS
           end
 
           it 'works' do
@@ -2277,11 +2277,11 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class FooWithKnownMacro < ActiveRecord::Base
               has_many :yah
             end
-          EOS
+          CORPUS
         end
 
         it 'works and does not care about known macros' do
@@ -2297,12 +2297,12 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             # encoding: utf-8
             class FooWithUtf8 < ActiveRecord::Base
               UTF8STRINGS = %w[résumé façon âge]
             end
-          EOS
+          CORPUS
         end
 
         it 'works without complaining of invalid multibyte chars' do
@@ -2318,10 +2318,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class NonNamespacedFooInsideBar < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         it 'works' do
@@ -2336,10 +2336,10 @@ describe AnnotateModels do
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class NonNamespacedFooWithCapitalsInsideBar < ActiveRecord::Base
               end
-            EOS
+            CORPUS
           end
 
           it 'works' do
@@ -2356,11 +2356,11 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<~EOS
+          <<~CORPUS
             class LoadedClass < ActiveRecord::Base
               CONSTANT = 1
             end
-          EOS
+          CORPUS
         end
 
         before do
@@ -2391,11 +2391,11 @@ describe AnnotateModels do
           end
 
           let :file_content do
-            <<~EOS
+            <<~CORPUS
               class SubdirLoadedClass < ActiveRecord::Base
                 CONSTANT = 1
               end
-            EOS
+            CORPUS
           end
 
           it 'does not require model file twice' do
@@ -2416,10 +2416,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Foo < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2427,12 +2427,12 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<-EOS
+          <<-CORPUS
             module Bar
               class Foo < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
@@ -2451,10 +2451,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Foo < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2462,12 +2462,12 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<-EOS
+          <<-CORPUS
             module Bar
               class Foo < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
@@ -2503,10 +2503,10 @@ describe AnnotateModels do
         end
 
         let :file_content do
-          <<-EOS
+          <<-CORPUS
             class Voucher < ActiveRecord::Base
             end
-          EOS
+          CORPUS
         end
 
         let :filename_2 do
@@ -2514,12 +2514,12 @@ describe AnnotateModels do
         end
 
         let :file_content_2 do
-          <<~EOS
+          <<~CORPUS
             class Voucher
               class Foo < ActiveRecord::Base
               end
             end
-          EOS
+          CORPUS
         end
 
         let :klass_2 do
@@ -2561,10 +2561,10 @@ describe AnnotateModels do
     end
 
     let :expected_result do
-      <<~EOS
+      <<~CORPUS
         class Foo < ActiveRecord::Base
         end
-      EOS
+      CORPUS
     end
 
     context 'when annotation is before main content' do
@@ -2573,7 +2573,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # == Schema Information
           #
           # Table name: foo
@@ -2585,7 +2585,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2599,7 +2599,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # == Schema Information
           #
           # Table name: foo\r\n#
@@ -2610,7 +2610,7 @@ describe AnnotateModels do
           \r\n
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2628,7 +2628,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # wrapper
           # == Schema Information
           #
@@ -2641,7 +2641,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2659,7 +2659,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # wrapper\r\n# == Schema Information
           #
           # Table name: foo
@@ -2671,7 +2671,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2685,7 +2685,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
 
@@ -2698,7 +2698,7 @@ describe AnnotateModels do
           #  updated_at          :datetime
           #
 
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2716,7 +2716,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           class Foo < ActiveRecord::Base
           end
 
@@ -2730,7 +2730,7 @@ describe AnnotateModels do
           #
           # wrapper
 
-        EOS
+        CORPUS
       end
 
       it 'removes annotation' do
@@ -2744,7 +2744,7 @@ describe AnnotateModels do
       end
 
       let :file_content do
-        <<~EOS
+        <<~CORPUS
           # -*- SkipSchemaAnnotations
           # == Schema Information
           #
@@ -2757,7 +2757,7 @@ describe AnnotateModels do
 
           class Foo < ActiveRecord::Base
           end
-        EOS
+        CORPUS
       end
 
       let :expected_result do
@@ -2829,10 +2829,10 @@ describe AnnotateModels do
   describe 'annotating a file' do
     before do
       @model_dir = Dir.mktmpdir('annotate_models')
-      (@model_file_name, @file_content) = write_model 'user.rb', <<~EOS
+      (@model_file_name, @file_content) = write_model 'user.rb', <<~CORPUS
         class User < ActiveRecord::Base
         end
-      EOS
+      CORPUS
 
       @klass = mock_class(:users,
                           :id,
@@ -2988,10 +2988,10 @@ describe AnnotateModels do
     end
 
     it 'works with namespaced models (i.e. models inside modules/subdirectories)' do
-      (model_file_name, file_content) = write_model 'foo/user.rb', <<~EOS
+      (model_file_name, file_content) = write_model 'foo/user.rb', <<~CORPUS
         class Foo::User < ActiveRecord::Base
         end
-      EOS
+      CORPUS
 
       klass = mock_class(:foo_users,
                          :id,
@@ -3006,11 +3006,11 @@ describe AnnotateModels do
 
     it 'does not touch magic comments' do
       MAGIC_COMMENTS.each do |magic_comment|
-        write_model 'user.rb', <<~EOS
+        write_model 'user.rb', <<~CORPUS
           #{magic_comment}
           class User < ActiveRecord::Base
           end
-        EOS
+        CORPUS
 
         annotate_one_file position: :before
 
@@ -3063,11 +3063,11 @@ describe AnnotateModels do
       before do
         allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
-        write_model('user.rb', <<~EOS)
+        write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
             raise "oops"
           end
-        EOS
+        CORPUS
       end
 
       it 'displays just the error message with trace disabled (default)' do
@@ -3097,11 +3097,11 @@ describe AnnotateModels do
       before do
         allow(AnnotateModels).to receive(:get_loaded_model_by_path).with('user').and_return(nil)
 
-        write_model('user.rb', <<~EOS)
+        write_model('user.rb', <<~CORPUS)
           class User < ActiveRecord::Base
             raise "oops"
           end
-        EOS
+        CORPUS
       end
 
       it 'displays just the error message with trace disabled (default)' do

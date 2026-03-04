@@ -19,9 +19,9 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'rspec', require: false
 
-  gem 'rubocop', '~> 1.12.0', require: false
+  gem 'rubocop', '~> 1.85.0', require: false
   gem 'rubocop-rake', require: false
-  gem 'rubocop-rspec', '~> 2.2.0', require: false
+  gem 'rubocop-rspec', '~> 3.9.0', require: false
   gem 'simplecov', require: false
   gem 'terminal-notifier-guard', require: false
 

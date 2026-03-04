@@ -1,12 +1,22 @@
 Please see https://github.com/ctran/annotate_models/releases for changes between releases.
 
+## 4.0.0
+Changes
+- Use frozen strings internally
+- Support ActiveRecord 8.x
+- Drop support for Ruby 2.x
+
+## 3.2.0
+
+- ?
+
 ## 3.1.1
 Changes
 - Bump required ruby version to >= 2.4 [#772](https://github.com/ctran/annotate_models/pull/772)
 - [Revert #677] Fix column default annotations [#768](https://github.com/ctran/annotate_models/pull/768)
 
 Project Improvements
-- Refactor by adding AnnotateRoutes::Helpers [#770](https://github.com/ctran/annotate_models/pull/770) 
+- Refactor by adding AnnotateRoutes::Helpers [#770](https://github.com/ctran/annotate_models/pull/770)
 - Bump puma from 4.3.1 to 4.3.3 in /spec/integration/rails_6.0.2.1 [#771](https://github.com/ctran/annotate_models/pull/771)
 - Bump puma from 3.12.2 to 4.3.3 in /spec/integration/rails_5.2.4.1 [#769](https://github.com/ctran/annotate_models/pull/769)
 - Bump nokogiri from 1.10.7 to 1.10.8 in /spec/integration/rails_5.2.4.1 [#766](https://github.com/ctran/annotate_models/pull/766)
@@ -182,7 +192,7 @@ See https://github.com/ctran/annotate_models/releases/tag/v2.7.0
     better compartmentalized, and so forth -- at the cost that you must be
     using RVM to utilize it.  (It'll spit out appropriate pending messages if
     you don't.) Also includes a mode for "tinkering" by hand with a scenario,
-    and won't let you run it through rspect if the repo is in a dirty state. 
+    and won't let you run it through rspect if the repo is in a dirty state.
     Added appropriate rake tasks to help with all of this.
 - Routes can now be appended, pre-pended, or removed -- and do sane things in all cases.
 - Expose all `position_*` variables as CLI params.

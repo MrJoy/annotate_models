@@ -79,7 +79,7 @@ module AnnotateModels
       end
     end
 
-    def get_patterns(options, pattern_types = [])
+    def get_patterns(options, pattern_types = []) # rubocop:disable Metrics/MethodLength
       current_patterns = []
       root_dir.each do |root_directory|
         Array(pattern_types).each do |pattern_type|
@@ -234,7 +234,7 @@ module AnnotateModels
       end
     end
 
-    def get_index_info(klass, options = {})
+    def get_index_info(klass, options = {}) # rubocop:disable Metrics/MethodLength
       index_info = if options[:format_markdown]
                      +"#\n# ### Indexes\n#\n"
                    else
@@ -296,7 +296,7 @@ module AnnotateModels
       end
     end
 
-    def final_index_string_in_markdown(index)
+    def final_index_string_in_markdown(index) # rubocop:disable Metrics/MethodLength
       details = format(
         '%s%s%s',
         index_unique_info(index, :markdown),
@@ -346,7 +346,7 @@ module AnnotateModels
       excludes.include?(col_type)
     end
 
-    def get_foreign_key_info(klass, options = {})
+    def get_foreign_key_info(klass, options = {}) # rubocop:disable Metrics/MethodLength
       fk_info = if options[:format_markdown]
                   +"#\n# ### Foreign Keys\n#\n"
                 else
@@ -385,7 +385,7 @@ module AnnotateModels
       fk_info
     end
 
-    def get_check_constraint_info(klass, options = {})
+    def get_check_constraint_info(klass, options = {}) # rubocop:disable Metrics/MethodLength
       cc_info = if options[:format_markdown]
                   +"#\n# ### Check Constraints\n#\n"
                 else
@@ -427,7 +427,7 @@ module AnnotateModels
     #  :position_in_*<Symbol>:: where to place the annotated section in fixture or model file,
     #                           :before, :top, :after or :bottom. Default is :before.
     #
-    def annotate_one_file(file_name, info_block, position, options = {})
+    def annotate_one_file(file_name, info_block, position, options = {}) # rubocop:disable Metrics/MethodLength
       return false unless File.exist?(file_name)
 
       old_content = File.read(file_name)
@@ -540,7 +540,7 @@ module AnnotateModels
     # == Returns:
     # an array of file names that were annotated.
     #
-    def annotate(klass, file, header, options = {})
+    def annotate(klass, file, header, options = {}) # rubocop:disable Metrics/MethodLength
       begin
         klass.reset_column_information
         info = get_schema_info(klass, header, options)
@@ -591,7 +591,7 @@ module AnnotateModels
     # If we have command line arguments, they're assumed to the path
     # of model files from root dir. Otherwise we take all the model files
     # in the model_dir directory.
-    def get_model_files(options)
+    def get_model_files(options) # rubocop:disable Metrics/MethodLength
       model_files = []
 
       model_files = list_model_files_from_argument unless options[:is_rake]
@@ -617,7 +617,7 @@ module AnnotateModels
       exit 1
     end
 
-    def list_model_files_from_argument
+    def list_model_files_from_argument # rubocop:disable Metrics/MethodLength
       return [] if ARGV.empty?
 
       specified_files = ARGV.map { |file| File.expand_path(file) }
@@ -642,7 +642,7 @@ module AnnotateModels
     # Retrieve the classes belonging to the model names we're asked to process
     # Check for namespaced models in subdirectories as well as models
     # in subdirectories without namespacing.
-    def get_model_class(file)
+    def get_model_class(file) # rubocop:disable Metrics/MethodLength
       model_path = file.gsub(/\.rb$/, '')
       model_dir.each { |dir| model_path = model_path.gsub(/^#{dir}/, '').gsub(%r{^/}, '') }
       begin
@@ -662,7 +662,7 @@ module AnnotateModels
     end
 
     # Retrieve loaded model class
-    def get_loaded_model(model_path, file)
+    def get_loaded_model(model_path, file) # rubocop:disable Metrics/MethodLength
       unless skip_subdirectory_model_load
         loaded_model_class = get_loaded_model_by_path(model_path)
         return loaded_model_class if loaded_model_class
@@ -708,7 +708,7 @@ module AnnotateModels
     # ActiveRecord models. If we can find the class, and
     # if its a subclass of ActiveRecord::Base,
     # then pass it to the associated block
-    def do_annotations(options = {})
+    def do_annotations(options = {}) # rubocop:disable Metrics/MethodLength
       parse_options(options)
 
       header = options[:format_markdown] ? PREFIX_MD.dup : PREFIX.dup
@@ -735,7 +735,7 @@ module AnnotateModels
       Dir.glob(glob)
     end
 
-    def annotate_model_file(annotated, file, header, options)
+    def annotate_model_file(annotated, file, header, options) # rubocop:disable Metrics/MethodLength
       return false if /#{SKIP_ANNOTATION_PREFIX}.*/ =~ (File.exist?(file) ? File.read(file) : '')
 
       klass = get_model_class(file)
@@ -756,7 +756,7 @@ module AnnotateModels
       warn "\t" + e.backtrace.join("\n\t") if options[:trace]
     end
 
-    def remove_annotations(options = {})
+    def remove_annotations(options = {}) # rubocop:disable Metrics/MethodLength
       parse_options(options)
 
       deannotated = []
@@ -796,7 +796,7 @@ module AnnotateModels
         .gsub('%TABLE_NAME%', table_name || model_name.pluralize)
     end
 
-    def classified_sort(cols)
+    def classified_sort(cols) # rubocop:disable Metrics/MethodLength
       rest_cols = []
       timestamps = []
       associations = []
@@ -832,7 +832,7 @@ module AnnotateModels
         klass.columns.any? { |col| !col.comment.nil? }
     end
 
-    def max_schema_info_width(klass, options)
+    def max_schema_info_width(klass, options) # rubocop:disable Metrics/MethodLength
       cols = columns(klass, options)
 
       if with_comments?(klass, options)
@@ -922,7 +922,7 @@ module AnnotateModels
     ##
     # These are the columns that the globalize gem needs to work but
     # are not necessary for the models to be displayed as annotations.
-    def ignored_translation_table_colums(klass)
+    def ignored_translation_table_colums(klass) # rubocop:disable Metrics/MethodLength
       # Construct the foreign column name in the translations table
       # eg. Model: Car, foreign column name: car_id
       foreign_column_name = [
@@ -942,7 +942,7 @@ module AnnotateModels
     ##
     # Get the list of attributes that should be included in the annotation for
     # a given column.
-    def get_attributes(column, column_type, klass, options)
+    def get_attributes(column, column_type, klass, options) # rubocop:disable Metrics/MethodLength
       attrs = []
       attrs << "default(#{schema_default(klass, column)})" unless column.default.nil? || hide_default?(column_type,
                                                                                                        options)

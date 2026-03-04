@@ -9,7 +9,7 @@ group :development do
   gem 'bump'
   gem 'mg', require: false
   gem 'travis', require: false
-  platforms :mri, :mingw do
+  platforms :mri, :windows do
     gem 'yard', require: false
   end
 end
@@ -31,7 +31,7 @@ group :development, :test do
   gem 'overcommit'
   gem 'ruby_dep', '1.5.0'
 
-  platforms :mri, :mingw do
+  platforms :mri, :windows do
     gem 'pry', require: false
     gem 'pry-byebug', require: false
   end

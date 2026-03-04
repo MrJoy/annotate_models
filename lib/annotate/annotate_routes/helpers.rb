@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module AnnotateRoutes
   module Helpers
     MAGIC_COMMENT_MATCHER = /(^#\s*encoding:.*)|(^# coding:.*)|(^# -\*- coding:.*)|(^# -\*- encoding\s?:.*)|(^#\s*frozen_string_literal:.+)|(^# -\*- frozen_string_literal\s*:.+-\*-)/

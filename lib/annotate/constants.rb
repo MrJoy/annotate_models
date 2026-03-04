@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Annotate
   module Constants
     TRUE_RE = /^(true|t|yes|y|1)$/i

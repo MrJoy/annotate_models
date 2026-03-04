@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module AnnotateModels
   # This module provides module method to get file paths.
   module FilePatterns

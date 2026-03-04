@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'annotate/version'
 require 'annotate/annotate_models'

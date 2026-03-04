@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # rubocop:disable  Metrics/ModuleLength
 
 require 'bigdecimal'
@@ -133,7 +134,7 @@ module AnnotateModels
     # each column. The line contains the column name,
     # the type (and length), and any optional attributes
     def get_schema_info(klass, header, options = {}) # rubocop:disable Metrics/MethodLength
-      info = "# #{header}\n"
+      info = +"# #{header}\n"
       info << get_schema_header_text(klass, options)
 
       max_size = max_schema_info_width(klass, options)
@@ -210,7 +211,7 @@ module AnnotateModels
     end
 
     def get_schema_header_text(klass, options = {})
-      info = "#\n"
+      info = +"#\n"
       if options[:format_markdown]
         info << "# Table name: `#{klass.table_name}`\n"
         info << "#\n"
@@ -222,7 +223,7 @@ module AnnotateModels
     end
 
     def get_schema_footer_text(_klass, options = {})
-      info = ''
+      info = +""
       if options[:format_rdoc]
         info << "#--\n"
         info << "# #{END_MARK}\n"
@@ -234,9 +235,9 @@ module AnnotateModels
 
     def get_index_info(klass, options = {})
       index_info = if options[:format_markdown]
-                     "#\n# ### Indexes\n#\n"
+                     +"#\n# ### Indexes\n#\n"
                    else
-                     "#\n# Indexes\n#\n"
+                     +"#\n# Indexes\n#\n"
                    end
 
       indexes = retrieve_indexes_from_table(klass)
@@ -346,9 +347,9 @@ module AnnotateModels
 
     def get_foreign_key_info(klass, options = {})
       fk_info = if options[:format_markdown]
-                  "#\n# ### Foreign Keys\n#\n"
+                  +"#\n# ### Foreign Keys\n#\n"
                 else
-                  "#\n# Foreign Keys\n#\n"
+                  +"#\n# Foreign Keys\n#\n"
                 end
 
       return '' unless klass.connection.respond_to?(:supports_foreign_keys?) &&
@@ -366,7 +367,7 @@ module AnnotateModels
       max_size = foreign_keys.map(&format_name).map(&:size).max + 1
       foreign_keys.sort_by { |fk| [format_name.call(fk), fk.column] }.each do |fk|
         ref_info = "#{fk.column} => #{fk.to_table}.#{fk.primary_key}"
-        constraints_info = ''
+        constraints_info = +""
         constraints_info += "ON DELETE => #{fk.on_delete} " if fk.on_delete
         constraints_info += "ON UPDATE => #{fk.on_update} " if fk.on_update
         constraints_info.strip!
@@ -385,9 +386,9 @@ module AnnotateModels
 
     def get_check_constraint_info(klass, options = {})
       cc_info = if options[:format_markdown]
-                  "#\n# ### Check Constraints\n#\n"
+                  +"#\n# ### Check Constraints\n#\n"
                 else
-                  "#\n# Check Constraints\n#\n"
+                  +"#\n# Check Constraints\n#\n"
                 end
 
       return '' unless klass.connection.respond_to?(:supports_check_constraints?) &&
@@ -508,7 +509,7 @@ module AnnotateModels
     end
 
     def matched_types(options)
-      types = MATCHED_TYPES.dup
+      types = +MATCHED_TYPES.dup
       types << 'admin' if options[:active_admin] =~ Annotate::Constants::TRUE_RE && !types.include?('admin')
       types << 'additional_file_patterns' if options[:additional_file_patterns].present?
 

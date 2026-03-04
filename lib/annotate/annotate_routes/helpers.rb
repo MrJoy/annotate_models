@@ -2,7 +2,7 @@
 
 module AnnotateRoutes
   module Helpers
-    MAGIC_COMMENT_MATCHER = /(^#\s*encoding:.*)|(^# coding:.*)|(^# -\*- coding:.*)|(^# -\*- encoding\s?:.*)|(^#\s*frozen_string_literal:.+)|(^# -\*- frozen_string_literal\s*:.+-\*-)/
+    MAGIC_COMMENT_MATCHER = /(^#\s*encoding:.*)|(^# coding:.*)|(^# -\*- coding:.*)|(^# -\*- encoding\s?:.*)|(^#\s*frozen_string_literal:.+)|(^# -\*- frozen_string_literal\s*:.+-\*-)/ # rubocop:disable Layout/LineLength
 
     class << self
       # TODO: write the method doc using ruby rdoc formats

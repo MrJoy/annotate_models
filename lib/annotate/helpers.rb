@@ -5,7 +5,8 @@ module Annotate
   class Helpers
     class << self
       def skip_on_migration?
-        ENV['ANNOTATE_SKIP_ON_DB_MIGRATE'] =~ Constants::TRUE_RE || ENV['skip_on_db_migrate'] =~ Constants::TRUE_RE
+        ENV['ANNOTATE_SKIP_ON_DB_MIGRATE'] =~ Constants::TRUE_RE ||
+          ENV['skip_on_db_migrate'] =~ Constants::TRUE_RE
       end
 
       def include_routes?

@@ -383,7 +383,7 @@ describe AnnotateRoutes do
               end
 
               let :expected_result do
-                /ActionController::Routing...\nfoo\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/
+                /ActionController::Routing...\nfoo\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/ # rubocop:disable Layout/LineLength
               end
 
               it 'annotates with the timestamp and an empty line' do

@@ -30,7 +30,7 @@ require 'mg'
 begin
   MG.new('annotate.gemspec')
 rescue Exception
-  warn("WARNING: Couldn't read gemspec.  As such, a number of tasks may be unavailable to you until you run 'rake gem:gemspec' to correct the issue.")
+  warn("WARNING: Couldn't read gemspec.  As such, a number of tasks may be unavailable to you until you run 'rake gem:gemspec' to correct the issue.") # rubocop:disable Layout/LineLength
   # Gemspec is probably in a broken state, so let's give ourselves a chance to
   # build a new one...
 end
@@ -47,7 +47,7 @@ namespace :gem do
       gem.rubyforge_project = 'annotate'
       gem.license = 'Ruby'
       gem.summary = 'Annotates Rails Models, routes, fixtures, and others based on the database schema.'
-      gem.description = 'Annotates Rails/ActiveRecord Models, routes, fixtures, and others based on the database schema.'
+      gem.description = 'Annotates Rails/ActiveRecord Models, routes, fixtures, and others based on the database schema.' # rubocop:disable Layout/LineLength
       gem.email = ['alex@stinky.com', 'cuong@gmail.com', 'x@nofxx.com', 'turadg@aleahmad.net', 'jon@cloudability.com']
       gem.authors = ['Alex Chaffee', 'Cuong Tran', 'Marcos Piccinini', 'Turadg Aleahmad', 'Jon Frisby']
       gem.require_paths = ['lib']

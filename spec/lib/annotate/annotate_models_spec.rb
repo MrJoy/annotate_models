@@ -714,7 +714,8 @@ describe AnnotateModels do
                       mock_class(:users, primary_key, columns, indexes, foreign_keys).tap do |mock_klass|
                         allow(mock_klass).to receive(:table_name_prefix).and_return('my_prefix_')
                         allow(mock_klass.connection).to receive(:table_exists?).with('users').and_return(false)
-                        allow(mock_klass.connection).to receive(:indexes).with('users').and_raise('error fetching indexes on nonexistent table')
+                        allow(mock_klass.connection)
+                          .to receive(:indexes).with('users').and_raise('error fetching indexes on nonexistent table')
                       end
                     end
 
@@ -2328,7 +2329,7 @@ describe AnnotateModels do
       end
 
       context 'when class name is not capitalized normally' do
-        context 'when class NonNamespacedFooWithCapitalsInsideBar is defined in "bar/non_namespaced_foo_with_capitals_inside_bar.rb"' do
+        context 'when class NonNamespacedFooWithCapitalsInsideBar is defined in "bar/non_namespaced_foo_with_capitals_inside_bar.rb"' do # rubocop:disable Layout/LineLength
           let :filename do
             'bar/non_namespaced_foo_with_capitals_inside_bar.rb'
           end

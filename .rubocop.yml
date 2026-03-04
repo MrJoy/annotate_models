@@ -18,6 +18,9 @@ Layout/HashAlignment:
   EnforcedColonStyle: table
   EnforcedHashRocketStyle: table
 
+Layout/LineLength:
+  Max: 120
+
 Metrics/MethodLength:
   Exclude:
     - 'spec/spec_helper.rb'

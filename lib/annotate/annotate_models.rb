@@ -41,12 +41,12 @@ module AnnotateModels
     }
   }.freeze
 
-  MAGIC_COMMENT_MATCHER = /(^#\s*encoding:.*(?:\n|r\n))|(^# coding:.*(?:\n|\r\n))|(^# -\*- coding:.*(?:\n|\r\n))|(^# -\*- encoding\s?:.*(?:\n|\r\n))|(^#\s*frozen_string_literal:.+(?:\n|\r\n))|(^# -\*- frozen_string_literal\s*:.+-\*-(?:\n|\r\n))/
+  MAGIC_COMMENT_MATCHER = /(^#\s*encoding:.*(?:\n|r\n))|(^# coding:.*(?:\n|\r\n))|(^# -\*- coding:.*(?:\n|\r\n))|(^# -\*- encoding\s?:.*(?:\n|\r\n))|(^#\s*frozen_string_literal:.+(?:\n|\r\n))|(^# -\*- frozen_string_literal\s*:.+-\*-(?:\n|\r\n))/ # rubocop:disable Layout/LineLength
 
   class << self
     def annotate_pattern(options = {})
       if options[:wrapper_open]
-        return /(?:^(\n|\r\n)?# (?:#{options[:wrapper_open]}).*(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*)|^(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*/
+        return /(?:^(\n|\r\n)?# (?:#{options[:wrapper_open]}).*(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*)|^(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*/ # rubocop:disable Layout/LineLength
       end
 
       /^(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*/
@@ -145,7 +145,7 @@ module AnnotateModels
 
       if options[:format_markdown]
         info << format(
-          "# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n", 'Name', 'Type', 'Attributes'
+          "# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n", 'Name', 'Type', 'Attributes' # rubocop:disable Layout/LineLength
         )
 
         info << "# #{'-' * (max_size + md_names_overhead)} | #{'-' * md_type_allowance} | #{'-' * 27}\n"
@@ -186,12 +186,12 @@ module AnnotateModels
                           attrs.unshift(col_type).join(', ')).rstrip + "\n")
         elsif options[:format_yard]
           info << (sprintf("# @!attribute #{col_name}") + "\n")
-          ruby_class = col.respond_to?(:array) && col.array ? "Array<#{map_col_type_to_ruby_classes(col_type)}>" : map_col_type_to_ruby_classes(col_type)
+          ruby_class = col.respond_to?(:array) && col.array ? "Array<#{map_col_type_to_ruby_classes(col_type)}>" : map_col_type_to_ruby_classes(col_type) # rubocop:disable Layout/LineLength
           info << (sprintf("#   @return [#{ruby_class}]") + "\n")
         elsif options[:format_markdown]
           name_remainder = max_size - col_name.length - non_ascii_length(col_name)
           type_remainder = (md_type_allowance - 2) - col_type.length
-          info << (format("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`", col_name, ' ', col_type, ' ', attrs.join(', ').rstrip).gsub(
+          info << (format("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`", col_name, ' ', col_type, ' ', attrs.join(', ').rstrip).gsub( # rubocop:disable Layout/LineLength
             '``', '  '
           ).rstrip + "\n")
         elsif with_comments_column
@@ -741,7 +741,7 @@ module AnnotateModels
       klass = get_model_class(file)
       do_annotate = klass.is_a?(Class) &&
                     klass < ActiveRecord::Base &&
-                    (!options[:exclude_sti_subclasses] || !(klass.superclass < ActiveRecord::Base && klass.table_name == klass.superclass.table_name)) &&
+                    (!options[:exclude_sti_subclasses] || !(klass.superclass < ActiveRecord::Base && klass.table_name == klass.superclass.table_name)) && # rubocop:disable Layout/LineLength
                     !klass.abstract_class? &&
                     klass.table_exists?
 
@@ -948,7 +948,7 @@ module AnnotateModels
                                                                                                        options)
       attrs << 'unsigned' if column.respond_to?(:unsigned?) && column.unsigned?
       attrs << 'not null' unless column.null
-      if klass.primary_key && (klass.primary_key.is_a?(Array) ? klass.primary_key.collect(&:to_sym).include?(column.name.to_sym) : column.name.to_sym == klass.primary_key.to_sym)
+      if klass.primary_key && (klass.primary_key.is_a?(Array) ? klass.primary_key.collect(&:to_sym).include?(column.name.to_sym) : column.name.to_sym == klass.primary_key.to_sym) # rubocop:disable Layout/LineLength
         attrs << 'primary key'
       end
 

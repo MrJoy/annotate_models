@@ -62,7 +62,7 @@ module AnnotateRoutes
         return real_content, :after if header_position >= real_content.count
 
         # and the default
-        return real_content, header_position
+        [real_content, header_position]
       end
     end
   end

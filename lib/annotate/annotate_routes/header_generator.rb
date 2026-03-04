@@ -21,7 +21,7 @@ module AnnotateRoutes
         # In old versions of Rake, the first line of output was the cwd.  Not so
         # much in newer ones.  We ditch that line if it exists, and if not, we
         # keep the line around.
-        result.shift if result.first =~ %r{^\(in \/}
+        result.shift if result.first =~ %r{^\(in /}
 
         ignore_routes = options[:ignore_routes]
         regexp_for_ignoring_routes = ignore_routes ? /#{ignore_routes}/ : nil
@@ -68,7 +68,9 @@ module AnnotateRoutes
         out << comment(content(contents_without_magic_comments[0], maxs))
       end
 
-      out += contents_without_magic_comments[1..-1].map { |line| comment(content(markdown? ? line.split(' ') : line, maxs)) }
+      out += contents_without_magic_comments[1..-1].map do |line|
+        comment(content(markdown? ? line.split(' ') : line, maxs))
+      end
       out << comment(options[:wrapper_close]) if options[:wrapper_close]
 
       out

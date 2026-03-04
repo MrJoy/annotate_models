@@ -1,5 +1,4 @@
-# -*- encoding: utf-8 -*-
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'annotate/version'
 
@@ -20,12 +19,12 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.summary = 'Annotates Rails Models, routes, fixtures, and others based on the database schema.'
 
-  s.add_dependency(%q<rake>, '>= 10.4', '< 14.0')
-  s.add_dependency(%q<activerecord>, ['>= 3.2', '< 9.0'])
+  s.add_dependency('activerecord', ['>= 3.2', '< 9.0'])
+  s.add_dependency('rake', '>= 10.4', '< 14.0')
 
   s.metadata = {
-    "bug_tracker_uri" => "https://github.com/ctran/annotate_models/issues/",
-    "source_code_uri" => "https://github.com/ctran/annotate_models.git",
+    'bug_tracker_uri' => 'https://github.com/ctran/annotate_models/issues/',
+    'source_code_uri' => 'https://github.com/ctran/annotate_models.git',
     'rubygems_mfa_required' => 'true'
   }
 end

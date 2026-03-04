@@ -9,19 +9,21 @@ describe AnnotateRoutes do
   MESSAGE_NOT_FOUND = "#{ROUTE_FILE} could not be found.".freeze
   MESSAGE_REMOVED = "Annotations were removed from #{ROUTE_FILE}.".freeze
 
-  MAGIC_COMMENTS = [
-    '# encoding: UTF-8',
-    '# coding: UTF-8',
-    '# -*- coding: UTF-8 -*-',
-    '#encoding: utf-8',
-    '# encoding: utf-8',
-    '# -*- encoding : utf-8 -*-',
-    "# encoding: utf-8\n# frozen_string_literal: true",
-    "# frozen_string_literal: true\n# encoding: utf-8",
-    '# frozen_string_literal: true',
-    '#frozen_string_literal: false',
-    '# -*- frozen_string_literal : true -*-'
-  ].freeze unless const_defined?(:MAGIC_COMMENTS)
+  unless const_defined?(:MAGIC_COMMENTS)
+    MAGIC_COMMENTS = [
+      '# encoding: UTF-8',
+      '# coding: UTF-8',
+      '# -*- coding: UTF-8 -*-',
+      '#encoding: utf-8',
+      '# encoding: utf-8',
+      '# -*- encoding : utf-8 -*-',
+      "# encoding: utf-8\n# frozen_string_literal: true",
+      "# frozen_string_literal: true\n# encoding: utf-8",
+      '# frozen_string_literal: true',
+      '#frozen_string_literal: false',
+      '# -*- frozen_string_literal : true -*-'
+    ].freeze
+  end
 
   let :stubs do
     {}
@@ -33,7 +35,7 @@ describe AnnotateRoutes do
 
   describe '.do_annotations' do
     context 'When "config/routes.rb" does not exist' do
-      before :each do
+      before do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(false).once
       end
 
@@ -45,7 +47,7 @@ describe AnnotateRoutes do
     end
 
     context 'When "config/routes.rb" exists' do
-      before :each do
+      before do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
         expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
 
@@ -469,7 +471,7 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'should skip annotations if file does already contain annotation' do
+              it 'skips annotations if file does already contain annotation' do
                 expect(File).not_to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file)
                 expect(mock_file).not_to receive(:puts)
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_UNCHANGED).once
@@ -571,7 +573,7 @@ describe AnnotateRoutes do
         EOS
       end
 
-      before :each do
+      before do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
         expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
 
@@ -624,7 +626,7 @@ describe AnnotateRoutes do
   end
 
   describe '.remove_annotations' do
-    before :each do
+    before do
       expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
       expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
       expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once

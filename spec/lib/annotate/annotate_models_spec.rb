@@ -2844,7 +2844,7 @@ describe AnnotateModels do
     def write_model(file_name, file_content)
       fname = File.join(@model_dir, file_name)
       FileUtils.mkdir_p(File.dirname(fname))
-      File.open(fname, 'wb') { |f| f.write file_content }
+      File.binwrite(fname, file_content)
 
       [fname, file_content]
     end

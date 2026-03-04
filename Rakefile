@@ -140,17 +140,17 @@ namespace :integration do
       "#{target_dir}/.rvmrc",
       "#{target_dir}/**/*"
     ].select { |fname| !(File.symlink?(fname) || File.directory?(fname)) }
-      .map { |fname| fname.sub(integration_dir, '') }
-      .reject do |fname|
-        fname =~ /\/\.gitkeep$/ ||
-          fname =~ /\/app\/models\// ||
-          fname =~ /\/routes\.rb$/ ||
-          fname =~ /\/fixtures\// ||
-          fname =~ /\/factories\// ||
-          fname =~ /\.sqlite3$/ ||
-          (fname =~ /\/test\// && fname !~ /_helper\.rb$/) ||
-          (fname =~ /\/spec\// && fname !~ /_helper\.rb$/)
-      end
+     .map { |fname| fname.sub(integration_dir, '') }
+     .reject do |fname|
+       fname =~ /\/\.gitkeep$/ ||
+         fname =~ /\/app\/models\// ||
+         fname =~ /\/routes\.rb$/ ||
+         fname =~ /\/fixtures\// ||
+         fname =~ /\/factories\// ||
+         fname =~ /\.sqlite3$/ ||
+         (fname =~ /\/test\// && fname !~ /_helper\.rb$/) ||
+         (fname =~ /\/spec\// && fname !~ /_helper\.rb$/)
+     end
       .map { |fname| "#{integration_dir}#{fname}" }
       .each do |fname|
         digest = Digest::MD5.hexdigest(File.read(fname))

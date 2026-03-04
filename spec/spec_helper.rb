@@ -127,9 +127,7 @@ module Files
         if contents.is_a? File
           FileUtils.cp contents.path, path
         else
-          file_path = File.open(path, 'w') do |f|
-            f.write contents
-          end
+          File.write(path, contents)
         end
         path
       end
